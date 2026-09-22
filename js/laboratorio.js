@@ -358,8 +358,18 @@ const Laboratorio = (function () {
     raiz.querySelectorAll('.ranura').forEach(b => b.addEventListener('click', () => quitar(+b.dataset.slot)));
     raiz.querySelector('#lab-mezclar').addEventListener('click', mezclar);
     raiz.querySelector('#lab-limpiar').addEventListener('click', limpiar);
-    raiz.querySelector('#lab-reiniciar').addEventListener('click', () => {
-      if (!confirm('¿Borrar todos los experimentos registrados en el cuaderno?')) return;
+    // Confirmación en dos toques (los diálogos del navegador no están disponibles en todos los visores).
+    const borrar = raiz.querySelector('#lab-reiniciar');
+    let confirmando = null;
+    borrar.addEventListener('click', () => {
+      if (!confirmando) {
+        borrar.textContent = '¿Seguro? Toca otra vez';
+        confirmando = setTimeout(() => { confirmando = null; borrar.textContent = 'Borrar cuaderno'; }, 3000);
+        return;
+      }
+      clearTimeout(confirmando);
+      confirmando = null;
+      borrar.textContent = 'Borrar cuaderno';
       descubiertos = new Set();
       Util.guardar('lab-descubiertos', []);
       pintarCuaderno();
