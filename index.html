@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuímicaLab</title>
+  <meta name="description" content="Aplicación interactiva de química para secundaria: transformaciones físicas y químicas, laboratorio virtual, balanceo de ecuaciones y tabla periódica.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="brand" data-go="inicio">⚗️ QuímicaLab</button>
+    <nav class="tabs">
+      <button data-go="transformaciones">🔄 Transformaciones</button>
+      <button data-go="laboratorio">🧪 Laboratorio</button>
+      <button data-go="balanceo">⚖️ Balanceo</button>
+      <button data-go="tabla">🧩 Tabla periódica</button>
+    </nav>
+    <button id="btn-proyector" class="ghost" title="Agranda los textos para proyectar en el aula">📽️ Modo proyector</button>
+  </header>
+
+  <main>
+    <section id="inicio" class="view">
+      <div class="hero">
+        <h1>Laboratorio interactivo de Química</h1>
+        <p>Explora, experimenta y ponte a prueba. Elige una actividad para comenzar.</p>
+      </div>
+
+      <div class="tarjetas-inicio">
+        <button class="tarjeta-modulo" data-go="transformaciones">
+          <span class="tm-emoji">🔄</span>
+          <h2>¿Físico o químico?</h2>
+          <p>Analiza situaciones de la vida cotidiana y decide qué tipo de transformación ocurre.</p>
+          <span class="etiqueta">Transformaciones de la materia</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="laboratorio">
+          <span class="tm-emoji">🧪</span>
+          <h2>Laboratorio virtual</h2>
+          <p>Mezcla reactivos, observa lo que pasa y descubre las evidencias de una reacción química.</p>
+          <span class="etiqueta">Reacciones químicas</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="balanceo">
+          <span class="tm-emoji">⚖️</span>
+          <h2>Balanceo de ecuaciones</h2>
+          <p>Ajusta los coeficientes hasta que la balanza quede equilibrada. ¡Nada se pierde, todo se transforma!</p>
+          <span class="etiqueta">Ecuaciones químicas</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="tabla">
+          <span class="tm-emoji">🧩</span>
+          <h2>Tabla periódica</h2>
+          <p>Explora los 118 elementos, sus propiedades y su estructura. Luego acepta el desafío.</p>
+          <span class="etiqueta">Tabla periódica</span>
+        </button>
+      </div>
+
+      <div class="panel consejos">
+        <h2>👩‍🏫 Ideas para usarla en clase</h2>
+        <ul>
+          <li><b>Proyectada:</b> activa el <em>Modo proyector</em> y hagan votación a mano alzada antes de responder.</li>
+          <li><b>En parejas:</b> cada grupo completa el cuaderno del laboratorio y compara sus observaciones.</li>
+          <li><b>Como cierre:</b> una ronda de desafío de la tabla periódica o de balanceo para repasar.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="transformaciones" class="view" hidden></section>
+    <section id="laboratorio" class="view" hidden></section>
+    <section id="balanceo" class="view" hidden></section>
+    <section id="tabla" class="view" hidden></section>
+  </main>
+
+  <script src="js/util.js"></script>
+  <script src="js/datos/elementos.js"></script>
+  <script src="js/transformaciones.js"></script>
+  <script src="js/laboratorio.js"></script>
+  <script src="js/balanceo.js"></script>
+  <script src="js/tabla.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
