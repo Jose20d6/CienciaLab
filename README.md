@@ -32,6 +32,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 index.html            Página principal e inicio
 css/styles.css        Estilos
 js/util.js            Utilidades compartidas
+js/arte.js            Piezas de ilustración compartidas (animales, árboles, fábrica)
 js/datos/elementos.js Datos de los 118 elementos
 js/transformaciones.js
 js/laboratorio.js     Reactivos y reacciones (fáciles de ampliar)

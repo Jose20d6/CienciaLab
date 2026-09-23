@@ -582,10 +582,10 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .cel-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 1rem; align-items: start; }
 .cel-visor { position: relative; }
 .cel-zoom { display: flex; gap: 0.4rem; justify-content: flex-end; margin-bottom: 0.5rem; }
-.cel-svg { width: 100%; height: auto; display: block; background: var(--bg); border-radius: 12px; }
+.cel-svg { width: 100%; height: auto; display: block; background: radial-gradient(ellipse at 50% 45%, #1d1f5a, #0d0f33 75%); border-radius: 12px; }
 .cel-svg .org { cursor: pointer; transition: opacity 0.25s, filter 0.25s; }
-.cel-svg.con-sel .org:not(.sel):not([data-org="citoplasma"]):not([data-org="pared"]) { opacity: 0.45; }
-.cel-svg .org.sel { filter: drop-shadow(0 0 4px #fab005) drop-shadow(0 0 3px #fab005); opacity: 1; }
+.cel-svg.con-sel .org:not(.sel):not([data-org="citoplasma"]):not([data-org="pared"]) { opacity: 0.35; }
+.cel-svg .org.sel { filter: drop-shadow(0 0 5px #ffd166) drop-shadow(0 0 3px #ffd166); opacity: 1; }
 .cel-svg .org:hover { filter: brightness(1.08); }
 .cel-lista { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.75rem; }
 .cel-chip { border: 1px solid var(--linea); background: var(--bg); border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.85rem; }

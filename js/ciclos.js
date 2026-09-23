@@ -33,6 +33,7 @@ const Ciclos = (function () {
     <marker id="cc-flecha" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#fff"/></marker>`;
 
   // ---------- Piezas de ilustración ----------
+  const { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica } = Arte;
   // Luz siempre desde el Sol: caras iluminadas más claras, sombras suaves al pie de cada objeto.
 
   const cielo = (solX, solY, rayos = true) => `
@@ -45,7 +46,7 @@ const Ciclos = (function () {
     <g class="cc-sol-latido"><circle cx="${solX}" cy="${solY}" r="120" fill="url(#cc-sol)" opacity="0.55"/></g>
     <circle cx="${solX}" cy="${solY}" r="54" fill="url(#cc-sol)"/><circle cx="${solX}" cy="${solY}" r="28" fill="#fff3c4"/>`;
   const vineta = '<rect width="800" height="460" fill="url(#cc-vineta)" pointer-events="none"/>';
-  const sombra = (x, y, rx) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${Math.max(2, rx * 0.18)}" fill="#0a0c2a" opacity="0.28"/>`;
+
 
   // Capas lejanas: cuanto más lejos, más claras y azuladas (perspectiva atmosférica).
   const lejanas = (d1, d2) => `<path d="${d1}" fill="#6d8fd6" opacity="0.55"/><path d="${d2}" fill="#4f74c4" opacity="0.75"/>`;
@@ -72,25 +73,6 @@ const Ciclos = (function () {
         <path d="M${x},${py} L${x + w * n},${py + h * n} L${x + w * n * 0.55},${py + h * n * 0.8} L${x + w * n * 0.2},${py + h * n * 1.05} L${x + w * 0.05},${py + h * n * 0.6} Z" fill="#c3cbff"/>` : ''}</g>`;
   };
 
-  const pino = (x, y, h) => `<g>${sombra(x + 3, y + 1, h * 0.32)}
-    <rect x="${x - 1.8}" y="${y - h * 0.22}" width="3.6" height="${h * 0.24}" fill="#553a2f"/>
-    <path d="M${x - h * 0.3},${y - h * 0.18} L${x},${y - h * 0.72} L${x + h * 0.3},${y - h * 0.18} Z" fill="#1fae6c"/>
-    <path d="M${x},${y - h * 0.72} L${x + h * 0.3},${y - h * 0.18} L${x},${y - h * 0.18} Z" fill="#158553"/>
-    <path d="M${x - h * 0.22},${y - h * 0.5} L${x},${y - h} L${x + h * 0.22},${y - h * 0.5} Z" fill="#27c07a"/>
-    <path d="M${x},${y - h} L${x + h * 0.22},${y - h * 0.5} L${x},${y - h * 0.5} Z" fill="#1a9a61"/></g>`;
-  // Sombreado en dos tonos (característico del estilo): las formas se pintan con el color claro
-  // y la parte en sombra se recorta con la misma silueta.
-  let idArte = 0;
-  const dosTonos = (formas, claro, oscuro, corte) => {
-    const id = 'cc-dt-' + (idArte++);
-    const zona = corte.x !== undefined
-      ? `<rect x="${corte.x}" y="-2000" width="4000" height="4000" fill="${oscuro}"/>`
-      : `<rect x="-2000" y="${corte.y}" width="4000" height="4000" fill="${oscuro}"/>`;
-    return `${formas.replace(/FILL/g, claro)}<clipPath id="${id}">${formas.replace(/FILL/g, '#000')}</clipPath><g clip-path="url(#${id})">${zona}${corte.extra || ''}</g>`;
-  };
-  // Ojo típico: blanco grande, pupila mirando hacia adelante y un brillito.
-  const ojo = (x, y, r, dir = -1) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x + dir * r * 0.3}" cy="${y + r * 0.1}" r="${r * 0.55}" fill="#15163d"/><circle cx="${x + dir * r * 0.45}" cy="${y - r * 0.2}" r="${r * 0.2}" fill="#fff"/>`;
-
   const arbusto = (x, y, r) => `<g>${sombra(x + 2, y + 1, r * 1.3)}
     ${dosTonos(`<circle cx="${x - r * 0.6}" cy="${y - r * 0.5}" r="${r * 0.7}" fill="FILL"/><circle cx="${x + r * 0.5}" cy="${y - r * 0.55}" r="${r * 0.75}" fill="FILL"/><circle cx="${x}" cy="${y - r}" r="${r * 0.85}" fill="FILL"/>`, '#2fd186', '#1a9a61', { x: x + r * 0.1 })}
     <circle cx="${x - r * 0.3}" cy="${y - r * 1.3}" r="${r * 0.22}" fill="#9df5c8" opacity="0.7"/></g>`;
@@ -102,32 +84,6 @@ const Ciclos = (function () {
     ${dosTonos('<rect x="-44" y="-128" width="88" height="92" rx="44" fill="FILL"/><circle cx="-30" cy="-58" r="22" fill="FILL"/><circle cx="30" cy="-60" r="24" fill="FILL"/>', '#2fd186', '#1a9a61', { x: 4 })}
     <path d="M-30,-104 a34,34 0 0 1 22,-18" stroke="#9df5c8" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.6"/>
     <circle cx="-26" cy="-86" r="4" fill="#9df5c8" opacity="0.6"/></g>`;
-
-  const pajaro = (x, y, s = 1, retraso = 0) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="cc-pajaro" style="animation-delay:${retraso}s">
-    ${dosTonos('<ellipse cx="0" cy="0" rx="11" ry="9" fill="FILL"/>', '#5c7cfa', '#4263eb', { y: 2 })}
-    <ellipse cx="-2" cy="3" rx="6" ry="4.5" fill="#e7ecff"/>
-    <path d="M-10,-1 L-17,1 L-10,3 Z" fill="#ffb347"/>
-    ${ojo(-5, -3, 3)}
-    <g class="cc-ala"><ellipse cx="4" cy="-4" rx="7" ry="4" fill="#3b5bdb" transform="rotate(-25 4 -4)"/></g>
-    <path d="M10,-1 L16,-4 L15,2 Z" fill="#3b5bdb"/></g></g>`;
-
-  // Vaca mirando hacia la izquierda (hacia el árbol).
-  const vaca = (x, y) => {
-    const cuerpo = '<rect x="-38" y="-26" width="80" height="40" rx="20" fill="FILL"/>';
-    return `<g transform="translate(${x} ${y})">
-      ${sombra(2, 30, 46)}
-      <path d="M40,-10 C50,-6 50,6 46,14" stroke="#3b3d5c" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="46" cy="15" r="3.5" fill="#3b3d5c"/>
-      ${[-26, -12, 16, 30].map(lx => `<rect x="${lx - 4}" y="6" width="9" height="24" rx="4.5" fill="#3b3d5c"/><rect x="${lx - 4}" y="24" width="9" height="6" rx="3" fill="#1f2037"/>`).join('')}
-      ${dosTonos(cuerpo, '#f4f1ff', '#d4d0f5', { y: -4, extra: '<path d="M-10,-26 C-4,-14 10,-16 14,-26 Z M20,-4 C28,-14 42,-8 40,6 C32,10 22,6 20,-4 Z M-30,0 C-24,-8 -14,-4 -16,6 C-22,10 -30,8 -30,0 Z" fill="#2b2d42"/>' })}
-      <ellipse cx="18" cy="14" rx="9" ry="5" fill="#ff9fb5"/>
-      <g transform="translate(-44 -14)">
-        <path d="M-6,-16 C-10,-26 -4,-30 -2,-22 M8,-16 C12,-26 6,-30 4,-22" stroke="#ffe8a3" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <ellipse cx="-16" cy="-10" rx="9" ry="5" fill="#f4f1ff" transform="rotate(-20 -16 -10)"/><ellipse cx="-16" cy="-10" rx="5" ry="2.5" fill="#ff9fb5" transform="rotate(-20 -16 -10)"/>
-        ${dosTonos('<rect x="-14" y="-18" width="30" height="32" rx="14" fill="FILL"/>', '#f4f1ff', '#d4d0f5', { x: 4 })}
-        <rect x="-19" y="0" width="28" height="18" rx="9" fill="#ff9fb5"/><rect x="-19" y="10" width="28" height="8" rx="4" fill="#f07f9c"/>
-        <ellipse cx="-12" cy="8" rx="2" ry="2.6" fill="#8a3b52"/><ellipse cx="-3" cy="8" rx="2" ry="2.6" fill="#8a3b52"/>
-        ${ojo(-4, -7, 4.6)}</g></g>`;
-  };
 
   // Conejo mirando hacia la izquierda.
   const conejo = (x, y) => `<g transform="translate(${x} ${y})">
@@ -150,17 +106,6 @@ const Ciclos = (function () {
       ${dosTonos('<rect x="-4" y="-14" width="9" height="16" rx="4" fill="FILL"/>', '#fff1dc', '#e6d3b8', { x: 1 })}
       ${dosTonos('<path d="M-13,-12 C-13,-28 13,-28 13,-12 Z" fill="FILL"/>', '#ff5d5d', '#d94848', { x: 3 })}
       <circle cx="-6" cy="-19" r="2" fill="#fff"/><circle cx="2" cy="-23" r="1.6" fill="#fff"/><circle cx="7" cy="-16" r="1.5" fill="#fff" opacity="0.8"/></g>`).join('')}</g>`;
-
-  // Fábrica con chimenea a rayas.
-  const fabrica = (x, yb) => `<g>
-    ${sombra(x + 54, yb + 1, 60)}
-    ${dosTonos(`<rect x="${x}" y="${yb - 52}" width="100" height="54" rx="6" fill="FILL"/>`, '#6272e6', '#4c59c4', { x: x + 70 })}
-    <path d="M${x},${yb - 50} L${x + 20},${yb - 70} L${x + 20},${yb - 50} L${x + 40},${yb - 70} L${x + 40},${yb - 50} L${x + 60},${yb - 70} L${x + 60},${yb - 50} Z" fill="#7f8cff" stroke="#7f8cff" stroke-width="4" stroke-linejoin="round"/>
-    ${[0, 1, 2].map(i => `<rect x="${x + 10 + i * 22}" y="${yb - 38}" width="12" height="12" rx="3" fill="#ffe8a3"/>`).join('')}
-    <rect x="${x + 76}" y="${yb - 24}" width="14" height="26" rx="3" fill="#2b2d42"/>
-    <g>${[0, 1, 2, 3].map(i => `<rect x="${x + 68}" y="${yb - 116 + i * 16}" width="20" height="16" fill="${i % 2 ? '#fff' : '#ff6b6b'}"/>`).join('')}
-      <rect x="${x + 82}" y="${yb - 116}" width="6" height="64" fill="#000" opacity="0.15"/>
-      <rect x="${x + 65}" y="${yb - 122}" width="26" height="8" rx="4" fill="#ff6b6b"/></g></g>`;
 
   // Legumbre con nódulos en las raíces y vainas.
   const legumbre = (x, y) => `<g transform="translate(${x} ${y})">

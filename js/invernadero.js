@@ -195,17 +195,48 @@ const Invernadero = (function () {
     const sx = x => superficie(x).toFixed(1);
     const costaI = 112 - avance * 0.6, costaD = 248 + avance; // las costas avanzan tierra adentro cuando sube el mar
 
-    const arbol = (x, h) => x < costaD + 6 ? '' : `<g><rect x="${x - 1.3}" y="${superficie(x) - h * 0.45}" width="2.6" height="${h * 0.45 + 2}" fill="#0f5c3f"/>
-      <circle cx="${x}" cy="${superficie(x) - h * 0.62}" r="${h * 0.34}" fill="#27c07a"/>
-      <path d="M${x},${superficie(x) - h * 0.96} a${h * 0.34},${h * 0.34} 0 0 1 0,${h * 0.68} Z" fill="#1a9a61"/></g>`;
-    const edificio = (x, w, h, c) => {
-      const y0 = superficie(x + w / 2) - h;
-      let ventanas = '';
-      for (let yy = y0 + 4; yy < y0 + h - 4; yy += 6) for (let xx = x + 2.5; xx < x + w - 3; xx += 5) {
-        if ((xx * 7 + yy * 3) % 5 > 1) ventanas += `<rect x="${xx.toFixed(1)}" y="${yy.toFixed(1)}" width="2" height="2.6" fill="#ffe8a3" opacity="0.9"/>`;
-      }
-      return `<rect x="${x}" y="${y0}" width="${w}" height="${h + 4}" rx="1.5" fill="${c}"/>${ventanas}`;
+    const { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica } = Arte;
+    // Con mucho calor el pasto y los árboles se secan.
+    const seco = anomalia > 3.2 ? 2 : anomalia > 2 ? 1 : 0;
+    const [hojaC, hojaO, hojaB] = [['#2fd186', '#1a9a61', '#9df5c8'], ['#a8d65a', '#7fae3a', '#e4f7a8'], ['#e0b44f', '#b98a30', '#fbe3a0']][seco];
+    const arbol = (x, h) => {
+      if (x < costaD + 6) return '';
+      const y = superficie(x), r = h * 0.36;
+      return `<g>${sombra(x + 2, y + 1, r * 1.2)}
+        ${dosTonos(`<path d="M${x - 1.6},${y + 1} L${x - 1},${y - h * 0.5} L${x + 1},${y - h * 0.5} L${x + 1.6},${y + 1} Z" fill="FILL"/>`, '#7a543f', '#5a3c30', { x })}
+        ${dosTonos(`<rect x="${x - r}" y="${y - h}" width="${r * 2}" height="${h * 0.62}" rx="${r}" fill="FILL"/><circle cx="${x - r * 0.75}" cy="${y - h * 0.45}" r="${r * 0.5}" fill="FILL"/><circle cx="${x + r * 0.7}" cy="${y - h * 0.46}" r="${r * 0.55}" fill="FILL"/>`, hojaC, hojaO, { x: x + r * 0.15 })}
+        <path d="M${x - r * 0.62},${y - h * 0.72} a${r * 0.75},${r * 0.75} 0 0 1 ${r * 0.5},${-r * 0.42}" stroke="${hojaB}" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.7"/></g>`;
     };
+    const edificio = (x, w, h, c) => {
+      const yb = superficie(x + w / 2) + 3, y0 = yb - h - 3;
+      let ventanas = '';
+      for (let yy = y0 + 4; yy < yb - 6; yy += 6) for (let xx = x + 2.5; xx < x + w - 4; xx += 4.5) {
+        if ((xx * 7 + yy * 3) % 5 > 1) ventanas += `<rect x="${xx.toFixed(1)}" y="${yy.toFixed(1)}" width="2" height="2.6" rx="0.6" fill="#ffe8a3" opacity="0.9"/>`;
+      }
+      return `${sombra(x + w / 2 + 2, yb - 2, w * 0.7)}<rect x="${x}" y="${y0}" width="${w}" height="${h + 3}" rx="1.5" fill="${c}"/>
+        <rect x="${x + w - 3.5}" y="${y0}" width="3.5" height="${h + 3}" fill="#000" opacity="0.18"/>
+        <rect x="${x - 0.8}" y="${y0 - 1.6}" width="${w + 1.6}" height="2.4" rx="1.2" fill="#9aa6ff"/>${ventanas}`;
+    };
+    // Oso polar sobre un témpano que se achica al derretirse (o nadando si ya no queda hielo).
+    const tx = 158, ty = superficie(tx) - Math.max(0, subida) * 0.2;
+    const tw = 22 * Math.min(1.25, Math.max(0, 1 - derretido * 1.15) + 0.25 * estadoHielo(anomalia).glaciacion);
+    const oso = (x, y, s, nadando) => `<g transform="translate(${x} ${y}) scale(${s})">
+      ${nadando ? `<path d="M-26,4 q6,-4 12,0 t12,0 M4,5 q6,-4 12,0" stroke="#bcd6ff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.8"/>` : `
+      ${[-14, -5, 7, 15].map(lx => `<rect x="${lx - 3.5}" y="2" width="7" height="12" rx="3.5" fill="${lx < 0 ? '#e3e7ff' : '#cfd5f7'}"/>`).join('')}
+      ${dosTonos('<rect x="-20" y="-14" width="44" height="22" rx="11" fill="FILL"/>', '#f4f6ff', '#cfd4f5', { y: 0 })}
+      <circle cx="24" cy="-6" r="3.5" fill="#f4f6ff"/>`}
+      <g transform="translate(-20 ${nadando ? 0 : -12})">
+        <circle cx="-5" cy="-9" r="3.6" fill="#f4f6ff"/><circle cx="-5" cy="-9" r="1.8" fill="#cfd4f5"/>
+        <circle cx="5" cy="-9.5" r="3.6" fill="#f4f6ff"/><circle cx="5" cy="-9.5" r="1.8" fill="#cfd4f5"/>
+        ${dosTonos('<circle cx="0" cy="0" r="10" fill="FILL"/>', '#f4f6ff', '#d8ddf8', { x: 4 })}
+        <ellipse cx="-7" cy="3.5" rx="6" ry="4.4" fill="#fff"/><ellipse cx="-11.2" cy="2" rx="2.3" ry="1.7" fill="#2b2d42"/>
+        ${ojo(-3, -2.5, 2.8)}
+        ${nadando ? '<path d="M-10,-7 l4,1.5 M-1,-7.5 l-3,2" stroke="#2b2d42" stroke-width="1" stroke-linecap="round"/>' : ''}</g>
+      ${nadando ? `<rect x="-40" y="2" width="60" height="16" fill="url(#kz-mar)"/><path d="M-40,2 q5,-2.5 10,0 t10,0 t10,0 t10,0 t10,0 t10,0" stroke="#dbe9ff" stroke-width="1.4" fill="none"/>` : ''}</g>`;
+    const tempano = tw < 4 ? oso(tx, ty, 0.42, true) : `<g>
+      <path d="M${tx - tw * 0.9},${ty + 1} L${tx + tw * 0.9},${ty + 1} L${tx + tw * 0.6},${ty + 7} L${tx - tw * 0.55},${ty + 6} Z" fill="#bcd6ff" opacity="0.35"/>
+      ${dosTonos(`<path d="M${tx - tw},${ty + 1} L${tx - tw + 3},${ty - 4} L${tx + tw - 5},${ty - 5} L${tx + tw},${ty + 1} Z" fill="FILL"/>`, '#f4f6ff', '#b9c6ff', { y: ty - 1 })}
+      ${oso(tx + 2, ty - 10, 0.42, false)}</g>`;
     const montania = (x, w, h) => `
       <path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
       <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.3},${sx(x + w * 0.3)} Z" fill="#2a3468"/>
@@ -229,7 +260,7 @@ const Invernadero = (function () {
       <rect x="${rx - 2}" y="${base - 34}" width="4" height="44" rx="1.5" fill="#f1f3ff"/>
       ${Array.from({ length: 8 }, (_, i) => `<line x1="${rx + 2}" x2="${rx + (i % 2 ? 5 : 8)}" y1="${base + 6 - i * 5}" y2="${base + 6 - i * 5}" stroke="#f1f3ff" stroke-width="1.2"/>`).join('')}
       <path d="M${rx - 9},${(base - subida).toFixed(1)} l6,-3.5 v7 Z" fill="#ffd166"/>
-      <text x="${rx - 11}" y="${(base - subida - 7).toFixed(1)}" text-anchor="end" class="kz-rotulo chico">NIVEL DEL MAR</text></g>`;
+      <text x="${rx + 9}" y="${base - 27}" class="kz-rotulo chico">NIVEL DEL MAR</text></g>`;
 
     raiz.querySelector('#inv-fondo').innerHTML = `
       <defs>
@@ -259,7 +290,6 @@ const Invernadero = (function () {
         ${[[150, 330], [205, 345], [170, 362], [235, 368]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
         <path d="M-20,${sx(0) - 20} L${costaI},${sx(costaI) - 20} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-20,${H} Z" fill="url(#kz-tierra)"/>
         <path d="M${costaD},${sx(costaD) - 20} L620,${sx(620) - 20} L620,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
-        ${derretido < 0.45 ? `<ellipse cx="186" cy="${sx(186) + 30}" rx="${16 * (1 - derretido * 2)}" ry="5" fill="url(#kz-tierra)"/>` : ''}
         <path d="M-20,${sx(0) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 620,${sx(620) + 40} L620,${H} L-20,${H} Z" fill="#0a0d2e" opacity="0.28"/>
       </g>
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
@@ -269,12 +299,15 @@ const Invernadero = (function () {
         <rect x="-38" y="6" width="76" height="4" rx="2" fill="#c9d3ff" opacity="0.7"/></g></g>`).join('')}
       ${montania(500, 48, 62)}${nieve(500, 48, 62)}
       ${montania(548, 34, 40)}${nieve(548, 34, 40)}
-      ${[262, 276, 292, 306, 440, 454, 468, 590].map((x, i) => arbol(x, 16 + (i % 3) * 4)).join('')}
-      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}
-        <rect x="399" y="${superficie(402) - 34}" width="7" height="36" fill="#9aa3ff"/>
-        <rect x="393" y="${superficie(402) - 14}" width="26" height="16" fill="#7f8cff"/></g>
-      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="402" cy="${superficie(402) - 38}" r="${6 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      ${[262, 292, 306, 454, 590].map((x, i) => arbol(x, 17 + (i % 3) * 4)).join('')}
+      ${seco < 2 ? [[276, 20], [440, 22], [468, 18]].map(([x, h]) => pino(x, superficie(x) + 1, h)).join('') : [276, 440, 468].map(x => arbol(x, 16)).join('')}
+      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}</g>
+      <g transform="translate(386 ${superficie(404) + 1}) scale(0.3)">${fabrica(0, 0)}</g>
+      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="410" cy="${superficie(404) - 36}" r="${5 + i * 2}" fill="${anomalia > 2 ? '#8d86b5' : '#b8bff5'}" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      <g transform="translate(424 ${superficie(424) - 6}) scale(0.19)">${vaca(0, 0)}</g>
+      ${pajaro(250, superficie(250) - 58, 0.55, 0)}${pajaro(270, superficie(270) - 70, 0.45, -1.5)}
       ${inundacion}
+      ${tempano}
       ${regla}
       ${sinAtmosfera ? '' : `<text x="${W - 14}" y="${superficie(W - 14) - 125}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
       <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>

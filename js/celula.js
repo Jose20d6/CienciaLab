@@ -46,60 +46,107 @@ const Celula = (function () {
   const MIN_W = 110;
 
   // ---------- Dibujo de orgánulos ----------
+  // Estilo divulgación: fondo oscuro, formas planas sin contorno, sombreado en dos tonos y brillos.
   // Cada orgánulo va en un <g data-org> sin transform (para medirlo) con un <g> interno que lo ubica.
+  // Sombreado en dos tonos: la copia oscura se recorta con un semiplano. Se recorta la copia (no un
+  // rectángulo grande) para que getBBox mida solo la forma y el zoom quede centrado.
+  let nClip = 0;
+  const dosTonos = (formas, claro, oscuro, corte) => {
+    const id = 'cel-dt-' + (nClip++);
+    const zona = corte.x !== undefined
+      ? `<rect x="${corte.x}" y="-500" width="1000" height="1000"/>`
+      : `<rect x="-500" y="${corte.y}" width="1000" height="1000"/>`;
+    return `${formas.replace(/FILL/g, claro)}<clipPath id="${id}">${zona}</clipPath><g clip-path="url(#${id})">${formas.replace(/FILL/g, oscuro)}</g>`;
+  };
   const org = (tipo, x, y, ang, contenido, s = 1) =>
     `<g class="org" data-org="${tipo}"><title>${ORGANULOS[tipo].nombre}</title><g transform="translate(${x} ${y}) rotate(${ang}) scale(${s})">${contenido}</g></g>`;
+  const brillo = (x, y, r, a0 = 200, a1 = 250, ancho = 3) => {
+    const p = a => [x + r * Math.cos(a * Math.PI / 180), y + r * Math.sin(a * Math.PI / 180)].map(v => v.toFixed(1)).join(',');
+    return `<path d="M${p(a0)} A${r},${r} 0 0 1 ${p(a1)}" stroke="#fff" stroke-width="${ancho}" stroke-linecap="round" fill="none" opacity="0.55"/>`;
+  };
+
+  // Degradados y motas del fondo. Cada dibujo usa su propio prefijo de id (hay varios SVG en la página).
+  let nDibujo = 0;
+  const defs = p => `<defs>
+    <radialGradient id="${p}-cito" cx="0.45" cy="0.4" r="0.65"><stop offset="0" stop-color="#4b3f9e"/><stop offset="1" stop-color="#2f276f"/></radialGradient>
+    <radialGradient id="${p}-citov" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#2f6a78"/><stop offset="1" stop-color="#1d3f5c"/></radialGradient>
+    <radialGradient id="${p}-halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0.6" stop-color="#ff7eb3" stop-opacity="0.22"/><stop offset="1" stop-color="#ff7eb3" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${p}-nuc" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#b9a4ff"/><stop offset="1" stop-color="#8a6cf0"/></radialGradient>
+    <radialGradient id="${p}-vac" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#8fd0ff" stop-opacity="0.75"/><stop offset="1" stop-color="#3f8ce0" stop-opacity="0.55"/></radialGradient>
+  </defs>`;
+  const motas = (n, x0, y0, w, h, c) => Array.from({ length: n }, (_, i) =>
+    `<circle cx="${(x0 + (i * 137.5) % w).toFixed(1)}" cy="${(y0 + (i * 71.3) % h).toFixed(1)}" r="${(0.8 + (i % 3) * 0.6).toFixed(1)}" fill="${c}" opacity="${0.18 + (i % 4) * 0.08}"/>`).join('');
 
   const nucleo = (x, y, r) => org('nucleo', x, y, 0, `
-    <circle r="${r}" fill="#d0bfff" stroke="#7048e8" stroke-width="5"/>
-    <circle r="${r - 7}" fill="none" stroke="#9775fa" stroke-width="1.5" stroke-dasharray="4 5"/>
-    <path d="M${-r * 0.5},${-r * 0.1} q${r * 0.2},${-r * 0.3} ${r * 0.4},0 t${r * 0.4},0" fill="none" stroke="#9775fa" stroke-width="2"/>
-    <path d="M${-r * 0.3},${r * 0.45} q${r * 0.2},${-r * 0.25} ${r * 0.4},0 t${r * 0.4},0" fill="none" stroke="#9775fa" stroke-width="2"/>
-    <circle cx="${r * 0.2}" cy="${r * 0.12}" r="${r * 0.3}" fill="#7048e8" opacity="0.85"/>`);
+    <circle r="${r + 10}" fill="#8a6cf0" opacity="0.18"/>
+    ${dosTonos(`<circle r="${r}" fill="FILL"/>`, '#7b5cf0', '#5f43cf', { x: r * 0.35 })}
+    <circle r="${r - 7}" fill="url(#P-nuc)"/>
+    ${Array.from({ length: 14 }, (_, i) => { const a = i / 14 * Math.PI * 2; return `<circle cx="${((r - 3.5) * Math.cos(a)).toFixed(1)}" cy="${((r - 3.5) * Math.sin(a)).toFixed(1)}" r="2" fill="#3d2a9e"/>`; }).join('')}
+    ${[[-0.62, -0.28, 1], [-0.55, 0.32, -1], [-0.1, -0.58, 1], [0.02, 0.5, -1]].map(([dx, dy, g]) => `<path d="M${r * dx},${r * dy} q${r * 0.12},${-r * 0.2 * g} ${r * 0.25},0 t${r * 0.25},0 t${r * 0.2},${r * 0.05}" fill="none" stroke="#e3d9ff" stroke-width="3" stroke-linecap="round" opacity="0.75"/>`).join('')}
+    ${dosTonos(`<circle cx="${r * 0.18}" cy="${r * 0.1}" r="${r * 0.3}" fill="FILL"/>`, '#5b3fd6', '#4630b0', { x: r * 0.28 })}
+    <circle cx="${r * 0.08}" cy="${-r * 0.02}" r="${r * 0.07}" fill="#fff" opacity="0.5"/>
+    ${brillo(0, 0, r - 12, 200, 250, 4)}`);
 
   const mitocondria = (x, y, ang, s) => org('mitocondria', x, y, ang, `
-    <ellipse rx="34" ry="16" fill="#ffa94d" stroke="#d9480f" stroke-width="3"/>
-    <path d="M-25,0 L-19,-9 L-12,9 L-5,-9 L2,9 L9,-9 L16,9 L22,-6 L26,0" fill="none" stroke="#d9480f" stroke-width="2.2" stroke-linejoin="round"/>`, s);
+    ${dosTonos('<rect x="-34" y="-16" width="68" height="32" rx="16" fill="FILL"/>', '#ff7b54', '#e0563a', { y: 5 })}
+    <rect x="-29" y="-11" width="58" height="22" rx="11" fill="#ffc07a"/>
+    ${[-20, -12, -4, 4, 12, 20].map((dx, i) => `<rect x="${dx - 2.6}" y="${i % 2 ? -1 : -11}" width="5.2" height="12" rx="2.6" fill="#ff8d5c"/>`).join('')}
+    <path d="M-24,-12 a14,14 0 0 1 12,-2" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5"/>`, s);
 
   const cloroplasto = (x, y, ang, s) => org('cloroplasto', x, y, ang, `
-    <ellipse rx="33" ry="17" fill="#8ce99a" stroke="#2b8a3e" stroke-width="3"/>
-    ${[-18, -6, 6, 18].map(dx => `<rect x="${dx - 3.5}" y="-7" width="7" height="14" rx="1.5" fill="#2b8a3e"/>`).join('')}
-    <line x1="-24" y1="0" x2="24" y2="0" stroke="#2b8a3e" stroke-width="1.5"/>`, s);
+    ${dosTonos('<rect x="-33" y="-17" width="66" height="34" rx="17" fill="FILL"/>', '#37d67a', '#1fae6c', { y: 5 })}
+    <rect x="-28" y="-12" width="56" height="24" rx="12" fill="#8af0bd"/>
+    <path d="M-24,1 L24,1" stroke="#1fae6c" stroke-width="2" stroke-linecap="round"/>
+    ${[-17, -5, 7, 19].map(dx => [-7, -2.5, 2, 6.5].map(dy => `<rect x="${dx - 4.5}" y="${dy - 2}" width="9" height="4" rx="2" fill="${dy < 0 ? '#16955a' : '#127a4a'}"/>`).join('')).join('')}
+    <path d="M-23,-13 a14,14 0 0 1 12,-2" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5"/>`, s);
 
   const golgi = (x, y, ang) => org('golgi', x, y, ang, `
-    ${[0, 1, 2, 3].map(i => `<path d="M${-42 + i * 5},${i * 11} Q0,${-16 + i * 11} ${42 - i * 5},${i * 11}" fill="none" stroke="#f06595" stroke-width="7" stroke-linecap="round"/>`).join('')}
-    <circle cx="50" cy="8" r="5" fill="#f06595"/><circle cx="-50" cy="10" r="4" fill="#f06595"/><circle cx="46" cy="28" r="4" fill="#f06595"/>`);
+    ${[0, 1, 2, 3].map(i => `<path d="M${-42 + i * 5},${i * 11} Q0,${-16 + i * 11} ${42 - i * 5},${i * 11}" fill="none" stroke="${['#ff8fc0', '#f76fa9', '#e85a96', '#d24884'][i]}" stroke-width="8" stroke-linecap="round"/>
+      <path d="M${-38 + i * 5},${i * 11 - 2.5} Q0,${-18 + i * 11} ${30 - i * 5},${i * 11 - 5}" fill="none" stroke="#ffd1e6" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>`).join('')}
+    ${[[50, 8, 5], [-50, 10, 4], [46, 28, 4], [58, 22, 3]].map(([cx, cy, r]) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ff8fc0"/><circle cx="${cx - r * 0.35}" cy="${cy - r * 0.35}" r="${r * 0.3}" fill="#fff" opacity="0.6"/>`).join('')}`);
 
   const rer = (x, y, ang) => org('rer', x, y, ang, `
-    ${[0, 1, 2].map(i => `<path d="M0,${i * 16} q16,-12 32,0 t32,0 t32,0" fill="none" stroke="#4dabf7" stroke-width="7" stroke-linecap="round"/>`).join('')}
-    ${[0, 1, 2].map(i => [6, 22, 38, 54, 70, 86].map(dx => `<circle cx="${dx}" cy="${i * 16 + (dx % 32 < 16 ? -7 : 7) * 0.6 - 5}" r="2.4" fill="#1864ab"/>`).join('')).join('')}`);
+    ${[0, 1, 2].map(i => `<path d="M0,${i * 16} q16,-12 32,0 t32,0 t32,0" fill="none" stroke="${['#5cb6ff', '#4a9ff0', '#3d8ae0'][i]}" stroke-width="8" stroke-linecap="round"/>
+      <path d="M2,${i * 16 - 2.5} q14,-11 30,0 t32,0 t30,0" fill="none" stroke="#c5e6ff" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>`).join('')}
+    ${[0, 1, 2].map(i => [6, 22, 38, 54, 70, 86].map(dx => `<circle cx="${dx}" cy="${i * 16 + (dx % 32 < 16 ? -7 : 7) * 0.6 - 6}" r="2.6" fill="#e599f7"/>`).join('')).join('')}`);
 
   const rel = (x, y, ang) => org('rel', x, y, ang, `
-    <path d="M0,0 c20,-20 40,20 60,0 s40,20 60,0" fill="none" stroke="#99e9f2" stroke-width="9" stroke-linecap="round"/>
-    <path d="M10,22 c20,-18 40,18 60,0 s30,16 50,2" fill="none" stroke="#99e9f2" stroke-width="9" stroke-linecap="round"/>
-    <path d="M0,0 c20,-20 40,20 60,0 s40,20 60,0 M10,22 c20,-18 40,18 60,0 s30,16 50,2" fill="none" stroke="#3bc9db" stroke-width="1.5"/>`);
+    <path d="M0,0 c20,-20 40,20 60,0 s40,20 60,0" fill="none" stroke="#22b8cf" stroke-width="10" stroke-linecap="round"/>
+    <path d="M10,22 c20,-18 40,18 60,0 s30,16 50,2" fill="none" stroke="#1c9fb5" stroke-width="10" stroke-linecap="round"/>
+    <path d="M0,0 c20,-20 40,20 60,0 s40,20 60,0 M10,22 c20,-18 40,18 60,0 s30,16 50,2" fill="none" stroke="#99e9f2" stroke-width="3" stroke-linecap="round" opacity="0.7"/>`);
 
   const lisosoma = (x, y) => org('lisosoma', x, y, 0, `
-    <circle r="11" fill="#ffd8a8" stroke="#e67700" stroke-width="2.5"/>
-    <circle cx="-3" cy="-3" r="1.8" fill="#e67700"/><circle cx="4" cy="1" r="1.8" fill="#e67700"/><circle cx="-1" cy="5" r="1.8" fill="#e67700"/>`);
+    <circle r="15" fill="#ffd43b" opacity="0.18"/>
+    ${dosTonos('<circle r="11" fill="FILL"/>', '#ffd43b', '#f5a524', { x: 3 })}
+    <circle cx="-3" cy="-1" r="1.9" fill="#c75b00"/><circle cx="3.5" cy="2" r="1.9" fill="#c75b00"/><circle cx="-1" cy="5" r="1.7" fill="#c75b00"/>
+    <circle cx="-4" cy="-5" r="2.2" fill="#fff" opacity="0.7"/>`);
 
-  const vacuolaChica = (x, y, r) => org('vacuola', x, y, 0, `<circle r="${r}" fill="#d0ebff" stroke="#74c0fc" stroke-width="2.5"/>`);
+  const vacuolaChica = (x, y, r) => org('vacuola', x, y, 0, `<circle r="${r}" fill="url(#P-vac)"/>${brillo(0, 0, r * 0.65, 200, 260, 2.2)}`);
 
-  const centriolos = (x, y) => org('centriolo', x, y, 0, `
-    <g><rect x="-14" y="-5" width="28" height="10" rx="2" fill="#ffe066" stroke="#e67700" stroke-width="1.5"/>
-      ${[-9, -3, 3, 9].map(dx => `<line x1="${dx}" y1="-5" x2="${dx}" y2="5" stroke="#e67700" stroke-width="1.2"/>`).join('')}</g>
-    <g transform="translate(10 12) rotate(90)"><rect x="-14" y="-5" width="28" height="10" rx="2" fill="#ffe066" stroke="#e67700" stroke-width="1.5"/>
-      ${[-9, -3, 3, 9].map(dx => `<line x1="${dx}" y1="-5" x2="${dx}" y2="5" stroke="#e67700" stroke-width="1.2"/>`).join('')}</g>`);
+  const centriolo = `${dosTonos('<rect x="-14" y="-5.5" width="28" height="11" rx="5.5" fill="FILL"/>', '#ffe066', '#fcc419', { y: 1 })}
+    ${[-8, -3, 2, 7].map(dx => `<rect x="${dx - 1}" y="-5.5" width="2" height="11" fill="#e8a500" opacity="0.8"/>`).join('')}`;
+  const centriolos = (x, y) => org('centriolo', x, y, 0, `<g>${centriolo}</g><g transform="translate(10 13) rotate(90)">${centriolo}</g>`);
 
   const ribosomas = puntos => `<g class="org" data-org="ribosoma"><title>Ribosomas</title>
-    ${puntos.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.8" fill="#1864ab"/>`).join('')}</g>`;
+    ${puntos.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="transparent"/><circle cx="${x}" cy="${y}" r="4.5" fill="#e599f7" opacity="0.25"/><circle cx="${x}" cy="${y}" r="2.8" fill="#e599f7"/>`).join('')}</g>`;
+
+  // Reemplaza el prefijo de ids para que cada SVG tenga sus propios degradados.
+  const conPrefijo = svg => { const p = 'cel' + (nDibujo++); return defs(p) + svg.replace(/url\(#P-/g, `url(#${p}-`); };
 
   function celulaAnimal() {
     const borde = 'M62,232 C58,96 196,34 330,36 C474,40 590,112 584,244 C578,372 452,428 320,424 C178,420 66,366 62,232 Z';
-    return `
-      <g class="org" data-org="citoplasma"><title>Citoplasma</title><path d="${borde}" fill="#fff0f3"/></g>
+    return conPrefijo(`
+      ${motas(40, 0, 0, 640, 460, '#8e9bff')}
+      <path d="${borde}" fill="none" stroke="#ff7eb3" stroke-width="40" opacity="0.07"/>
+      <path d="${borde}" fill="none" stroke="#ff7eb3" stroke-width="22" opacity="0.1"/>
+      <g class="org" data-org="citoplasma"><title>Citoplasma</title><path d="${borde}" fill="url(#P-cito)"/>
+        <g opacity="0.35" stroke="#7c6cd8" stroke-width="1.4" fill="none">
+          <path d="M120,180 C200,160 240,250 330,230 M380,300 C430,280 470,330 540,300 M200,400 C240,360 300,380 340,340 M420,80 C440,120 500,110 520,150"/></g>
+        ${motas(60, 80, 60, 490, 350, '#c7b8ff')}</g>
       <g class="org" data-org="membrana"><title>Membrana plasmática</title>
-        <path d="${borde}" fill="none" stroke="#e64980" stroke-width="6"/>
+        <path d="${borde}" fill="none" stroke="#d94d8a" stroke-width="10"/>
+        <path d="${borde}" fill="none" stroke="#ff8fc0" stroke-width="4"/>
+        <path d="${borde}" pathLength="100" fill="none" stroke="#ffd1e6" stroke-width="2.5" stroke-dasharray="14 86" stroke-dashoffset="-6" stroke-linecap="round"/>
         <path d="${borde}" fill="none" stroke="transparent" stroke-width="16" pointer-events="stroke"/></g>
       ${rer(196, 140, -12)}
       ${rel(420, 330, -8)}
@@ -109,26 +156,34 @@ const Celula = (function () {
       ${lisosoma(390, 110)}${lisosoma(212, 370)}${lisosoma(528, 330)}
       ${vacuolaChica(120, 200, 16)}${vacuolaChica(400, 395, 12)}
       ${centriolos(380, 250)}
-      ${ribosomas([[140, 250], [175, 330], [250, 330], [360, 310], [380, 150], [480, 220], [540, 200], [250, 90], [330, 410], [110, 280], [455, 380], [560, 270]])}`;
+      ${ribosomas([[140, 250], [175, 330], [250, 330], [360, 310], [380, 150], [480, 220], [540, 200], [250, 90], [330, 410], [110, 280], [455, 380], [560, 270]])}`);
   }
 
   function celulaVegetal() {
-    return `
+    return conPrefijo(`
+      ${motas(30, 0, 0, 640, 460, '#8e9bff')}
       <g class="org" data-org="pared"><title>Pared celular</title>
-        <rect x="30" y="26" width="580" height="408" rx="18" fill="#d8f5a2" stroke="#5c940d" stroke-width="10"/></g>
+        <rect x="26" y="22" width="588" height="416" rx="20" fill="#2f9e44"/>
+        <rect x="26" y="22" width="588" height="416" rx="20" fill="none" stroke="#1f7a33" stroke-width="5"/>
+        <path d="M34,40 L34,420 M606,40 L606,420 M44,30 L596,30 M44,430 L596,430" stroke="#69db7c" stroke-width="2" stroke-dasharray="10 7" stroke-linecap="round" opacity="0.6"/>
+        <path d="M46,30 L200,30" stroke="#b2f2bb" stroke-width="3" stroke-linecap="round" opacity="0.6"/></g>
       <g class="org" data-org="citoplasma"><title>Citoplasma</title>
-        <rect x="50" y="46" width="540" height="368" rx="12" fill="#f4fce3"/></g>
+        <rect x="46" y="42" width="548" height="376" rx="12" fill="url(#P-citov)"/>
+        ${motas(50, 60, 55, 520, 350, '#b8f0e0')}</g>
       <g class="org" data-org="membrana"><title>Membrana plasmática</title>
-        <rect x="50" y="46" width="540" height="368" rx="12" fill="none" stroke="#e64980" stroke-width="4"/>
-        <rect x="50" y="46" width="540" height="368" rx="12" fill="none" stroke="transparent" stroke-width="14" pointer-events="stroke"/></g>
-      ${org('vacuola', 0, 0, 0, `<path d="M250,120 C250,92 290,86 380,88 C470,90 520,100 522,150 C526,220 530,300 500,330 C470,358 360,356 300,344 C258,336 246,300 248,250 Z" fill="#d0ebff" stroke="#4dabf7" stroke-width="3"/>`)}
+        <rect x="46" y="42" width="548" height="376" rx="12" fill="none" stroke="#d94d8a" stroke-width="6"/>
+        <rect x="46" y="42" width="548" height="376" rx="12" fill="none" stroke="#ff8fc0" stroke-width="2.5"/>
+        <rect x="46" y="42" width="548" height="376" rx="12" fill="none" stroke="transparent" stroke-width="14" pointer-events="stroke"/></g>
+      ${org('vacuola', 0, 0, 0, `<path d="M250,120 C250,92 290,86 380,88 C470,90 520,100 522,150 C526,220 530,300 500,330 C470,358 360,356 300,344 C258,336 246,300 248,250 Z" fill="url(#P-vac)"/>
+        <path d="M268,132 C272,108 310,104 360,104" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.45"/>
+        <circle cx="470" cy="300" r="5" fill="#fff" opacity="0.25"/><circle cx="450" cy="318" r="3" fill="#fff" opacity="0.25"/>`)}
       ${nucleo(140, 140, 52)}
       ${rer(90, 220, 0)}
       ${golgi(150, 330, -10)}
       ${rel(210, 385, 0)}
       ${mitocondria(230, 70, 0, 0.8)}${mitocondria(560, 250, 90, 0.8)}${mitocondria(100, 290, 60, 0.75)}
       ${cloroplasto(420, 70, 5, 0.9)}${cloroplasto(560, 120, 70, 0.9)}${cloroplasto(555, 370, -30, 0.9)}${cloroplasto(420, 385, 0, 0.9)}${cloroplasto(250, 305, 80, 0.8)}${cloroplasto(300, 70, -8, 0.8)}
-      ${ribosomas([[80, 110], [210, 120], [220, 200], [200, 260], [80, 360], [330, 395], [480, 400], [580, 190], [490, 60], [360, 60]])}`;
+      ${ribosomas([[80, 110], [210, 120], [220, 200], [200, 260], [80, 360], [330, 395], [480, 400], [580, 190], [490, 60], [360, 60]])}`);
   }
 
   // ---------- Estado ----------
