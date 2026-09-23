@@ -14,6 +14,7 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | 🌍 **Efecto invernadero** | Cambio climático | Suben o bajan el CO₂ (con un deslizador, momentos históricos o acciones humanas) y ven la radiación solar y el calor en la atmósfera, la temperatura media año a año en un gráfico y sus consecuencias. Modelo simplificado: +3 °C por cada duplicación del CO₂. |
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla y juegan a "¿Dónde está?". |
 | ♻️ **Ciclos de la naturaleza** | Ciclos del agua, carbono y nitrógeno | Exploran un paisaje ilustrado donde gotas, vapor, copos y moléculas recorren cada proceso, siguen el viaje de una gota o un átomo eligiendo qué proceso ocurre en cada lugar, y ordenan las etapas. |
+| 🧬 **Biomoléculas** | Química de la vida | Arman carbohidratos, proteínas, lípidos y ADN uniendo monómeros (cada enlace libera una molécula de agua; la hidrólisis la devuelve), pliegan proteínas y completan la hebra complementaria del ADN. En el laboratorio identifican biomoléculas en alimentos con Lugol, Benedict, Biuret y Sudán, y luego clasifican alimentos según su biomolécula principal. |
 
 ## Cómo usarla
 
@@ -22,7 +23,7 @@ No necesita instalación ni internet: basta con **abrir `index.html`** en cualqu
 Para compartirla con los estudiantes por un enlace, se puede publicar gratis con **GitHub Pages**: *Settings → Pages → Deploy from a branch*.
 
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#invernadero`, `#celula` o `#ciclos`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#invernadero`, `#celula`, `#ciclos` o `#biomoleculas`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -40,6 +41,7 @@ js/atomos.js          Átomos y moléculas (misiones y moléculas conocidas)
 js/invernadero.js     Simulación del efecto invernadero
 js/celula.js          Orgánulos de las células animal y vegetal
 js/ciclos.js          Lugares, procesos y etapas de cada ciclo
+js/biomoleculas.js    Monómeros, reactivos de laboratorio y alimentos
 js/app.js             Navegación
 ```
 
