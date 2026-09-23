@@ -589,25 +589,58 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 /* ---------- Ciclos ---------- */
 .cic-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1rem; align-items: start; }
 #cic-svg { width: 100%; height: auto; display: block; border-radius: 12px; }
-.cic-trazo { fill: none; stroke: #495057; stroke-width: 2.5; stroke-dasharray: 8 6; animation: fluir 1.2s linear infinite; }
-@keyframes fluir { to { stroke-dashoffset: -14; } }
-@media (prefers-reduced-motion: reduce) { .cic-trazo { animation: none; } }
-.cic-trazo-ancho { fill: none; stroke: transparent; stroke-width: 18; }
-.cic-proceso { cursor: pointer; }
-.cic-proceso:hover .cic-trazo, .cic-proceso.marcado .cic-trazo { stroke: #e8590c; stroke-width: 4; }
-.cic-etq-proc { font-size: 12px; font-weight: 700; fill: #343a40; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.cic-pie { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem 1rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.cic-leyenda { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; font-size: 0.82rem; color: var(--suave); }
+.cic-leyenda span { display: flex; align-items: center; gap: 0.3rem; }
+.cic-toggle { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; font-weight: 600; }
+/* Animaciones del paisaje */
+.cc-rayos { animation: girar 30s linear infinite; transform-box: fill-box; transform-origin: center; }
+.cc-olas { animation: olas 3s linear infinite; }
+@keyframes olas { to { transform: translateX(40px); } }
+.cc-corriente { animation: corriente 1.6s linear infinite; }
+@keyframes corriente { to { stroke-dashoffset: 22; } }
+.cc-nube { animation: flotar 7s ease-in-out infinite alternate; }
+.cc-nube.lenta { animation-duration: 11s; }
+@keyframes flotar { to { translate: 14px 0; } }
+.cc-vaho path { animation: vaho 3s ease-in-out infinite; }
+.cc-vaho path:nth-child(2) { animation-delay: 1s; }
+.cc-vaho path:nth-child(3) { animation-delay: 2s; }
+@keyframes vaho { 0%, 100% { opacity: 0.2; translate: 0 6px; } 50% { opacity: 1; translate: 0 -4px; } }
+.cc-humo circle { animation: humo-chimenea 3.2s ease-out infinite; opacity: 0; transform-box: fill-box; transform-origin: center; }
+@keyframes humo-chimenea { 0% { opacity: 0.8; transform: translate(0, 0) scale(0.6); } 100% { opacity: 0; transform: translate(-30px, -70px) scale(1.8); } }
+.cc-rayo { animation: rayo 4s steps(1) infinite; }
+@keyframes rayo { 0%, 100% { opacity: 0; } 70% { opacity: 1; } 74% { opacity: 0.2; } 78% { opacity: 1; } 84% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cc-rayos, .cc-olas, .cc-corriente, .cc-nube, .cc-vaho path, .cc-humo circle { animation: none; } .cc-humo circle { opacity: 0.5; } .cc-rayo { animation: none; opacity: 1; } }
+/* Procesos: la ruta solo se dibuja al pedirla o al elegir un proceso */
+.cic-guia { fill: none; stroke: #343a40; stroke-width: 2.2; stroke-dasharray: 7 6; opacity: 0; transition: opacity 0.2s; }
+.ver-rotulos .cic-guia { opacity: 0.55; }
+.cic-proc.activo .cic-guia { opacity: 1; stroke: #e8590c; stroke-width: 3.5; }
+.cic-toque { fill: none; stroke: transparent; stroke-width: 22; }
+.modo-explorar .cic-proc { cursor: pointer; }
+.modo-explorar .cic-proc:hover .cic-guia { opacity: 0.8; }
+.cic-etq { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.cic-etq rect { fill: #fff; stroke: #343a40; stroke-width: 1; opacity: 0.92; }
+.cic-etq text { font-size: 11.5px; font-weight: 700; fill: #1d2433; }
+.ver-rotulos .cic-etq, .cic-etq.activo { opacity: 1; }
+.cic-etq.activo rect { stroke: #e8590c; stroke-width: 2; }
+#cic-particulas, #cic-viajero, #cic-etiquetas { pointer-events: none; }
+.cic-part { transition: opacity 0.3s; }
+.con-sel .cic-part:not(.activa) { opacity: 0.2 !important; }
+.cic-part.activa > * { transform: scale(1.35); }
+/* Lugares */
 .cic-nodo { cursor: pointer; }
-.cic-nodo-fondo { fill: #fff; stroke: #495057; stroke-width: 2; }
-.cic-nodo:hover .cic-nodo-fondo, .cic-nodo.marcado .cic-nodo-fondo { stroke: #e8590c; stroke-width: 4; }
-.cic-nodo-icono { font-size: 28px; }
-.cic-nodo-nombre { font-size: 13px; font-weight: 800; fill: #1d2433; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
-#cic-viajeros { pointer-events: none; }
-.cic-gota { fill: #1c7ed6; stroke: #fff; stroke-width: 2; }
-.cic-atomo { stroke: #fff; stroke-width: 2; }
-.cic-atomo.carbono { fill: #343a40; }
-.cic-atomo.nitrogeno { fill: #3b5bdb; }
-.cic-atomo-txt { fill: #fff; font-weight: 800; }
-.cic-viajero-grande { filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.cic-zona { fill: transparent; }
+.modo-explorar .cic-nodo:hover .cic-zona, .cic-nodo.marcado .cic-zona { fill: rgba(255, 255, 255, 0.35); stroke: #e8590c; stroke-width: 3; stroke-dasharray: 6 5; }
+.cic-pastilla { fill: #fff; stroke: #495057; stroke-width: 1.2; filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+.cic-nodo.marcado .cic-pastilla { stroke: #e8590c; stroke-width: 2.5; }
+.cic-pastilla-txt { font-size: 13px; font-weight: 800; fill: #1d2433; }
+.cic-viajero { filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+.cic-viajero.reposo { animation: latir 1.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes latir { to { transform: scale(1.12); } }
+.cic-asi, .cic-ahora { display: flex; align-items: center; gap: 0.5rem; background: var(--bg); border-radius: 10px; padding: 0.45rem 0.6rem; }
+.cic-ahora span { display: flex; flex-direction: column; }
+.cic-ahora small { color: var(--suave); }
+.cic-link { border: 0; background: none; padding: 0; color: var(--primario); font-weight: 700; text-align: left; }
 .cic-panel h3 { font-size: 0.95rem; margin: 0.75rem 0 0.3rem; }
 .cic-panel ul, .cic-panel ol { margin: 0; padding-left: 1.2rem; }
 .cic-ayuda { color: var(--suave); font-size: 0.92rem; }

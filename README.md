@@ -13,7 +13,7 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | ⚛️ **Átomos y moléculas** | Estructura de la materia | Arman átomos con protones, neutrones y electrones (hasta Z = 20) y ven qué elemento, isótopo o ion formaron, si el núcleo es estable y su notación con número másico y atómico. Luego unen átomos (H, C, N, O, S, Cl) con enlaces simples, dobles o triples respetando cuántos enlaces forma cada uno. Ambos modos tienen misiones. |
 | 🌍 **Efecto invernadero** | Cambio climático | Suben o bajan el CO₂ (con un deslizador, momentos históricos o acciones humanas) y ven la radiación solar y el calor en la atmósfera, la temperatura media año a año en un gráfico y sus consecuencias. Modelo simplificado: +3 °C por cada duplicación del CO₂. |
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla y juegan a "¿Dónde está?". |
-| ♻️ **Ciclos de la naturaleza** | Ciclos del agua, carbono y nitrógeno | Exploran el ciclo animado, siguen el viaje de una gota o un átomo eligiendo qué proceso ocurre en cada lugar, y ordenan las etapas. |
+| ♻️ **Ciclos de la naturaleza** | Ciclos del agua, carbono y nitrógeno | Exploran un paisaje ilustrado donde gotas, vapor, copos y moléculas recorren cada proceso, siguen el viaje de una gota o un átomo eligiendo qué proceso ocurre en cada lugar, y ordenan las etapas. |
 
 ## Cómo usarla
 
