@@ -4,7 +4,7 @@
 const Invernadero = (function () {
   const T_BASE = 14, CO2_BASE = 280, SENSIBILIDAD = 3, T_SIN_ATMOSFERA = -18;
   const CO2_MIN = 150, CO2_MAX = 1200;
-  const ANIO_INICIAL = 1850, MS_POR_ANIO = 150, TAU = 8; // TAU: años que tarda en acercarse al equilibrio
+  const ANIO_INICIAL = 1850, MS_POR_ANIO = 350, TAU = 8; // TAU: años que tarda en acercarse al equilibrio
   const VENTANA = 150; // años visibles en el gráfico
   const W = 600, H = 380; // escena
   // El planeta se ve como un gran arco en la parte de abajo; la atmósfera es una franja alrededor.
@@ -36,7 +36,8 @@ const Invernadero = (function () {
   let ppm = 420, sinAtmosfera = false, T = null, anio = ANIO_INICIAL, historial = [];
   let pausado = false, ultimo = 0, acumulado = 0, fotones = [], moleculas = [];
   let cuenta = { escapan: 0, vuelven: 0 };
-  let activo = false;
+  let activo = false, velocidad = 1;
+  const VELOCIDADES = [{ f: 0.4, texto: '🐢 Lenta' }, { f: 1, texto: 'Normal' }, { f: 2.5, texto: '🐇 Rápida' }];
 
   const tEquilibrio = () => (sinAtmosfera ? T_SIN_ATMOSFERA : T_BASE + SENSIBILIDAD * Math.log2(ppm / CO2_BASE));
   // Probabilidad de que el calor (infrarrojo) sea absorbido y devuelto por la atmósfera.
@@ -62,6 +63,11 @@ const Invernadero = (function () {
             <span><b class="kz-co2"><i></i><i></i><i></i></b>Molécula de CO₂</span>
           </div>
           <p class="inv-balance" id="inv-balance"></p>
+          <div class="inv-velocidad">
+            <span>Velocidad:</span>
+            <div class="segmentado oscuro" id="inv-vel">${VELOCIDADES.map(v => `<button data-f="${v.f}">${v.texto}</button>`).join('')}</div>
+            <button class="inv-pausa-escena" id="inv-pausa2">⏸ Pausar</button>
+          </div>
         </div>
 
         <div class="panel inv-controles">
@@ -69,6 +75,7 @@ const Invernadero = (function () {
             <div><span class="inv-num" id="inv-temp"></span><span class="inv-lab">Temperatura media</span></div>
             <div><span class="inv-num" id="inv-ppm"></span><span class="inv-lab">CO₂ en el aire</span></div>
             <div><span class="inv-num" id="inv-anio"></span><span class="inv-lab">Año simulado</span></div>
+            <div><span class="inv-num" id="inv-hielo"></span><span class="inv-lab">Hielo en las montañas</span></div>
           </div>
           <label class="inv-slider-lab" for="inv-slider">Cantidad de CO₂ (partes por millón)</label>
           <input type="range" id="inv-slider" min="${CO2_MIN}" max="${CO2_MAX}" step="10">
@@ -109,10 +116,15 @@ const Invernadero = (function () {
     raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.addEventListener('click', () => cambiarCO2(+b.dataset.ppm)));
     raiz.querySelectorAll('.inv-btn[data-d]').forEach(b => b.addEventListener('click', () => cambiarCO2(ppm + +b.dataset.d)));
     raiz.querySelector('#inv-sin-atm').addEventListener('change', e => { sinAtmosfera = e.target.checked; actualizarLecturas(); dibujarFondo(); });
-    raiz.querySelector('#inv-pausa').addEventListener('click', () => {
+    const alternarPausa = () => {
       pausado = !pausado;
-      raiz.querySelector('#inv-pausa').textContent = pausado ? '▶ Continuar' : '⏸ Pausar';
-    });
+      ['#inv-pausa', '#inv-pausa2'].forEach(id => { raiz.querySelector(id).textContent = pausado ? '▶ Continuar' : '⏸ Pausar'; });
+    };
+    raiz.querySelector('#inv-pausa').addEventListener('click', alternarPausa);
+    raiz.querySelector('#inv-pausa2').addEventListener('click', alternarPausa);
+    const marcarVelocidad = () => raiz.querySelectorAll('#inv-vel button').forEach(b => b.classList.toggle('activo', +b.dataset.f === velocidad));
+    raiz.querySelectorAll('#inv-vel button').forEach(b => b.addEventListener('click', () => { velocidad = +b.dataset.f; marcarVelocidad(); }));
+    marcarVelocidad();
     raiz.querySelector('#inv-reiniciar').addEventListener('click', reiniciar);
     grafico.addEventListener('pointermove', mostrarTooltip);
     grafico.addEventListener('pointerleave', () => { raiz.querySelector('#inv-tooltip').hidden = true; dibujarGrafico(); });
@@ -168,45 +180,86 @@ const Invernadero = (function () {
     return { x, y, r: 0.6 + ((i * 7) % 5) * 0.25, tit: i % 4 === 0 };
   });
 
+  // Cuánto hielo queda y cuánto sube (o baja) el mar según la temperatura.
+  function estadoHielo(anomalia) {
+    const hielo = Math.max(0.1, Math.min(1.35, 1 - anomalia * 0.2));
+    const derretido = Math.max(0, Math.min(1, (1 - hielo) / 0.9));
+    const glaciacion = Math.max(0, Math.min(1, (hielo - 1) / 0.35));
+    return { hielo, derretido, glaciacion, subida: 14 * derretido - 5 * glaciacion, avance: 75 * derretido - 22 * glaciacion };
+  }
+
   function dibujarFondo() {
     const anomalia = (T ?? tEquilibrio()) - T_BASE;
     const atm = colorAtmosfera(anomalia);
-    const hielo = Math.max(0.1, Math.min(1.35, 1 - anomalia * 0.2));
+    const { hielo, derretido, subida, avance } = estadoHielo(anomalia);
     const sx = x => superficie(x).toFixed(1);
-    // Árboles, ciudad e hielo apoyados sobre la curva del planeta.
-    const arbolito = (x, h) => `<path d="M${x - 5},${sx(x) - 0} L${x},${superficie(x) - h} L${x + 5},${sx(x)} Z" fill="#1b9e77"/>`;
-    const edificio = (x, w, h, c) => `<rect x="${x}" y="${superficie(x + w / 2) - h}" width="${w}" height="${h + 4}" rx="1.5" fill="${c}"/>`;
-    const montania = (x, w, h) => `<path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
-      <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.35},${sx(x + w * 0.35)} Z" fill="#2f3a73"/>`;
+    const costaI = 112 - avance * 0.6, costaD = 248 + avance; // las costas avanzan tierra adentro cuando sube el mar
+
+    const arbol = (x, h) => x < costaD + 6 ? '' : `<g><rect x="${x - 1.3}" y="${superficie(x) - h * 0.45}" width="2.6" height="${h * 0.45 + 2}" fill="#0f5c3f"/>
+      <circle cx="${x}" cy="${superficie(x) - h * 0.62}" r="${h * 0.34}" fill="#27c07a"/>
+      <path d="M${x},${superficie(x) - h * 0.96} a${h * 0.34},${h * 0.34} 0 0 1 0,${h * 0.68} Z" fill="#1a9a61"/></g>`;
+    const edificio = (x, w, h, c) => {
+      const y0 = superficie(x + w / 2) - h;
+      let ventanas = '';
+      for (let yy = y0 + 4; yy < y0 + h - 4; yy += 6) for (let xx = x + 2.5; xx < x + w - 3; xx += 5) {
+        if ((xx * 7 + yy * 3) % 5 > 1) ventanas += `<rect x="${xx.toFixed(1)}" y="${yy.toFixed(1)}" width="2" height="2.6" fill="#ffe8a3" opacity="0.9"/>`;
+      }
+      return `<rect x="${x}" y="${y0}" width="${w}" height="${h + 4}" rx="1.5" fill="${c}"/>${ventanas}`;
+    };
+    const montania = (x, w, h) => `
+      <path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
+      <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.3},${sx(x + w * 0.3)} Z" fill="#2a3468"/>
+      <path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h}" stroke="#9fb0ff" stroke-width="1.6" opacity="0.7"/>`;
     const nieve = (x, w, h) => {
       const k = hielo, hy = superficie(x) - h;
-      return `<path d="M${x - w * 0.42 * k},${hy + h * 0.42 * k} L${x},${hy} L${x + w * 0.42 * k},${hy + h * 0.42 * k} L${x + w * 0.18 * k},${hy + h * 0.34 * k} L${x},${hy + h * 0.44 * k} L${x - w * 0.2 * k},${hy + h * 0.34 * k} Z" fill="#f1f3ff"/>`;
+      return `<path d="M${x - w * 0.42 * k},${hy + h * 0.42 * k} L${x},${hy} L${x + w * 0.42 * k},${hy + h * 0.42 * k} L${x + w * 0.18 * k},${hy + h * 0.34 * k} L${x},${hy + h * 0.44 * k} L${x - w * 0.2 * k},${hy + h * 0.34 * k} Z" fill="#f1f3ff"/>
+        <path d="M${x},${hy} L${x + w * 0.42 * k},${hy + h * 0.42 * k} L${x + w * 0.18 * k},${hy + h * 0.34 * k} L${x},${hy + h * 0.44 * k} Z" fill="#c9d1ff"/>`;
     };
+    // Agua que cubre las zonas bajas cuando sube el nivel del mar.
+    let inundacion = '';
+    if (subida > 0.5) {
+      const pts = [];
+      for (let x = costaI - 4; x <= costaD + 4; x += 12) pts.push(`${x.toFixed(1)},${(superficie(x) - subida).toFixed(1)}`);
+      inundacion = `<path d="M${(costaI - 16).toFixed(1)},${sx(costaI - 16)} L${pts.join(' L')} L${(costaD + 16).toFixed(1)},${sx(costaD + 16)} Z" fill="url(#kz-mar)"/>
+        <path d="M${pts.join(' L')}" stroke="#bcd6ff" stroke-width="1.6" fill="none" opacity="0.8"/>`;
+    }
+    // Regla de marea en el mar: muestra hasta dónde llega el agua.
+    const rx = 196, base = superficie(rx);
+    const regla = `<g>
+      <rect x="${rx - 2}" y="${base - 34}" width="4" height="44" rx="1.5" fill="#f1f3ff"/>
+      ${Array.from({ length: 8 }, (_, i) => `<line x1="${rx + 2}" x2="${rx + (i % 2 ? 5 : 8)}" y1="${base + 6 - i * 5}" y2="${base + 6 - i * 5}" stroke="#f1f3ff" stroke-width="1.2"/>`).join('')}
+      <path d="M${rx - 9},${(base - subida).toFixed(1)} l6,-3.5 v7 Z" fill="#ffd166"/>
+      <text x="${rx - 11}" y="${(base - subida - 7).toFixed(1)}" text-anchor="end" class="kz-rotulo chico">NIVEL DEL MAR</text></g>`;
+
     raiz.querySelector('#inv-fondo').innerHTML = `
       <defs>
-        <linearGradient id="kz-espacio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#090b26"/><stop offset="1" stop-color="#1d1f5a"/></linearGradient>
+        <linearGradient id="kz-espacio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070921"/><stop offset="1" stop-color="#1d1f5a"/></linearGradient>
         <radialGradient id="kz-sol" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff6d5"/><stop offset="0.35" stop-color="#ffd166"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
         <radialGradient id="kz-halo" cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" gradientUnits="userSpaceOnUse">
           <stop offset="${(PR - 5) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.95"/>
           <stop offset="${(PR + 40) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.45"/>
           <stop offset="${(PR + ATM - 20) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.12"/>
           <stop offset="1" stop-color="${atm}" stop-opacity="0"/></radialGradient>
-        <linearGradient id="kz-mar" x1="0" y1="295" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4c8dff"/><stop offset="1" stop-color="#1a2f86"/></linearGradient>
+        <radialGradient id="kz-vineta" cx="0.5" cy="0.45" r="0.75"><stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></radialGradient>
+        <radialGradient id="kz-brillo" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="kz-mar" x1="0" y1="280" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4c8dff"/><stop offset="1" stop-color="#1a2f86"/></linearGradient>
         <linearGradient id="kz-tierra" x1="0" y1="295" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#34d27f"/><stop offset="1" stop-color="#116b48"/></linearGradient>
         <clipPath id="kz-planeta"><circle cx="${PX}" cy="${PY}" r="${PR}"/></clipPath>
       </defs>
       <rect width="${W}" height="${H}" fill="url(#kz-espacio)"/>
-      <g>${ESTRELLAS.map(e => `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="${e.r}" fill="#fff" ${e.tit ? 'class="kz-titila"' : 'opacity="0.7"'}/>`).join('')}</g>
-      <circle cx="${SOL.x}" cy="${SOL.y}" r="120" fill="url(#kz-sol)" opacity="0.55"/>
+      <g>${ESTRELLAS.map((e, i) => `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="${e.r}" fill="${['#fff', '#cfe3ff', '#ffd9f0'][i % 3]}" ${e.tit ? 'class="kz-titila"' : 'opacity="0.7"'}/>`).join('')}</g>
+      <g class="kz-sol-latido"><circle cx="${SOL.x}" cy="${SOL.y}" r="130" fill="url(#kz-sol)" opacity="0.5"/></g>
       <circle cx="${SOL.x}" cy="${SOL.y}" r="58" fill="url(#kz-sol)"/>
       <circle cx="${SOL.x}" cy="${SOL.y}" r="30" fill="#fff3c4"/>
-      ${sinAtmosfera ? '' : `<circle cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" fill="url(#kz-halo)"/>`}
+      ${sinAtmosfera ? '' : `<circle cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" fill="url(#kz-halo)"/>
+        ${[60, 110].map(d => `<circle cx="${PX}" cy="${PY}" r="${PR + d}" fill="none" stroke="${atm}" stroke-opacity="0.12" stroke-width="1.5"/>`).join('')}`}
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="url(#kz-mar)"/>
       <g clip-path="url(#kz-planeta)">
-        ${[[150, 312], [200, 330], [170, 352], [225, 360]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
-        <path d="M-20,${sx(0) - 20} L112,${sx(112) - 20} L112,${sx(112) + 4} C128,${sx(120) + 28} 94,${sx(110) + 52} 118,${H} L-20,${H} Z" fill="url(#kz-tierra)"/>
-        <path d="M248,${sx(248) - 20} L620,${sx(620) - 20} L620,${H} L262,${H} C250,${H - 30} 274,${sx(262) + 48} 244,${sx(248) + 20} Z" fill="url(#kz-tierra)"/>
-        <ellipse cx="186" cy="${sx(186) + 30}" rx="16" ry="5" fill="url(#kz-tierra)"/>
+        <ellipse cx="150" cy="${superficie(150) + 8}" rx="60" ry="9" fill="url(#kz-brillo)"/>
+        ${[[150, 330], [205, 345], [170, 362], [235, 368]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
+        <path d="M-20,${sx(0) - 20} L${costaI},${sx(costaI) - 20} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-20,${H} Z" fill="url(#kz-tierra)"/>
+        <path d="M${costaD},${sx(costaD) - 20} L620,${sx(620) - 20} L620,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
+        ${derretido < 0.45 ? `<ellipse cx="186" cy="${sx(186) + 30}" rx="${16 * (1 - derretido * 2)}" ry="5" fill="url(#kz-tierra)"/>` : ''}
         <path d="M-20,${sx(0) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 620,${sx(620) + 40} L620,${H} L-20,${H} Z" fill="#0a0d2e" opacity="0.28"/>
       </g>
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
@@ -216,13 +269,16 @@ const Invernadero = (function () {
         <rect x="-38" y="6" width="76" height="4" rx="2" fill="#c9d3ff" opacity="0.7"/></g></g>`).join('')}
       ${montania(500, 48, 62)}${nieve(500, 48, 62)}
       ${montania(548, 34, 40)}${nieve(548, 34, 40)}
-      ${[270, 282, 296, 440, 452, 466, 590].map((x, i) => arbolito(x, 12 + (i % 3) * 4)).join('')}
-      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 10, 38, '#7f8cff')}${edificio(358, 16, 20, '#5a67d8')}${edificio(376, 12, 30, '#6c7ae0')}
-        <rect x="396" y="${superficie(402) - 34}" width="7" height="36" fill="#9aa3ff"/>
-        <rect x="390" y="${superficie(400) - 14}" width="26" height="16" fill="#7f8cff"/></g>
-      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="399" cy="${superficie(402) - 38}" r="${6 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      ${[262, 276, 292, 306, 440, 454, 468, 590].map((x, i) => arbol(x, 16 + (i % 3) * 4)).join('')}
+      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}
+        <rect x="399" y="${superficie(402) - 34}" width="7" height="36" fill="#9aa3ff"/>
+        <rect x="393" y="${superficie(402) - 14}" width="26" height="16" fill="#7f8cff"/></g>
+      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="402" cy="${superficie(402) - 38}" r="${6 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      ${inundacion}
+      ${regla}
       ${sinAtmosfera ? '' : `<text x="${W - 14}" y="${superficie(W - 14) - 125}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
-      <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>`;
+      <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>
+      <rect width="${W}" height="${H}" fill="url(#kz-vineta)" pointer-events="none"/>`;
   }
 
   function bucle(t) {
@@ -230,8 +286,8 @@ const Invernadero = (function () {
     const dt = Math.min(0.05, (t - (ultimo || t)) / 1000);
     ultimo = t;
     if (!raiz.hidden && raiz.offsetParent !== null) {
-      if (!pausado) avanzar(dt);
-      animarParticulas(dt);
+      if (!pausado) avanzar(dt * velocidad);
+      animarParticulas(dt * velocidad * 0.65);
     }
     requestAnimationFrame(bucle);
   }
@@ -250,7 +306,7 @@ const Invernadero = (function () {
       while (historial.length > VENTANA + 1) historial.shift();
       actualizarLecturas();
       dibujarGrafico();
-      if (anio % 5 === 0) dibujarFondo();
+      dibujarFondo();
     }
   }
 
@@ -411,6 +467,8 @@ const Invernadero = (function () {
     raiz.querySelector('#inv-temp').textContent = T.toFixed(1).replace('.', ',') + ' °C';
     raiz.querySelector('#inv-ppm').textContent = sinAtmosfera ? '—' : ppm + ' ppm';
     raiz.querySelector('#inv-anio').textContent = anio;
+    const eh = estadoHielo(T - T_BASE);
+    raiz.querySelector('#inv-hielo').textContent = Math.round(Math.min(1, eh.hielo) * 100) + ' %';
     raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.classList.toggle('activo', +b.dataset.ppm === ppm));
     const anomalia = T - T_BASE;
     const c = CONSECUENCIAS.find(x => anomalia <= x.hasta);

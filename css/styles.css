@@ -518,6 +518,15 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .inv-escena-panel .inv-leyenda { color: #b8bcf0; }
 .inv-escena-panel .inv-balance b { color: #ffd166; }
 .kz-rotulo { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; fill: #fff; opacity: 0.55; }
+.kz-rotulo.chico { font-size: 7.5px; letter-spacing: 0.12em; opacity: 0.8; }
+.kz-sol-latido { animation: latido-sol 5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes latido-sol { from { transform: scale(0.94); opacity: 0.8; } to { transform: scale(1.06); opacity: 1; } }
+.inv-velocidad { display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem; font-size: 0.9rem; color: #b8bcf0; }
+.segmentado.oscuro { background: #1f2256; box-shadow: none; margin: 0; }
+.segmentado.oscuro button { color: #b8bcf0; padding: 0.3rem 0.7rem; font-size: 0.85rem; }
+.segmentado.oscuro button.activo { background: #ffd166; color: #12143a; }
+.inv-pausa-escena { border: 1px solid #3a3e85; background: transparent; color: #e9ebff; border-radius: 9px; padding: 0.3rem 0.7rem; font-size: 0.85rem; font-weight: 600; }
+.inv-pausa-escena:hover { border-color: #ffd166; }
 .kz-titila { animation: titilar-estrella 2.6s ease-in-out infinite alternate; }
 .kz-titila:nth-child(3n) { animation-delay: 1.3s; }
 @keyframes titilar-estrella { from { opacity: 0.2; } to { opacity: 1; } }
@@ -527,12 +536,12 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .kz-co2 { display: inline-flex; align-items: center; }
 .kz-co2 i { width: 8px; height: 8px; border-radius: 50%; background: #ff6b6b; display: inline-block; }
 .kz-co2 i:nth-child(2) { width: 10px; height: 10px; background: #2b2d42; margin: 0 -2px; border: 1px solid #555a8a; position: relative; }
-@media (prefers-reduced-motion: reduce) { .kz-titila, .kz-humo circle, .kz-nube { animation: none; } .kz-humo circle { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .kz-titila, .kz-humo circle, .kz-nube, .kz-sol-latido { animation: none; } .kz-humo circle { opacity: 0.5; } }
 .inv-leyenda { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 0.6rem; font-size: 0.88rem; color: var(--suave); }
 .inv-leyenda span { display: flex; align-items: center; gap: 0.35rem; }
 .inv-leyenda > span > i { width: 16px; height: 5px; border-radius: 3px; display: inline-block; }
 .inv-balance { text-align: center; margin: 0.5rem 0 0; }
-.inv-lecturas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; text-align: center; }
+.inv-lecturas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; text-align: center; }
 .inv-lecturas > div { background: var(--bg); border-radius: 10px; padding: 0.5rem 0.25rem; }
 .inv-num { display: block; font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 .inv-lab { font-size: 0.78rem; color: var(--suave); }
