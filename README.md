@@ -10,6 +10,7 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | 🧪 **Laboratorio virtual** | Reacciones químicas | Mezclan dos reactivos, observan la reacción animada (burbujas, color, precipitado, espuma, luz y temperatura), deciden si fue un cambio físico o químico y ven la ecuación, el tipo de reacción y las evidencias. Un cuaderno registra los 22 experimentos por descubrir. |
 | ⚖️ **Balanceo de ecuaciones** | Ecuaciones químicas / Ley de Lavoisier | Ajustan coeficientes con una balanza visual y una tabla de conteo de átomos. Tiene 3 niveles y pistas. |
 | 🧩 **Tabla periódica** | Tabla periódica | Exploran los 118 elementos coloreados por familia, por tipo (metal/no metal) o por estado. Cada ficha muestra protones, neutrones, configuración electrónica y modelo de Bohr (hasta Z = 20). Incluye un **desafío** de 10 preguntas con récord. |
+| ⚛️ **Átomos y moléculas** | Estructura de la materia | Arman átomos con protones, neutrones y electrones (hasta Z = 20) y ven qué elemento, isótopo o ion formaron, si el núcleo es estable y la notación ᴬ𝓏X. Luego unen átomos (H, C, N, O, S, Cl) con enlaces simples, dobles o triples respetando cuántos enlaces forma cada uno. Ambos modos tienen misiones. |
 
 ## Cómo usarla
 
@@ -17,8 +18,8 @@ No necesita instalación ni internet: basta con **abrir `index.html`** en cualqu
 
 Para compartirla con los estudiantes por un enlace, se puede publicar gratis con **GitHub Pages**: *Settings → Pages → Deploy from a branch*.
 
-- El botón **📽️ Modo proyector** agranda los textos para proyectar en el aula.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo` o `#tabla`.
+- El botón **📽️ Proyector** agranda los textos para proyectar en el aula.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla` o `#atomos`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -32,6 +33,7 @@ js/transformaciones.js
 js/laboratorio.js     Reactivos y reacciones (fáciles de ampliar)
 js/balanceo.js        Lista de ecuaciones por nivel
 js/tabla.js
+js/atomos.js         Átomos y moléculas (misiones y moléculas conocidas)
 js/app.js             Navegación
 ```
 

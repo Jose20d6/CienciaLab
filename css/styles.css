@@ -107,7 +107,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .hero { text-align: center; padding: 1.5rem 0 1.75rem; }
 .hero h1 { font-size: 2.2rem; margin: 0 0 0.5rem; }
 .hero p { color: var(--suave); margin: 0; font-size: 1.1rem; }
-.tarjetas-inicio { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.tarjetas-inicio { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
 .tarjeta-modulo {
   text-align: left; background: var(--panel); border: 2px solid transparent;
   border-radius: var(--radio); box-shadow: var(--sombra); padding: 1.25rem;
@@ -118,8 +118,6 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .tarjeta-modulo p { margin: 0 0 0.5rem; color: var(--suave); flex: 1; }
 .tarjeta-modulo .etiqueta { align-self: flex-start; }
 .tm-emoji { font-size: 2.4rem; }
-.consejos ul { margin: 0; padding-left: 1.2rem; }
-.consejos li { margin-bottom: 0.35rem; }
 
 /* ---------- Transformaciones ---------- */
 .grid-juego { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1rem; align-items: start; }
@@ -436,6 +434,71 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .bd-fb.mal { background: #ffe3e3; color: var(--mal); }
 .barra-desafio .btn.primario { background: #fff; color: var(--primario); }
 
+/* ---------- Átomos y moléculas ---------- */
+.am-grid { display: grid; grid-template-columns: 290px minmax(0, 1fr) 300px; gap: 1rem; align-items: start; }
+.am-controles h2, .am-info h2 { margin-bottom: 0.6rem; }
+.am-fila { display: grid; grid-template-columns: 1fr auto 2.4rem auto; align-items: center; gap: 0.4rem; padding: 0.4rem 0; border-bottom: 1px solid var(--bg); }
+.am-etiqueta { display: flex; align-items: center; gap: 0.45rem; font-weight: 600; }
+.am-etiqueta small { color: var(--suave); font-weight: 400; }
+.am-paso {
+  width: 2.3rem; height: 2.3rem; border-radius: 50%; border: 1px solid var(--linea); background: var(--bg);
+  font-size: 1.25rem; font-weight: 700; line-height: 1;
+}
+.am-paso:hover:not(:disabled) { background: var(--primario-suave); border-color: var(--primario); color: var(--primario); }
+.am-paso:disabled { opacity: 0.35; }
+.am-num { text-align: center; font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.particula { display: inline-block; width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.particula.proton, #am-svg-atomo .proton { background: #e03131; fill: #e03131; stroke: #a51d1d; }
+.particula.neutron, #am-svg-atomo .neutron { background: #adb5bd; fill: #adb5bd; stroke: #7b858e; }
+.particula.electron, #am-svg-atomo .electron { background: #1c7ed6; fill: #1c7ed6; stroke: #145a9c; }
+.am-recordatorio { font-size: 0.88rem; color: var(--suave); margin: 0.75rem 0; }
+.am-visor { display: flex; flex-direction: column; align-items: center; }
+#am-svg-atomo { width: 100%; max-width: 360px; height: auto; color: var(--texto); }
+.orbita { transform-box: view-box; transform-origin: 50% 50%; animation: girar linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .orbita { animation: none; } }
+.am-vacio { fill: var(--suave); font-size: 15px; }
+.am-leyenda { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 0.85rem; color: var(--suave); }
+.am-leyenda span { display: flex; align-items: center; gap: 0.35rem; }
+.am-notacion { display: flex; align-items: center; justify-content: center; gap: 0.1rem; margin: 0.25rem 0 0.5rem; }
+.am-n-izq { display: flex; flex-direction: column; align-items: flex-end; font-size: 1.1rem; font-weight: 700; line-height: 1.1; color: var(--suave); }
+.am-n-sim { font-size: 3.4rem; font-weight: 800; line-height: 1; }
+.am-n-carga { align-self: flex-start; font-size: 1.3rem; font-weight: 800; color: var(--quimico); }
+.am-grande { font-size: 1.3rem; font-weight: 800; margin: 0 0 0.15rem; text-align: center; }
+.am-tipo { text-align: center; color: var(--suave); margin: 0 0 0.75rem; }
+.am-datos { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 0.75rem; margin: 0 0 0.75rem; font-size: 0.92rem; }
+.am-datos dt { color: var(--suave); }
+.am-datos dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.am-ok { background: var(--ok-suave); color: var(--ok); border-radius: 10px; padding: 0.5rem 0.7rem; margin: 0 0 0.5rem; }
+.am-alerta { background: var(--aviso-suave); color: #8a6d00; border-radius: 10px; padding: 0.5rem 0.7rem; margin: 0 0 0.5rem; }
+.am-dato { background: var(--bg); border-radius: 10px; padding: 0.5rem 0.7rem; margin: 0 0 0.5rem; }
+.am-info p { margin: 0 0 0.5rem; }
+.am-mision { border: 2px dashed var(--linea); border-radius: 12px; padding: 0.75rem; margin-top: 0.5rem; }
+.am-mision.cumplida { border-style: solid; border-color: var(--ok); background: var(--ok-suave); }
+.am-mision p { margin: 0.4rem 0 0.6rem; }
+.am-mision-cab { display: flex; justify-content: space-between; font-size: 0.9rem; }
+.am-mision-cab span { color: var(--ok); font-weight: 700; }
+.am-logro { color: var(--ok); font-weight: 700; }
+.am-paleta { display: flex; flex-direction: column; gap: 0.35rem; }
+.am-ficha { display: flex; align-items: center; gap: 0.6rem; text-align: left; background: var(--bg); border: 2px solid transparent; border-radius: 10px; padding: 0.35rem 0.55rem; }
+.am-ficha:hover { border-color: var(--primario); }
+.am-ficha small { display: block; color: var(--suave); font-size: 0.8rem; }
+.am-bolita { width: 2.2rem; height: 2.2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1.5px solid rgba(0,0,0,.3); flex: none; }
+.am-acciones { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
+.am-ayuda { font-size: 0.9rem; color: var(--suave); margin: 0 0 0.5rem; align-self: stretch; }
+#am-svg-mol { width: 100%; height: auto; background: var(--bg); border-radius: 12px; touch-action: none; user-select: none; }
+.am-atomo { cursor: grab; }
+.am-sim { font-size: 17px; font-weight: 800; pointer-events: none; }
+.am-anillo { fill: none; stroke: var(--primario); stroke-width: 3; stroke-dasharray: 6 4; }
+.am-enlace { stroke: #495057; stroke-width: 4; stroke-linecap: round; }
+.am-libres { fill: #fff3bf; stroke: #f59f00; stroke-width: 1.5; }
+.am-libres.completo { fill: #d3f9d8; stroke: var(--ok); }
+.am-libres-txt { font-size: 12px; font-weight: 800; fill: #5c3c00; pointer-events: none; }
+.am-aviso { min-height: 1.5rem; margin: 0.5rem 0 0; font-weight: 600; color: var(--primario); text-align: center; }
+.am-aviso.alerta { color: #b35c00; }
+.am-formula { font-size: 2.2rem; font-weight: 800; text-align: center; margin: 0 0 0.5rem; }
+.am-enlaces-cuenta { font-size: 0.9rem; color: var(--suave); }
+
 /* ---------- Pantallas chicas ---------- */
 @media (prefers-reduced-motion: reduce) {
   .burbuja, .gases span { animation-duration: 3s !important; }
@@ -445,6 +508,8 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .reactivos { flex-direction: row; flex-wrap: wrap; max-height: none; }
   .reactivo { flex: 1 1 200px; }
   .grid-juego { grid-template-columns: 1fr; }
+  .am-grid { grid-template-columns: 1fr; }
+  .am-visor { order: -1; }
 }
 @media (max-width: 600px) {
   .hero h1 { font-size: 1.6rem; }

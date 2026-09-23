@@ -15,8 +15,9 @@
       <button data-go="laboratorio">🧪 Laboratorio</button>
       <button data-go="balanceo">⚖️ Balanceo</button>
       <button data-go="tabla">🧩 Tabla periódica</button>
+      <button data-go="atomos">⚛️ Átomos</button>
     </nav>
-    <button id="btn-proyector" class="ghost" title="Agranda los textos para proyectar en el aula">📽️ Modo proyector</button>
+    <button id="btn-proyector" class="ghost" title="Agranda los textos para proyectar en el aula">📽️ Proyector</button>
   </header>
 
   <main>
@@ -51,15 +52,12 @@
           <p>Explora los 118 elementos, sus propiedades y su estructura. Luego acepta el desafío.</p>
           <span class="etiqueta">Tabla periódica</span>
         </button>
-      </div>
-
-      <div class="panel consejos">
-        <h2>👩‍🏫 Ideas para usarla en clase</h2>
-        <ul>
-          <li><b>Proyectada:</b> activa el <em>Modo proyector</em> y hagan votación a mano alzada antes de responder.</li>
-          <li><b>En parejas:</b> cada grupo completa el cuaderno del laboratorio y compara sus observaciones.</li>
-          <li><b>Como cierre:</b> una ronda de desafío de la tabla periódica o de balanceo para repasar.</li>
-        </ul>
+        <button class="tarjeta-modulo" data-go="atomos">
+          <span class="tm-emoji">⚛️</span>
+          <h2>Átomos y moléculas</h2>
+          <p>Arma átomos, isótopos e iones con protones, neutrones y electrones. Después une átomos para formar moléculas.</p>
+          <span class="etiqueta">Estructura de la materia</span>
+        </button>
       </div>
     </section>
 
@@ -67,6 +65,7 @@
     <section id="laboratorio" class="view" hidden></section>
     <section id="balanceo" class="view" hidden></section>
     <section id="tabla" class="view" hidden></section>
+    <section id="atomos" class="view" hidden></section>
   </main>
 
   <script src="js/util.js"></script>
@@ -75,6 +74,7 @@
   <script src="js/laboratorio.js"></script>
   <script src="js/balanceo.js"></script>
   <script src="js/tabla.js"></script>
+  <script src="js/atomos.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
