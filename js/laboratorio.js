@@ -27,6 +27,7 @@ const Laboratorio = (function () {
   // anim: cómo se ve la reacción en el vaso.
   //   burbujas 0-3 · espuma (color) · precipitado (color) · liquidoFin (color) · nivelFin (%)
   //   solidoFin (color, o null si desaparece) · solidoTam (0-1) · luz · humo · temp (variación en °C)
+  //   espumaExtra (% que sube por encima del borde) · espumaBaja (la espuma luego baja) · gas (nombre del gas que escapa)
   const REACCIONES = [
     {
       r: ['vinagre', 'bicarbonato'], titulo: 'Vinagre + bicarbonato', cambio: 'quimico',
@@ -37,7 +38,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas', 'Absorción de energía (se enfría)'],
       explicacion: 'Las burbujas son dióxido de carbono (CO₂), una sustancia que no estaba al principio. Por eso es un cambio químico.',
       dato: 'Es la misma reacción de los "volcanes" de las ferias de ciencias.',
-      anim: { burbujas: 3, espuma: '#fffaf0', solidoFin: null, temp: -3 },
+      anim: { burbujas: 3, espuma: '#fbefc9', espumaExtra: 6, espumaBaja: true, solidoFin: null, temp: -3, gas: 'dióxido de carbono (CO₂)' },
     },
     {
       r: ['hcl', 'naoh'], titulo: 'Ácido + base: neutralización', cambio: 'quimico',
@@ -125,7 +126,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas', 'Liberación de calor'],
       explicacion: 'El zinc reemplaza al hidrógeno del ácido. El gas que burbujea es hidrógeno (H₂).',
       dato: 'El hidrógeno es muy inflamable: si acercas una llama a un tubo con este gas se oye un pequeño "¡pop!".',
-      anim: { burbujas: 2, temp: 6, solidoTam: 0.55 },
+      anim: { burbujas: 2, temp: 6, solidoTam: 0.55, gas: 'hidrógeno (H₂)' },
     },
     {
       r: ['mg', 'hcl'], titulo: 'Magnesio + ácido', cambio: 'quimico',
@@ -136,7 +137,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas', 'Liberación de calor'],
       explicacion: 'El magnesio desplaza al hidrógeno del ácido y se libera hidrógeno gaseoso (H₂).',
       dato: 'El magnesio reacciona más rápido que el zinc porque es un metal más activo.',
-      anim: { burbujas: 3, temp: 15, solidoFin: null },
+      anim: { burbujas: 3, temp: 15, solidoFin: null, gas: 'hidrógeno (H₂)' },
     },
     {
       r: ['fe', 'hcl'], titulo: 'Hierro + ácido', cambio: 'quimico',
@@ -147,7 +148,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas', 'Cambio de color'],
       explicacion: 'El hierro reacciona con el ácido, pero más despacio que el magnesio o el zinc.',
       dato: 'Por eso los alimentos ácidos no se guardan en latas de hierro sin recubrir.',
-      anim: { burbujas: 1, liquidoFin: 'rgba(178, 242, 187, 0.7)', temp: 3 },
+      anim: { burbujas: 1, liquidoFin: 'rgba(178, 242, 187, 0.7)', temp: 3, gas: 'hidrógeno (H₂)' },
     },
     {
       r: ['fe', 'cuso4'], titulo: 'Clavo de hierro + sulfato de cobre', cambio: 'quimico',
@@ -191,7 +192,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas', 'Liberación de calor'],
       explicacion: 'El agua oxigenada se descompone en agua y oxígeno. El yoduro de potasio es un catalizador: acelera la reacción sin gastarse.',
       dato: 'Con detergente y colorante, este experimento se conoce como "pasta de dientes de elefante".',
-      anim: { espuma: '#fff3bf', burbujas: 3, temp: 12, liquidoFin: 'rgba(255, 232, 161, 0.8)' },
+      anim: { espuma: '#fff3bf', espumaExtra: 75, burbujas: 3, temp: 12, liquidoFin: 'rgba(255, 232, 161, 0.8)', gas: 'oxígeno (O₂)' },
     },
     {
       r: ['mg', 'calor'], titulo: 'Combustión del magnesio', cambio: 'quimico',
@@ -224,7 +225,7 @@ const Laboratorio = (function () {
       evidencias: ['Desprendimiento de gas'],
       explicacion: 'Se forman carbonato de sodio, agua y dióxido de carbono: sustancias nuevas. ¡No siempre un cambio químico cambia el aspecto!',
       dato: 'Por eso el bicarbonato sirve para hornear: el CO₂ infla la masa.',
-      anim: { humo: true, temp: 30 },
+      anim: { humo: true, temp: 30, gas: 'dióxido de carbono (CO₂)' },
     },
     {
       r: ['hielo', 'calor'], titulo: 'Hielo + calor: fusión', cambio: 'fisico',
@@ -246,7 +247,7 @@ const Laboratorio = (function () {
       evidencias: [],
       explicacion: 'Las burbujas son vapor de agua, no una sustancia nueva: sigue siendo H₂O. Si el vapor toca algo frío, se condensa y vuelve a ser líquido.',
       dato: '¡Ojo! No todas las burbujas indican un cambio químico. Aquí son del agua cambiando de estado.',
-      anim: { burbujas: 2, humo: true, nivelFin: 15, temp: 80 },
+      anim: { burbujas: 2, humo: true, nivelFin: 15, temp: 80, gas: 'vapor de agua (H₂O)' },
     },
     {
       r: ['sal', 'agua'], titulo: 'Sal + agua: disolución', cambio: 'fisico',
@@ -322,6 +323,8 @@ const Laboratorio = (function () {
           <div class="mesa" id="lab-mesa">
             <div class="soporte">
               <div class="vaso" id="lab-vaso">
+                <div class="cayendo" aria-hidden="true"></div>
+                <div class="gases" aria-hidden="true"></div>
                 <div class="humo"><span></span><span></span><span></span></div>
                 <div class="espuma"></div>
                 <div class="vaso-interior">
@@ -338,6 +341,7 @@ const Laboratorio = (function () {
               <span class="temp-valor">20 °C</span>
             </div>
           </div>
+          <ol class="narracion" id="lab-narracion" aria-live="polite"></ol>
           <div class="lab-botones">
             <button id="lab-mezclar" class="btn primario" disabled>Mezclar ⚗️</button>
             <button id="lab-limpiar" class="btn">🧽 Limpiar mesa</button>
@@ -412,9 +416,11 @@ const Laboratorio = (function () {
     });
     raiz.querySelectorAll('.reactivo').forEach(b => b.classList.toggle('elegido', seleccion.includes(b.dataset.id)));
     raiz.querySelector('#lab-mezclar').disabled = ocupado || seleccion.includes(null);
-    dibujarEstado(estadoInicial(seleccion.filter(Boolean).map(id => POR_ID[id])), false);
+    raiz.querySelector('#lab-narracion').innerHTML = '';
+    dibujarEstado(estadoPrevio(seleccion.filter(Boolean).map(id => POR_ID[id])), false);
   }
 
+  // Estado del vaso con los dos reactivos ya juntos (antes de que reaccionen).
   function estadoInicial(rs) {
     const liquidos = rs.filter(r => r.tipo === 'liquido');
     const solido = rs.find(r => r.tipo === 'solido');
@@ -429,22 +435,48 @@ const Laboratorio = (function () {
     };
   }
 
+  // Antes de mezclar solo se ve el primer líquido en el vaso; lo demás se agrega al tocar "Mezclar".
+  function estadoPrevio(rs) {
+    const e = estadoInicial(rs);
+    const liquidos = rs.filter(r => r.tipo === 'liquido');
+    e.calor = false;
+    if (liquidos.length) {
+      e.liquido = liquidos[0].color;
+      e.nivel = 30;
+      e.solido = null;
+    }
+    return e;
+  }
+
+  // El reactivo que se agrega al vaso al mezclar.
+  function agregado(rs) {
+    const liquidos = rs.filter(r => r.tipo === 'liquido');
+    if (!liquidos.length) return rs.find(r => r.tipo === 'energia') || null;
+    return rs.find(r => r !== liquidos[0]);
+  }
+
   function dibujarEstado(e, animado) {
     vaso.classList.toggle('sin-transicion', !animado);
     const liq = vaso.querySelector('.liquido');
     liq.style.height = (e.liquido ? e.nivel : 0) + '%';
     if (e.liquido) liq.style.background = e.liquido;
     const sol = vaso.querySelector('.solido');
+    // Si el sólido desaparece (se disuelve o se consume), primero se achica y recién después se desvanece.
+    sol.style.setProperty('--demora', e.solido ? '0s' : '2.4s');
+    // Al caer al vaso aparece de golpe; los cambios de tamaño posteriores son lentos.
+    sol.style.setProperty('--duracion', e.solido && sol.style.opacity !== '1' ? '0.3s' : '2.6s');
     sol.style.opacity = e.solido ? 1 : 0;
     if (e.solido) sol.style.background = e.solido;
-    sol.style.transform = `translateX(-50%) scale(${e.solido ? e.solidoTam : 0.2})`;
+    sol.style.transform = `translateX(-50%) scale(${e.solido ? e.solidoTam : 0.15})`;
     raiz.querySelector('#lab-mesa').classList.toggle('con-calor', e.calor);
     if (!animado) {
       vaso.querySelector('.burbujas').innerHTML = '';
+      vaso.querySelector('.gases').innerHTML = '';
       vaso.querySelector('.precipitado').style.height = '0';
       vaso.querySelector('.espuma').style.height = '0';
       vaso.querySelector('.flash').classList.remove('activo');
       vaso.querySelector('.humo').classList.remove('activo');
+      vaso.querySelector('.cayendo').classList.remove('activo');
       ponerTemperatura(e.temp);
       void vaso.offsetHeight; // aplica los estilos antes de reactivar las transiciones
       vaso.classList.remove('sin-transicion');
@@ -467,48 +499,100 @@ const Laboratorio = (function () {
     requestAnimationFrame(paso);
   }
 
-  function mezclar() {
-    const [a, b] = seleccion.map(id => POR_ID[id]);
-    const reac = MAPA[clave(a.id, b.id)] || reaccionPorDefecto(a, b);
-    const an = reac.anim || {};
-    const ini = estadoInicial([a, b]);
-    ocupado = true;
-    actualizarBotones();
+  function narrar(texto, icono) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="n-ico">${icono}</span><span>${texto}</span>`;
+    raiz.querySelector('#lab-narracion').appendChild(li);
+  }
 
+  function crearBurbujas(nivel, desdeSolido) {
+    const n = [0, 10, 22, 45][nivel];
+    vaso.querySelector('.burbujas').innerHTML = Array.from({ length: n }, () => {
+      const tam = 5 + Math.random() * 9;
+      const x = desdeSolido ? 32 + Math.random() * 36 : 5 + Math.random() * 88;
+      const dx = (Math.random() * 24 - 12).toFixed(0);
+      return `<span class="burbuja" style="left:${x}%;width:${tam}px;height:${tam}px;--dx:${dx}px;` +
+        `animation-delay:${(Math.random() * 1.4).toFixed(2)}s;animation-duration:${(0.9 + Math.random() * 0.9).toFixed(2)}s"></span>`;
+    }).join('');
+  }
+
+  function soltarGas(nombre) {
+    const corto = (nombre.match(/\(([^)]+)\)/) || [, nombre])[1];
+    vaso.querySelector('.gases').innerHTML = [0, 1, 2, 3].map(i =>
+      `<span style="left:${[-40, 10, -15, 30][i]}px;animation-delay:${i * 0.55}s">${corto}</span>`).join('');
+  }
+
+  // La mezcla ocurre en etapas, cada una narrada debajo del vaso:
+  // 1) se agrega el segundo reactivo, 2) aparecen las evidencias una por una, 3) se pregunta qué tipo de cambio fue.
+  function mezclar() {
+    const rs = seleccion.map(id => POR_ID[id]);
+    const reac = MAPA[clave(rs[0].id, rs[1].id)] || reaccionPorDefecto(rs[0], rs[1]);
+    const an = reac.anim || {};
+    const ini = estadoInicial(rs);
     const fin = { ...ini };
     if ('liquidoFin' in an) fin.liquido = an.liquidoFin;
     if ('nivelFin' in an) fin.nivel = an.nivelFin;
     if ('solidoFin' in an) fin.solido = an.solidoFin;
     if ('solidoTam' in an) fin.solidoTam = an.solidoTam;
-    dibujarEstado(fin, true);
+    ocupado = true;
+    actualizarBotones();
+    raiz.querySelector('#lab-resultado').innerHTML = '';
+    raiz.querySelector('#lab-narracion').innerHTML = '';
 
-    if (an.burbujas) {
-      const cont = vaso.querySelector('.burbujas');
-      const n = [0, 8, 16, 30][an.burbujas];
-      cont.innerHTML = Array.from({ length: n }, () => {
-        const tam = 4 + Math.random() * 8;
-        return `<span class="burbuja" style="left:${5 + Math.random() * 88}%;width:${tam}px;height:${tam}px;animation-delay:${(Math.random() * 1.6).toFixed(2)}s;animation-duration:${(1 + Math.random()).toFixed(2)}s"></span>`;
-      }).join('');
+    // Etapa 1: agregar
+    const add = agregado(rs);
+    let t = 0;
+    if (add && add.tipo !== 'energia') {
+      const c = vaso.querySelector('.cayendo');
+      c.textContent = add.icono;
+      c.classList.remove('activo');
+      void c.offsetWidth;
+      c.classList.add('activo');
+      narrar(`Se agrega ${add.nombre.toLowerCase()} al vaso.`, '⬇️');
+      setTimeout(() => dibujarEstado(ini, true), 550);
+      t = 1300;
+    } else {
+      narrar(add ? 'Se enciende el mechero.' : 'Se juntan las sustancias.', add ? '🔥' : '🥣');
+      dibujarEstado(ini, true);
+      t = 900;
     }
-    if (an.precipitado) {
+
+    // Etapa 2: la reacción, con cada evidencia narrada por separado
+    const pasos = [];
+    const paso = (fn, texto, icono) => pasos.push({ fn, texto, icono });
+    if (an.burbujas) paso(() => crearBurbujas(an.burbujas, !!ini.solido && !!ini.liquido),
+      ini.solido && ini.liquido ? 'Salen burbujas desde el sólido: se está formando un gas.' : 'Aparecen burbujas: se está formando un gas.', '🫧');
+    if (an.espuma) paso(() => {
+      const e = vaso.querySelector('.espuma');
+      e.style.setProperty('--espuma', an.espuma);
+      e.style.bottom = fin.nivel + '%';
+      e.style.height = (100 - fin.nivel + (an.espumaExtra || 0)) + '%';
+      if (an.espumaBaja) setTimeout(() => { e.style.height = '7%'; }, 2600);
+    }, (an.espumaExtra || 0) > 30 ? '¡Se forma tanta espuma que desborda el vaso!' : 'Las burbujas forman espuma que sube hasta el borde.', '🧼');
+    if (an.gas) paso(() => soltarGas(an.gas), `El gas escapa del vaso: es <b>${an.gas}</b>.`, '💨');
+    if (an.precipitado) paso(() => {
       const p = vaso.querySelector('.precipitado');
       p.style.background = an.precipitado;
       p.style.height = '16%';
-    }
-    if (an.espuma) {
-      const e = vaso.querySelector('.espuma');
-      e.style.setProperty('--espuma', an.espuma);
-      e.style.height = '135%';
-    }
-    if (an.luz) vaso.querySelector('.flash').classList.add('activo');
-    if (an.humo) vaso.querySelector('.humo').classList.add('activo');
-    if (an.temp) animarTemperatura(ini.temp, ini.temp + an.temp, 2200);
+    }, 'Aparece un sólido nuevo que se deposita en el fondo (precipitado).', '⬇️');
+    if ('liquidoFin' in an && ini.liquido && an.liquidoFin !== ini.liquido) paso(() => {}, 'El líquido cambia de color.', '🎨');
+    if (an.luz) paso(() => vaso.querySelector('.flash').classList.add('activo'), '¡Un destello de luz muy intenso!', '✨');
+    if (an.humo && !an.gas) paso(() => vaso.querySelector('.humo').classList.add('activo'), 'Sale humo.', '🌫️');
+    if (an.humo && an.gas) vaso.querySelector('.humo').classList.add('activo');
+    if (ini.solido && fin.solido === null) paso(() => {}, ini.liquido ? 'El sólido se va achicando hasta desaparecer.' : 'El sólido se derrite.', '🔍');
+    else if (ini.solido && fin.solido !== ini.solido) paso(() => {}, 'El sólido cambia de color.', '🎨');
+    if (an.temp) paso(() => animarTemperatura(ini.temp, ini.temp + an.temp, 2200),
+      `La temperatura ${an.temp > 0 ? 'sube' : 'baja'}: de ${ini.temp} °C a ${ini.temp + an.temp} °C.`, an.temp > 0 ? '🌡️' : '❄️');
+    if (!pasos.length) paso(() => {}, 'No se observa ningún cambio.', '👀');
+
+    setTimeout(() => dibujarEstado(fin, true), t);
+    pasos.forEach((p, i) => setTimeout(() => { p.fn(); narrar(p.texto, p.icono); }, t + i * 800));
 
     setTimeout(() => {
       ocupado = false;
       actualizarBotones();
       preguntar(reac);
-    }, 2400);
+    }, t + pasos.length * 800 + 900);
   }
 
   function actualizarBotones() {

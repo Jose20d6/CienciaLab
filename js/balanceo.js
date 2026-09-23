@@ -56,7 +56,10 @@ const Balanceo = (function () {
 
   const mcd = (a, b) => (b ? mcd(b, a % b) : a);
 
-  let raiz, nivel = 1, lista, indice = 0, coef = [];
+  const NIVELES = [1, 2, 3];
+  const ESPERA = 6; // segundos antes de pasar solo al nivel siguiente
+
+  let raiz, nivel = 1, lista, indice = 0, coef = [], cuentaAtras = null;
   let resueltas = new Set(Util.leer('bal-resueltas', []));
 
   function iniciar(el) {
@@ -74,6 +77,7 @@ const Balanceo = (function () {
         <button data-n="3">Nivel 3 · Avanzado</button>
       </div>
       <div class="panel bal-panel">
+        <div class="bal-festejo" id="bal-festejo" hidden></div>
         <div class="bal-cabecera">
           <span id="bal-titulo"></span>
           <span id="bal-puntos"></span>
@@ -107,10 +111,74 @@ const Balanceo = (function () {
   }
 
   function elegirNivel(n) {
+    cerrarFestejo();
     nivel = n;
     lista = ECUACIONES.filter(e => e.nivel === n);
-    raiz.querySelectorAll('#bal-niveles button').forEach(b => b.classList.toggle('activo', +b.dataset.n === n));
-    ir(0);
+    pintarNiveles();
+    // Empieza por la primera ecuación que falta resolver.
+    const pendiente = lista.findIndex(e => !resueltas.has(e.nombre));
+    ir(pendiente === -1 ? 0 : pendiente);
+  }
+
+  function pintarNiveles() {
+    raiz.querySelectorAll('#bal-niveles button').forEach(b => {
+      const n = +b.dataset.n;
+      const completo = ECUACIONES.filter(e => e.nivel === n).every(e => resueltas.has(e.nombre));
+      b.classList.toggle('activo', n === nivel);
+      b.classList.toggle('completo', completo);
+    });
+  }
+
+  function festejar() {
+    const siguiente = NIVELES.find(n => n > nivel);
+    const f = raiz.querySelector('#bal-festejo');
+    const confeti = Array.from({ length: 24 }, (_, i) =>
+      `<span style="left:${(i * 4.2 + Math.random() * 3).toFixed(1)}%;background:${['#3b5bdb', '#e8590c', '#2b8a3e', '#fab005', '#e64980'][i % 5]};` +
+      `animation-delay:${(Math.random() * 0.6).toFixed(2)}s"></span>`).join('');
+    f.innerHTML = `
+      <div class="confeti">${confeti}</div>
+      <div class="festejo-caja">
+        <div class="festejo-emoji">🏆</div>
+        <h2>¡Felicitaciones! Completaste el Nivel ${nivel}</h2>
+        <p>Balanceaste las ${lista.length} ecuaciones. Los átomos quedaron iguales de ambos lados, tal como dice la ley de Lavoisier.</p>
+        ${siguiente
+          ? `<p class="festejo-cuenta">Pasando al Nivel ${siguiente} en <b id="bal-cuenta">${ESPERA}</b> s…</p>
+             <div class="festejo-botones">
+               <button class="btn primario" id="bal-ir">Ir al Nivel ${siguiente} ahora →</button>
+               <button class="btn" id="bal-quedarse">Quedarme aquí</button>
+             </div>`
+          : `<p><b>¡Terminaste todos los niveles!</b> Ya eres un experto en balanceo de ecuaciones.</p>
+             <div class="festejo-botones">
+               <button class="btn primario" id="bal-reempezar">Empezar de nuevo desde el Nivel 1</button>
+               <button class="btn" id="bal-quedarse">Cerrar</button>
+             </div>`}
+      </div>`;
+    f.hidden = false;
+    f.querySelector('#bal-quedarse').addEventListener('click', cerrarFestejo);
+    if (siguiente) {
+      f.querySelector('#bal-ir').addEventListener('click', () => elegirNivel(siguiente));
+      let quedan = ESPERA;
+      cuentaAtras = setInterval(() => {
+        quedan--;
+        const c = f.querySelector('#bal-cuenta');
+        if (c) c.textContent = quedan;
+        if (quedan <= 0) elegirNivel(siguiente);
+      }, 1000);
+    } else {
+      f.querySelector('#bal-reempezar').addEventListener('click', () => {
+        resueltas = new Set();
+        Util.guardar('bal-resueltas', []);
+        elegirNivel(1);
+      });
+    }
+  }
+
+  function cerrarFestejo() {
+    clearInterval(cuentaAtras);
+    cuentaAtras = null;
+    const f = raiz.querySelector('#bal-festejo');
+    f.hidden = true;
+    f.innerHTML = '';
   }
 
   function ir(i) {
@@ -193,8 +261,14 @@ const Balanceo = (function () {
     } else if (balanceada) {
       msg.className = 'bal-mensaje ok';
       msg.innerHTML = '🎉 ¡Ecuación balanceada! Hay la misma cantidad de cada átomo en ambos lados.';
+      const nueva = !resueltas.has(eq.nombre);
       resueltas.add(eq.nombre);
       Util.guardar('bal-resueltas', [...resueltas]);
+      if (nueva) {
+        pintarNiveles();
+        if (lista.every(e => resueltas.has(e.nombre))) setTimeout(festejar, 900);
+        else msg.innerHTML += ' Toca <b>Siguiente →</b> para continuar.';
+      }
     } else {
       msg.className = 'bal-mensaje';
       msg.textContent = 'Revisa la tabla: las filas en rojo muestran los átomos que todavía no coinciden.';

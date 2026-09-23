@@ -183,31 +183,68 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .burbujas { position: absolute; inset: 0; }
 .burbuja {
   position: absolute; bottom: 0; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,.95); background: rgba(255,255,255,.35);
+  border: 1.5px solid rgba(73, 90, 110, 0.55); background: radial-gradient(circle at 35% 30%, #fff 20%, rgba(255,255,255,.35) 60%);
   animation: subir 1.4s ease-in infinite;
 }
-@keyframes subir { from { bottom: 0; opacity: 1; } to { bottom: 96%; opacity: 0.1; } }
+@keyframes subir {
+  0% { bottom: 0; transform: translateX(0) scale(0.5); opacity: 1; }
+  50% { transform: translateX(var(--dx, 0)) scale(0.9); }
+  92% { opacity: 1; }
+  100% { bottom: 97%; transform: translateX(0) scale(1.15); opacity: 0; }
+}
 .precipitado {
   position: absolute; left: 0; right: 0; bottom: 0; height: 0;
   border-radius: 40% 40% 0 0 / 30% 30% 0 0;
   transition: height 2s ease 0.4s;
 }
 .solido {
-  position: absolute; left: 50%; bottom: 8px; width: 64px; height: 26px; border-radius: 8px;
-  border: 1px solid rgba(0,0,0,.18); opacity: 0;
+  position: absolute; left: 50%; bottom: 6px; width: 70px; height: 28px; border-radius: 50% 50% 8px 8px / 80% 80% 8px 8px;
+  border: 1.5px solid rgba(73, 90, 110, 0.45); box-shadow: inset 0 -4px 0 rgba(0,0,0,.08); opacity: 0;
   transform: translateX(-50%); transform-origin: bottom center;
-  transition: background-color 2s ease, opacity 1.8s ease, transform 1.8s ease;
+  transition: background-color 2s ease, opacity 0.4s ease var(--demora, 0s), transform var(--duracion, 2.6s) ease;
 }
 .espuma {
   --espuma: #fff;
-  position: absolute; left: -8px; right: -8px; bottom: 0; height: 0; z-index: 3;
-  border-radius: 50px 50px 12px 12px;
+  position: absolute; left: 4px; right: 4px; bottom: 0; height: 0; z-index: 3;
+  border-radius: 45% 45% 0 0 / 22px 22px 0 0;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,.95) 6px, transparent 7px) 0 0 / 24px 24px,
-    radial-gradient(circle at 70% 60%, rgba(0,0,0,.05) 5px, transparent 6px) 0 0 / 20px 20px,
+    radial-gradient(circle, transparent 5px, rgba(120,120,120,.25) 6px, transparent 7px) 0 0 / 18px 18px,
+    radial-gradient(circle, transparent 3px, rgba(120,120,120,.2) 4px, transparent 5px) 9px 9px / 18px 18px,
     var(--espuma);
-  transition: height 2.2s cubic-bezier(.2,.8,.3,1);
+  box-shadow: inset 0 6px 8px rgba(255,255,255,.8);
+  transition: height 2.4s cubic-bezier(.2,.8,.3,1);
 }
+/* Reactivo que cae dentro del vaso al mezclar */
+.cayendo {
+  position: absolute; left: 50%; top: -70px; z-index: 6; font-size: 2.2rem; line-height: 1;
+  opacity: 0; transform: translateX(-50%); pointer-events: none;
+}
+.cayendo.activo { animation: caer 1.1s ease-in forwards; }
+@keyframes caer {
+  0% { opacity: 0; transform: translate(-50%, -20px) rotate(-20deg); }
+  15% { opacity: 1; }
+  60% { opacity: 1; transform: translate(-50%, 110px) rotate(10deg); }
+  100% { opacity: 0; transform: translate(-50%, 150px) scale(0.6); }
+}
+/* Etiquetas del gas que escapa */
+.gases { position: absolute; left: 50%; top: 0; width: 0; z-index: 6; pointer-events: none; }
+.gases span {
+  position: absolute; top: 0; white-space: nowrap; font-weight: 800; font-size: 0.95rem;
+  color: #1864ab; background: #e7f5ff; border: 1px solid #a5d8ff; border-radius: 999px; padding: 0 0.45rem;
+  opacity: 0; animation: gas 2.2s ease-out infinite;
+}
+@keyframes gas {
+  0% { opacity: 0; transform: translateY(10px) scale(.8); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-75px) scale(1.1); }
+}
+/* Narración paso a paso de lo que ocurre */
+.narracion { list-style: none; margin: 0.75rem auto 0; padding: 0; max-width: 460px; display: flex; flex-direction: column; gap: 0.35rem; }
+.narracion li {
+  display: flex; gap: 0.6rem; align-items: center; background: var(--bg); border-radius: 10px; padding: 0.4rem 0.75rem;
+  animation: aparecer 0.35s ease;
+}
+.narracion .n-ico { font-size: 1.2rem; flex: none; }
 .flash {
   position: absolute; inset: -60px; z-index: 5; pointer-events: none; opacity: 0; border-radius: 50%;
   background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.95) 30%, rgba(255,250,220,0) 70%);
@@ -295,6 +332,26 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .bal-mensaje.ok { background: var(--ok-suave); color: var(--ok); font-weight: 700; animation: aparecer .3s ease; }
 .bal-mensaje.aviso { background: var(--aviso-suave); color: #8a6d00; }
 .bal-botones { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 0.75rem; }
+.niveles button.completo::after { content: " ✓"; color: var(--ok); }
+.niveles button.completo.activo::after { color: #d3f9d8; }
+.bal-panel { position: relative; }
+.bal-festejo {
+  position: absolute; inset: 0; z-index: 10; overflow: hidden; border-radius: var(--radio);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  background: rgba(255, 255, 255, 0.94);
+}
+.festejo-caja { position: relative; text-align: center; max-width: 520px; animation: aparecer 0.4s ease; }
+.festejo-caja h2 { font-size: 1.6rem; margin: 0.25rem 0 0.5rem; text-wrap: balance; }
+.festejo-caja p { margin: 0 0 0.75rem; color: var(--suave); }
+.festejo-emoji { font-size: 4rem; line-height: 1; animation: saltar 0.9s ease infinite alternate; }
+.festejo-cuenta { font-weight: 600; color: var(--primario) !important; }
+.festejo-botones { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.confeti span {
+  position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px;
+  animation: confeti 2.6s linear infinite;
+}
+@keyframes confeti { to { transform: translateY(620px) rotate(540deg); } }
+@keyframes saltar { to { transform: translateY(-10px) scale(1.05); } }
 
 /* ---------- Tabla periódica ---------- */
 .tp-controles { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
@@ -302,8 +359,8 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .tp-grid {
   --celda: 58px;
   display: grid; gap: 3px;
-  grid-template-columns: repeat(18, var(--celda));
-  grid-template-rows: repeat(7, var(--celda)) 14px repeat(2, var(--celda));
+  grid-template-columns: 30px repeat(18, var(--celda));
+  grid-template-rows: 38px repeat(7, var(--celda)) 14px repeat(2, var(--celda));
   width: max-content; margin: 0 auto;
 }
 html.proyector .tp-grid { --celda: 62px; }
@@ -329,10 +386,22 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 @keyframes latido { to { transform: scale(1.12); } }
 
 .tp-detalle {
-  grid-row: 1 / 4; grid-column: 3 / 13; align-self: stretch;
+  grid-row: 2 / 5; grid-column: 4 / 14; align-self: stretch;
   display: flex; gap: 0.9rem; align-items: center; padding: 0.35rem 0.6rem; overflow: hidden;
   font-size: 0.8rem;
 }
+.tp-grupo, .tp-periodo {
+  border: 0; background: none; border-radius: 6px; color: var(--suave); padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05;
+}
+.tp-grupo b, .tp-periodo { font-weight: 800; font-size: 0.95rem; }
+.tp-grupo small { font-size: 0.6rem; letter-spacing: 0.02em; }
+.tp-grupo { align-self: end; padding-bottom: 2px; }
+.tp-grupo:hover, .tp-periodo:hover { background: var(--primario-suave); color: var(--primario); }
+.tp-grupo.activo, .tp-periodo.activo { background: var(--primario); color: #fff; }
+.tp-esquina { display: flex; flex-direction: column; justify-content: flex-end; font-size: 0.5rem; color: var(--suave); line-height: 1.2; white-space: nowrap; }
+.tp-serie { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding-right: 6px; font-size: 0.72rem; font-weight: 700; color: var(--suave); line-height: 1.15; }
+.tp-serie small { font-weight: 400; font-size: 0.62rem; }
 .tp-detalle-vacio { width: 100%; text-align: center; color: var(--suave); font-size: 0.95rem; }
 .ficha {
   flex: none; width: 92px; height: 104px; border-radius: 10px; border: 1px solid rgba(0,0,0,.12);
@@ -368,6 +437,9 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .barra-desafio .btn.primario { background: #fff; color: var(--primario); }
 
 /* ---------- Pantallas chicas ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .burbuja, .gases span { animation-duration: 3s !important; }
+}
 @media (max-width: 1000px) {
   .lab-grid { grid-template-columns: 1fr; }
   .reactivos { flex-direction: row; flex-wrap: wrap; max-height: none; }

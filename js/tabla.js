@@ -19,7 +19,11 @@ const TablaPeriodica = (function () {
   const SUPER = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
   const POR_Z = Object.fromEntries(ELEMENTOS.map(e => [e.z, e]));
 
+  // Numeración de grupos: IUPAC (1-18) y la tradicional (A/B), muy usada en los libros de texto.
+  const GRUPOS_AB = ['IA', 'IIA', 'IIIB', 'IVB', 'VB', 'VIB', 'VIIB', 'VIIIB', 'VIIIB', 'VIIIB', 'IB', 'IIB', 'IIIA', 'IVA', 'VA', 'VIA', 'VIIA', 'VIIIA'];
+
   let raiz, modo = 'categoria', filtro = null, seleccionado = null;
+  let linea = null; // grupo o período resaltado: { g: 3 } o { p: 4 }
   let desafio = null; // { preguntas, i, puntos, inicio, esperando }
 
   function iniciar(el) {
@@ -27,7 +31,7 @@ const TablaPeriodica = (function () {
     raiz.innerHTML = `
       <div class="encabezado-modulo">
         <h1>🧩 Tabla periódica</h1>
-        <p>Toca un elemento para ver su información. Cambia la forma de colorear para descubrir patrones.</p>
+        <p>Toca un elemento para ver su información. Toca el número de un grupo o de un período para resaltarlo, y cambia la forma de colorear para descubrir patrones.</p>
       </div>
       <div class="tp-controles">
         <div class="segmentado" id="tp-modos">
@@ -38,10 +42,15 @@ const TablaPeriodica = (function () {
       <div id="tp-barra-desafio" class="barra-desafio" hidden></div>
       <div class="tp-scroll">
         <div class="tp-grid" id="tp-grid">
+          <div class="tp-esquina" style="grid-row:1;grid-column:1"><span>Grupo →</span><span>Período ↓</span></div>
+          ${GRUPOS_AB.map((ab, i) => `<button class="tp-grupo" data-g="${i + 1}" style="grid-row:1;grid-column:${i + 2}" title="Resaltar el grupo ${i + 1}"><b>${i + 1}</b><small>${ab}</small></button>`).join('')}
+          ${[1, 2, 3, 4, 5, 6, 7].map(p => `<button class="tp-periodo" data-p="${p}" style="grid-row:${p + 1};grid-column:1" title="Resaltar el período ${p}">${p}</button>`).join('')}
           <div class="tp-detalle" id="tp-detalle"></div>
           ${ELEMENTOS.map(celda).join('')}
-          <div class="tp-celda marcador-f" style="grid-row:6;grid-column:3">57–71</div>
-          <div class="tp-celda marcador-f" style="grid-row:7;grid-column:3">89–103</div>
+          <div class="tp-celda marcador-f" style="grid-row:7;grid-column:4">57–71</div>
+          <div class="tp-celda marcador-f" style="grid-row:8;grid-column:4">89–103</div>
+          <div class="tp-serie" style="grid-row:10;grid-column:2 / 4">Lantánidos<small>período 6</small></div>
+          <div class="tp-serie" style="grid-row:11;grid-column:2 / 4">Actínidos<small>período 7</small></div>
         </div>
       </div>
       <div class="leyenda" id="tp-leyenda"></div>`;
@@ -49,7 +58,12 @@ const TablaPeriodica = (function () {
     raiz.querySelectorAll('#tp-modos button').forEach(b => b.addEventListener('click', () => cambiarModo(b.dataset.modo)));
     raiz.querySelector('#tp-grid').addEventListener('click', e => {
       const c = e.target.closest('.tp-celda[data-z]');
-      if (c) tocar(+c.dataset.z);
+      if (c) return tocar(+c.dataset.z);
+      const g = e.target.closest('.tp-grupo'), p = e.target.closest('.tp-periodo');
+      if (g) linea = linea && linea.g === +g.dataset.g ? null : { g: +g.dataset.g };
+      else if (p) linea = linea && linea.p === +p.dataset.p ? null : { p: +p.dataset.p };
+      else return;
+      pintar();
     });
     raiz.querySelector('#tp-desafio').addEventListener('click', () => (desafio ? terminarDesafio(true) : empezarDesafio()));
     cambiarModo('categoria');
@@ -58,7 +72,7 @@ const TablaPeriodica = (function () {
 
   function celda(e) {
     return `
-      <button class="tp-celda" data-z="${e.z}" style="grid-row:${e.fila};grid-column:${e.col}" title="${e.nombre}">
+      <button class="tp-celda" data-z="${e.z}" style="grid-row:${e.fila + 1};grid-column:${e.col + 1}" title="${e.nombre}">
         <span class="z">${e.z}</span>
         <span class="sim">${e.simbolo}</span>
         <span class="nom">${e.nombre}</span>
@@ -68,6 +82,7 @@ const TablaPeriodica = (function () {
   function cambiarModo(m) {
     modo = m;
     filtro = null;
+    linea = null;
     raiz.querySelectorAll('#tp-modos button').forEach(b => b.classList.toggle('activo', b.dataset.modo === m));
     pintar();
   }
@@ -78,8 +93,19 @@ const TablaPeriodica = (function () {
       const e = POR_Z[+c.dataset.z];
       const k = M.clave(e);
       c.style.background = M.leyenda[k].color;
-      c.classList.toggle('atenuado', filtro !== null && filtro !== k);
+      const fueraDeLinea = linea && (linea.g ? e.grupo !== linea.g : e.periodo !== linea.p);
+      c.classList.toggle('atenuado', (filtro !== null && filtro !== k) || !!fueraDeLinea);
       c.classList.toggle('seleccionado', seleccionado === e.z);
+    });
+    // Encabezados: resalta el grupo y el período del elemento elegido (o la fila/columna resaltada).
+    const sel = seleccionado ? POR_Z[seleccionado] : null;
+    raiz.querySelectorAll('.tp-grupo').forEach(b => {
+      const g = +b.dataset.g;
+      b.classList.toggle('activo', (sel && sel.grupo === g) || (linea && linea.g === g));
+    });
+    raiz.querySelectorAll('.tp-periodo').forEach(b => {
+      const p = +b.dataset.p;
+      b.classList.toggle('activo', (sel && sel.periodo === p) || (linea && linea.p === p));
     });
     const ley = raiz.querySelector('#tp-leyenda');
     ley.innerHTML = Object.entries(M.leyenda).map(([k, v]) =>
@@ -197,6 +223,7 @@ const TablaPeriodica = (function () {
     desafio = { preguntas: Array.from({ length: TOTAL }, () => Util.elegir(GENERADORES)()), i: 0, puntos: 0, inicio: Date.now(), esperando: false };
     seleccionado = null;
     filtro = null;
+    linea = null;
     raiz.querySelector('#tp-grid').classList.add('modo-desafio');
     raiz.querySelector('#tp-desafio').textContent = '✕ Salir del desafío';
     raiz.querySelector('#tp-barra-desafio').hidden = false;
