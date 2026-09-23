@@ -7,7 +7,9 @@ const Invernadero = (function () {
   const ANIO_INICIAL = 1850, MS_POR_ANIO = 150, TAU = 8; // TAU: años que tarda en acercarse al equilibrio
   const VENTANA = 150; // años visibles en el gráfico
   const W = 600, H = 380; // escena
-  const ATM_ARRIBA = 95, ATM_ABAJO = 255, SUELO = 300;
+  // El planeta se ve como un gran arco en la parte de abajo; la atmósfera es una franja alrededor.
+  const PX = 300, PY = 1060, PR = 760, ATM = 170;
+  const SOL = { x: 46, y: 44 };
 
   const PRESETS = [
     { ppm: 180, texto: '🧊 Glaciación', sub: '180 ppm' },
@@ -55,9 +57,9 @@ const Invernadero = (function () {
             <canvas id="inv-canvas" aria-label="Animación de la radiación solar y el calor"></canvas>
           </div>
           <div class="inv-leyenda">
-            <span><i style="background:#fcc419"></i>Luz del Sol</span>
-            <span><i style="background:#e03131"></i>Calor (infrarrojo)</span>
-            <span><i style="background:#868e96"></i>Molécula de CO₂</span>
+            <span><i style="background:#ffe08a;box-shadow:0 0 6px #ffd166"></i>Luz del Sol</span>
+            <span><i style="background:#ff7a45;box-shadow:0 0 6px #ff5a36"></i>Calor (infrarrojo)</span>
+            <span><b class="kz-co2"><i></i><i></i><i></i></b>Molécula de CO₂</span>
           </div>
           <p class="inv-balance" id="inv-balance"></p>
         </div>
@@ -149,30 +151,78 @@ const Invernadero = (function () {
 
   // ---------- Escena ----------
 
+  const superficie = x => PY - Math.sqrt(PR * PR - (x - PX) * (x - PX));
+  // Color de la atmósfera según la temperatura: celeste frío → turquesa → naranja → rojo.
+  function colorAtmosfera(anomalia) {
+    const paradas = [[-4, [120, 190, 255]], [0, [64, 224, 208]], [2, [255, 170, 80]], [5, [255, 80, 70]]];
+    let i = 0;
+    while (i < paradas.length - 2 && anomalia > paradas[i + 1][0]) i++;
+    const [a0, c0] = paradas[i], [a1, c1] = paradas[i + 1];
+    const f = Math.max(0, Math.min(1, (anomalia - a0) / (a1 - a0)));
+    return `rgb(${c0.map((v, k) => Math.round(v + (c1[k] - v) * f)).join(',')})`;
+  }
+
+  // Estrellas fijas (misma posición en cada dibujo).
+  const ESTRELLAS = Array.from({ length: 70 }, (_, i) => {
+    const x = (i * 97.13) % W, y = (i * 53.71) % 230;
+    return { x, y, r: 0.6 + ((i * 7) % 5) * 0.25, tit: i % 4 === 0 };
+  });
+
   function dibujarFondo() {
     const anomalia = (T ?? tEquilibrio()) - T_BASE;
-    const hielo = Math.max(0.15, Math.min(1.4, 1 - anomalia * 0.18)); // el hielo se achica con el calor
-    const mar = SUELO + 8 - Math.max(0, anomalia) * 3;
+    const atm = colorAtmosfera(anomalia);
+    const hielo = Math.max(0.1, Math.min(1.35, 1 - anomalia * 0.2));
+    const sx = x => superficie(x).toFixed(1);
+    // Árboles, ciudad e hielo apoyados sobre la curva del planeta.
+    const arbolito = (x, h) => `<path d="M${x - 5},${sx(x) - 0} L${x},${superficie(x) - h} L${x + 5},${sx(x)} Z" fill="#1b9e77"/>`;
+    const edificio = (x, w, h, c) => `<rect x="${x}" y="${superficie(x + w / 2) - h}" width="${w}" height="${h + 4}" rx="1.5" fill="${c}"/>`;
+    const montania = (x, w, h) => `<path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
+      <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.35},${sx(x + w * 0.35)} Z" fill="#2f3a73"/>`;
+    const nieve = (x, w, h) => {
+      const k = hielo, hy = superficie(x) - h;
+      return `<path d="M${x - w * 0.42 * k},${hy + h * 0.42 * k} L${x},${hy} L${x + w * 0.42 * k},${hy + h * 0.42 * k} L${x + w * 0.18 * k},${hy + h * 0.34 * k} L${x},${hy + h * 0.44 * k} L${x - w * 0.2 * k},${hy + h * 0.34 * k} Z" fill="#f1f3ff"/>`;
+    };
     raiz.querySelector('#inv-fondo').innerHTML = `
       <defs>
-        <linearGradient id="inv-cielo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#0b1d3a"/><stop offset="0.22" stop-color="#1c3d6e"/>
-          <stop offset="0.3" stop-color="#a5d8ff"/><stop offset="1" stop-color="#e7f5ff"/>
-        </linearGradient>
+        <linearGradient id="kz-espacio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#090b26"/><stop offset="1" stop-color="#1d1f5a"/></linearGradient>
+        <radialGradient id="kz-sol" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff6d5"/><stop offset="0.35" stop-color="#ffd166"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
+        <radialGradient id="kz-halo" cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" gradientUnits="userSpaceOnUse">
+          <stop offset="${(PR - 5) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.95"/>
+          <stop offset="${(PR + 40) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.45"/>
+          <stop offset="${(PR + ATM - 20) / (PR + ATM + 40)}" stop-color="${atm}" stop-opacity="0.12"/>
+          <stop offset="1" stop-color="${atm}" stop-opacity="0"/></radialGradient>
+        <linearGradient id="kz-mar" x1="0" y1="295" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4c8dff"/><stop offset="1" stop-color="#1a2f86"/></linearGradient>
+        <linearGradient id="kz-tierra" x1="0" y1="295" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#34d27f"/><stop offset="1" stop-color="#116b48"/></linearGradient>
+        <clipPath id="kz-planeta"><circle cx="${PX}" cy="${PY}" r="${PR}"/></clipPath>
       </defs>
-      <rect width="${W}" height="${H}" fill="url(#inv-cielo)"/>
-      <text x="${W - 12}" y="24" text-anchor="end" class="inv-rotulo claro">Espacio</text>
-      ${sinAtmosfera ? '' : `<rect x="0" y="${ATM_ARRIBA}" width="${W}" height="${ATM_ABAJO - ATM_ARRIBA}" fill="#ffffff" opacity="0.18"/>
-      <text x="${W - 12}" y="${ATM_ARRIBA + 18}" text-anchor="end" class="inv-rotulo">Atmósfera</text>`}
-      <circle cx="58" cy="44" r="30" fill="#ffd43b"/><circle cx="58" cy="44" r="40" fill="#ffd43b" opacity="0.25"/>
-      <rect x="0" y="${mar}" width="230" height="${H - mar}" fill="#339af0"/>
-      <path d="M200,${SUELO} L${W},${SUELO} L${W},${H} L230,${H} Z" fill="#8ce99a"/>
-      <path d="M230,${SUELO + 2} L${W},${SUELO + 2} L${W},${H} L230,${H} Z" fill="#69db7c"/>
-      <path d="M380,${SUELO} L440,215 L500,${SUELO} Z" fill="#868e96"/>
-      <path d="M${440 - 26 * hielo},${215 + 38 * hielo} L440,215 L${440 + 26 * hielo},${215 + 38 * hielo} Z" fill="#fff"/>
-      <ellipse cx="560" cy="${SUELO + 4}" rx="${38 * hielo}" ry="${7 * hielo}" fill="#f8f9fa" stroke="#dee2e6"/>
-      <text x="115" y="${H - 12}" text-anchor="middle" class="inv-rotulo claro">Océano</text>
-      <text x="560" y="${H - 12}" text-anchor="middle" class="inv-rotulo">Hielo</text>`;
+      <rect width="${W}" height="${H}" fill="url(#kz-espacio)"/>
+      <g>${ESTRELLAS.map(e => `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="${e.r}" fill="#fff" ${e.tit ? 'class="kz-titila"' : 'opacity="0.7"'}/>`).join('')}</g>
+      <circle cx="${SOL.x}" cy="${SOL.y}" r="120" fill="url(#kz-sol)" opacity="0.55"/>
+      <circle cx="${SOL.x}" cy="${SOL.y}" r="58" fill="url(#kz-sol)"/>
+      <circle cx="${SOL.x}" cy="${SOL.y}" r="30" fill="#fff3c4"/>
+      ${sinAtmosfera ? '' : `<circle cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" fill="url(#kz-halo)"/>`}
+      <circle cx="${PX}" cy="${PY}" r="${PR}" fill="url(#kz-mar)"/>
+      <g clip-path="url(#kz-planeta)">
+        ${[[150, 312], [200, 330], [170, 352], [225, 360]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
+        <path d="M-20,${sx(0) - 20} L112,${sx(112) - 20} L112,${sx(112) + 4} C128,${sx(120) + 28} 94,${sx(110) + 52} 118,${H} L-20,${H} Z" fill="url(#kz-tierra)"/>
+        <path d="M248,${sx(248) - 20} L620,${sx(620) - 20} L620,${H} L262,${H} C250,${H - 30} 274,${sx(262) + 48} 244,${sx(248) + 20} Z" fill="url(#kz-tierra)"/>
+        <ellipse cx="186" cy="${sx(186) + 30}" rx="16" ry="5" fill="url(#kz-tierra)"/>
+        <path d="M-20,${sx(0) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 620,${sx(620) + 40} L620,${H} L-20,${H} Z" fill="#0a0d2e" opacity="0.28"/>
+      </g>
+      <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
+      ${[[150, 58, 1], [455, 70, 0.8], [300, 92, 0.6]].map(([x, alto, e], i) => `<g class="kz-nube" style="animation-delay:${-i * 3}s">
+        <g transform="translate(${x} ${superficie(x) - alto}) scale(${e})"><rect x="-38" y="-6" width="76" height="16" rx="8" fill="#fff" opacity="0.92"/>
+        <circle cx="-12" cy="-8" r="13" fill="#fff" opacity="0.92"/><circle cx="10" cy="-12" r="16" fill="#fff" opacity="0.92"/>
+        <rect x="-38" y="6" width="76" height="4" rx="2" fill="#c9d3ff" opacity="0.7"/></g></g>`).join('')}
+      ${montania(500, 48, 62)}${nieve(500, 48, 62)}
+      ${montania(548, 34, 40)}${nieve(548, 34, 40)}
+      ${[270, 282, 296, 440, 452, 466, 590].map((x, i) => arbolito(x, 12 + (i % 3) * 4)).join('')}
+      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 10, 38, '#7f8cff')}${edificio(358, 16, 20, '#5a67d8')}${edificio(376, 12, 30, '#6c7ae0')}
+        <rect x="396" y="${superficie(402) - 34}" width="7" height="36" fill="#9aa3ff"/>
+        <rect x="390" y="${superficie(400) - 14}" width="26" height="16" fill="#7f8cff"/></g>
+      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="399" cy="${superficie(402) - 38}" r="${6 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      ${sinAtmosfera ? '' : `<text x="${W - 14}" y="${superficie(W - 14) - 125}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
+      <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>`;
   }
 
   function bucle(t) {
@@ -204,76 +254,155 @@ const Invernadero = (function () {
     }
   }
 
-  function animarParticulas(dt) {
-    // Moléculas de CO₂ proporcionales a la concentración.
-    const objetivo = sinAtmosfera ? 0 : Math.round(ppm / 22);
-    while (moleculas.length < objetivo) moleculas.push({ x: Math.random() * W, y: ATM_ARRIBA + 10 + Math.random() * (ATM_ABAJO - ATM_ARRIBA - 20), v: (Math.random() - 0.5) * 20 });
-    if (moleculas.length > objetivo) moleculas.length = objetivo;
+  const distancia = (x, y) => Math.hypot(x - PX, y - PY);
 
-    // Nuevos rayos de sol.
-    if (Math.random() < dt * 9) fotones.push({ tipo: 'sol', x: 70 + Math.random() * 40, y: 60, vx: 40 + Math.random() * 140, vy: 150 });
+  function animarParticulas(dt) {
+    // Moléculas de CO₂: flotan en la franja de la atmósfera, siguiendo la curva del planeta.
+    const objetivo = sinAtmosfera ? 0 : Math.round(ppm / 24);
+    while (moleculas.length < objetivo) {
+      moleculas.push({ ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.0, rad: PR + 28 + Math.random() * (ATM - 55), vel: (Math.random() - 0.5) * 0.012, rot: Math.random() * 6, brillo: 0 });
+    }
+    if (moleculas.length > objetivo) moleculas.length = objetivo;
+    moleculas.forEach(m => {
+      m.ang += m.vel * dt;
+      if (m.ang < -Math.PI / 2 - 0.5) m.ang += 1.0;
+      if (m.ang > -Math.PI / 2 + 0.5) m.ang -= 1.0;
+      m.rot += dt * 0.6;
+      m.brillo = Math.max(0, m.brillo - dt * 1.4);
+      m.x = PX + m.rad * Math.cos(m.ang);
+      m.y = PY + m.rad * Math.sin(m.ang);
+    });
+
+    // Rayos de sol: salen del Sol hacia un punto al azar de la superficie.
+    if (Math.random() < dt * 5) {
+      const destinoX = 150 + Math.random() * 450, destinoY = superficie(destinoX);
+      const dx = destinoX - SOL.x, dy = destinoY - SOL.y, d = Math.hypot(dx, dy);
+      fotones.push({ tipo: 'sol', x: SOL.x + dx / d * 30, y: SOL.y + dy / d * 30, vx: dx / d * 190, vy: dy / d * 190, vida: 0 });
+    }
 
     const p = pAbsorcion();
+    const emitirHaciaArriba = f => {
+      const n = [(f.x - PX) / distancia(f.x, f.y), (f.y - PY) / distancia(f.x, f.y)];
+      const giro = (Math.random() - 0.5) * 0.9;
+      f.vx = (n[0] * Math.cos(giro) - n[1] * Math.sin(giro)) * 95;
+      f.vy = (n[0] * Math.sin(giro) + n[1] * Math.cos(giro)) * 95;
+      f.sube = true;
+      f.decidido = false;
+    };
+
     fotones.forEach(f => {
-      const yAntes = f.y;
+      f.vida += dt;
+      f.fase = (f.fase || Math.random() * 6) + dt * 10;
+      if (f.objetivo) {
+        // Va hacia la molécula que lo va a absorber.
+        const m = f.objetivo, dx = m.x - f.x, dy = m.y - f.y, d = Math.hypot(dx, dy);
+        if (d < 6) {
+          m.brillo = 1;
+          f.objetivo = null;
+          // La molécula reemite el calor en cualquier dirección: muchas veces hacia abajo.
+          const ang = Math.random() * Math.PI * 2;
+          f.vx = Math.cos(ang) * 95;
+          f.vy = Math.abs(Math.sin(ang)) * 95 * (Math.random() < 0.7 ? 1 : -1);
+          f.sube = f.vy < 0;
+          f.decidido = true;
+          if (!f.sube) cuenta.vuelven++;
+        } else {
+          f.vx = dx / d * 95;
+          f.vy = dy / d * 95;
+        }
+      }
       f.x += f.vx * dt;
       f.y += f.vy * dt;
-      if (f.tipo === 'sol' && f.y >= SUELO) {
-        // La superficie absorbe la luz y emite calor hacia arriba.
-        f.tipo = 'ir'; f.y = SUELO; f.vy = -110; f.vx = (Math.random() - 0.5) * 60; f.ondas = Math.random() * 6;
-      } else if (f.tipo === 'ir' && f.vy < 0 && yAntes > ATM_ABAJO && f.y <= ATM_ABAJO) {
-        // Entra a la atmósfera: se decide si escapa o si lo atrapa el CO₂.
-        f.rebote = Math.random() < p ? ATM_ARRIBA + 15 + Math.random() * (ATM_ABAJO - ATM_ARRIBA - 30) : null;
-      } else if (f.tipo === 'ir' && f.vy < 0 && f.rebote && f.y <= f.rebote) {
-        f.vy = 110; f.vx = (Math.random() - 0.5) * 80; f.rebote = null;
-        cuenta.vuelven++;
-      } else if (f.tipo === 'ir' && f.vy > 0 && f.y >= SUELO) {
-        f.vy = -110; f.vx = (Math.random() - 0.5) * 60;
-      } else if (f.tipo === 'ir' && f.vy < 0 && f.y < ATM_ARRIBA && !f.contado) {
+      const d = distancia(f.x, f.y);
+      if (d <= PR) {
+        // Llega a la superficie: la luz (o el calor que vuelve) calienta el suelo, que emite infrarrojo.
+        f.tipo = 'ir';
+        f.y = superficie(f.x) - 1;
+        emitirHaciaArriba(f);
+      } else if (f.tipo === 'ir' && f.sube && !f.decidido && d > PR + 25) {
+        f.decidido = true;
+        if (Math.random() < p && moleculas.length) {
+          // Elige una molécula cercana y por delante en su camino.
+          let mejor = null, dm = Infinity;
+          moleculas.forEach(m => {
+            const dd = Math.hypot(m.x - f.x, m.y - f.y);
+            if (m.rad > d && dd < dm) { dm = dd; mejor = m; }
+          });
+          if (mejor && dm < 160) f.objetivo = mejor;
+        }
+      } else if (f.tipo === 'ir' && f.sube && d > PR + ATM && !f.contado) {
         f.contado = true;
         cuenta.escapan++;
       }
     });
-    fotones = fotones.filter(f => f.y > -10 && f.x > -10 && f.x < W + 10 && !(f.tipo === 'ir' && (f.vueltas = (f.vueltas || 0) + dt) > 9));
-    if (fotones.length > 160) fotones.splice(0, fotones.length - 160);
+    fotones = fotones.filter(f => f.y > -20 && f.x > -20 && f.x < W + 20 && f.vida < 12 && distancia(f.x, f.y) < PR + ATM + 100);
+    if (fotones.length > 140) fotones.splice(0, fotones.length - 140);
 
+    // ---- Dibujo ----
     ctx.clearRect(0, 0, W, H);
-    moleculas.forEach(m => {
-      m.x += m.v * dt;
-      if (m.x < -10) m.x = W + 10;
-      if (m.x > W + 10) m.x = -10;
-      ctx.fillStyle = '#e03131';
-      ctx.beginPath(); ctx.arc(m.x - 5, m.y, 3, 0, 7); ctx.arc(m.x + 5, m.y, 3, 0, 7); ctx.fill();
-      ctx.fillStyle = '#495057';
-      ctx.beginPath(); ctx.arc(m.x, m.y, 3.4, 0, 7); ctx.fill();
-    });
+    ctx.lineCap = 'round';
     fotones.forEach(f => {
       if (f.tipo === 'sol') {
-        ctx.strokeStyle = '#fcc419';
+        const v = Math.hypot(f.vx, f.vy);
+        ctx.shadowColor = '#ffd166';
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = '#ffe08a';
         ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(f.x - f.vx * 0.06, f.y - f.vy * 0.06); ctx.stroke();
-      } else {
-        // El calor se dibuja como una onda roja.
-        ctx.strokeStyle = '#e03131';
-        ctx.lineWidth = 2.2;
         ctx.beginPath();
-        const dir = Math.sign(f.vy);
-        for (let i = 0; i <= 14; i++) {
-          const yy = f.y - dir * i * 1.4;
-          const xx = f.x + Math.sin(i * 0.9 + f.ondas) * 3;
+        ctx.moveTo(f.x, f.y);
+        ctx.lineTo(f.x - f.vx / v * 18, f.y - f.vy / v * 18);
+        ctx.stroke();
+      } else {
+        // Calor: una onda naranja brillante que se mueve en su dirección.
+        const v = Math.hypot(f.vx, f.vy) || 1, ux = f.vx / v, uy = f.vy / v;
+        // Se desvanece al alejarse en el espacio.
+        ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (distancia(f.x, f.y) - PR - ATM) / 90));
+        ctx.shadowColor = '#ff5a36';
+        ctx.shadowBlur = 12;
+        ctx.strokeStyle = '#ff7a45';
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        for (let i = 0; i <= 16; i++) {
+          const a = Math.sin(i * 0.55 + f.fase) * 2.6;
+          const xx = f.x - ux * i * 1.5 - uy * a, yy = f.y - uy * i * 1.5 + ux * a;
           i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy);
         }
         ctx.stroke();
+        ctx.globalAlpha = 1;
       }
     });
+    moleculas.forEach(m => {
+      const ox = Math.cos(m.rot) * 8, oy = Math.sin(m.rot) * 8;
+      if (m.brillo > 0) {
+        // Al absorber calor, la molécula brilla y vibra.
+        const g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 22);
+        g.addColorStop(0, `rgba(255, 150, 90, ${0.8 * m.brillo})`);
+        g.addColorStop(1, 'rgba(255, 150, 90, 0)');
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 22, 0, 7); ctx.fill();
+      }
+      const vib = m.brillo * 2 * Math.sin(performance.now() / 25);
+      ctx.shadowColor = 'rgba(0,0,0,0.35)';
+      ctx.shadowBlur = 4;
+      [[-1, '#ff6b6b'], [1, '#ff6b6b']].forEach(([s, c]) => {
+        ctx.fillStyle = c;
+        ctx.beginPath(); ctx.arc(m.x + s * (ox + vib), m.y + s * oy, 4.2, 0, 7); ctx.fill();
+      });
+      ctx.fillStyle = '#2b2d42';
+      ctx.beginPath(); ctx.arc(m.x, m.y, 5, 0, 7); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.beginPath(); ctx.arc(m.x - 1.6, m.y - 1.8, 1.5, 0, 7); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
 
-    // Balance de calor de los últimos segundos.
     const total = cuenta.escapan + cuenta.vuelven;
     if (total > 40) { cuenta.escapan *= 0.5; cuenta.vuelven *= 0.5; }
     const pct = Math.round(p * 100);
     raiz.querySelector('#inv-balance').innerHTML = sinAtmosfera
       ? 'Sin gases de efecto invernadero, <b>todo el calor escapa al espacio</b> y la Tierra se congela.'
-      : `De cada 100 "rayos" de calor, unos <b>${pct}</b> vuelven hacia la superficie y <b>${100 - pct}</b> escapan al espacio.`;
+      : `De cada 100 "rayos" de calor, unos <b>${pct}</b> son atrapados por el CO₂ y <b>${100 - pct}</b> escapan al espacio. Mira cómo <b>brillan</b> las moléculas al absorberlos.`;
   }
 
   // ---------- Lecturas ----------
