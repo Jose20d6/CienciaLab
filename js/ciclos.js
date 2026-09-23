@@ -5,111 +5,135 @@ const Ciclos = (function () {
   // ---------- Partículas ----------
   // Cada estilo es una figura centrada en (0,0). Se usan para la animación y para el viajero.
   const ESTILOS = {
-    gota: { nombre: 'Gota de agua', svg: '<path d="M0,-9 C6,-2 7,4 0,8 C-7,4 -6,-2 0,-9 Z" fill="#1c7ed6" stroke="#fff" stroke-width="1.5"/>' },
-    vapor: { nombre: 'Vapor de agua', svg: '<path d="M-3,8 q5,-4 0,-8 t0,-8" fill="none" stroke="#74c0fc" stroke-width="5" stroke-linecap="round"/><path d="M-3,8 q5,-4 0,-8 t0,-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>' },
-    copo: { nombre: 'Nieve', svg: [0, 60, 120].map(a => `<g transform="rotate(${a})"><line x1="0" y1="-8" x2="0" y2="8" stroke="#74c0fc" stroke-width="4.5" stroke-linecap="round"/><line x1="0" y1="-8" x2="0" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`).join('') },
-    co2: { nombre: 'CO₂ (dióxido de carbono)', svg: '<circle cx="-7.5" r="4.2" fill="#e03131" stroke="#fff" stroke-width="1"/><circle cx="7.5" r="4.2" fill="#e03131" stroke="#fff" stroke-width="1"/><circle r="5.2" fill="#343a40" stroke="#fff" stroke-width="1"/>' },
-    c: { nombre: 'Carbono dentro de seres vivos o fósiles', svg: '<circle r="7" fill="#343a40" stroke="#fff" stroke-width="1.5"/><text y="3.2" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">C</text>' },
-    n2: { nombre: 'N₂ (nitrógeno del aire)', svg: '<circle cx="-4.5" r="5" fill="#4263eb" stroke="#fff" stroke-width="1"/><circle cx="4.5" r="5" fill="#4263eb" stroke="#fff" stroke-width="1"/>' },
-    nh4: { nombre: 'Amonio (NH₄⁺)', svg: '<circle r="6" fill="#9c36b5" stroke="#fff" stroke-width="1"/>' + [[-6, -6], [6, -6], [-6, 6], [6, 6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#f8f9fa" stroke="#9c36b5" stroke-width="1"/>`).join('') },
-    no3: { nombre: 'Nitrato (NO₃⁻)', svg: [0, 120, 240].map(a => `<circle cx="${(8 * Math.sin(a * Math.PI / 180)).toFixed(1)}" cy="${(-8 * Math.cos(a * Math.PI / 180)).toFixed(1)}" r="3.4" fill="#e03131" stroke="#fff" stroke-width="1"/>`).join('') + '<circle r="5.5" fill="#4263eb" stroke="#fff" stroke-width="1"/>' },
-    n: { nombre: 'Nitrógeno dentro de seres vivos', svg: '<circle r="7" fill="#4263eb" stroke="#fff" stroke-width="1.5"/><text y="3.2" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">N</text>' },
+    gota: { nombre: 'Gota de agua', svg: '<path d="M0,-9 C6,-2 7,4 0,8 C-7,4 -6,-2 0,-9 Z" fill="#5cc8ff" stroke="#fff" stroke-width="1.4"/><circle cx="-2" cy="1" r="1.6" fill="#fff" opacity="0.8"/>' },
+    vapor: { nombre: 'Vapor de agua', svg: '<path d="M-3,8 q5,-4 0,-8 t0,-8" fill="none" stroke="#2f6fd6" stroke-opacity="0.55" stroke-width="5.5" stroke-linecap="round"/><path d="M-3,8 q5,-4 0,-8 t0,-8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>' },
+    copo: { nombre: 'Nieve', svg: [0, 60, 120].map(a => `<g transform="rotate(${a})"><line x1="0" y1="-8" x2="0" y2="8" stroke="#2f6fd6" stroke-opacity="0.6" stroke-width="4.5" stroke-linecap="round"/><line x1="0" y1="-8" x2="0" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`).join('') },
+    co2: { nombre: 'CO₂ (dióxido de carbono)', svg: '<circle cx="-7.5" r="4.3" fill="#ff6b6b" stroke="#fff" stroke-width="0.9"/><circle cx="7.5" r="4.3" fill="#ff6b6b" stroke="#fff" stroke-width="0.9"/><circle r="5.3" fill="#2b2d42" stroke="#fff" stroke-width="0.9"/><circle cx="-1.6" cy="-1.8" r="1.4" fill="#fff" opacity="0.6"/>' },
+    c: { nombre: 'Carbono dentro de seres vivos o fósiles', svg: '<circle r="7" fill="#2b2d42" stroke="#ffd166" stroke-width="1.6"/><text y="3.2" text-anchor="middle" font-size="9" font-weight="800" fill="#ffd166">C</text>' },
+    n2: { nombre: 'N₂ (nitrógeno del aire)', svg: '<circle cx="-4.5" r="5" fill="#7c86ff" stroke="#fff" stroke-width="0.9"/><circle cx="4.5" r="5" fill="#7c86ff" stroke="#fff" stroke-width="0.9"/>' },
+    nh4: { nombre: 'Amonio (NH₄⁺)', svg: '<circle r="6" fill="#c05ce0" stroke="#fff" stroke-width="0.9"/>' + [[-6, -6], [6, -6], [-6, 6], [6, 6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#f1f3ff" stroke="#c05ce0" stroke-width="1"/>`).join('') },
+    no3: { nombre: 'Nitrato (NO₃⁻)', svg: [0, 120, 240].map(a => `<circle cx="${(8 * Math.sin(a * Math.PI / 180)).toFixed(1)}" cy="${(-8 * Math.cos(a * Math.PI / 180)).toFixed(1)}" r="3.4" fill="#ff6b6b" stroke="#fff" stroke-width="0.9"/>`).join('') + '<circle r="5.5" fill="#7c86ff" stroke="#fff" stroke-width="0.9"/>' },
+    n: { nombre: 'Nitrógeno dentro de seres vivos', svg: '<circle r="7" fill="#3b44b8" stroke="#a5b4ff" stroke-width="1.6"/><text y="3.2" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">N</text>' },
   };
   const figura = (estilo, x, y, s = 1) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s})">${ESTILOS[estilo].svg}</g>`;
 
-  // ---------- Paisajes ----------
+  // ---------- Paisajes (estilo ilustración de divulgación) ----------
 
   const DEFS = `
-    <linearGradient id="cc-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74c0fc"/><stop offset="0.7" stop-color="#e7f5ff"/></linearGradient>
-    <linearGradient id="cc-mar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4dabf7"/><stop offset="1" stop-color="#1864ab"/></linearGradient>
-    <linearGradient id="cc-suelo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c49a6c"/><stop offset="1" stop-color="#8b5e3c"/></linearGradient>
-    <linearGradient id="cc-roca" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#868e96"/><stop offset="1" stop-color="#495057"/></linearGradient>
-    <pattern id="cc-poros" width="16" height="14" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.8" fill="#1971c2" opacity="0.45"/><circle cx="12" cy="10" r="1.4" fill="#1971c2" opacity="0.45"/></pattern>
-    <pattern id="cc-granos" width="18" height="16" patternUnits="userSpaceOnUse"><circle cx="3" cy="5" r="1.2" fill="#6f4518" opacity="0.35"/><circle cx="12" cy="12" r="1.5" fill="#6f4518" opacity="0.3"/></pattern>
-    <marker id="cc-flecha" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#343a40"/></marker>`;
+    <linearGradient id="cc-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171b55"/><stop offset="0.5" stop-color="#2d56a8"/><stop offset="1" stop-color="#6fc3df"/></linearGradient>
+    <radialGradient id="cc-sol" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff6d5"/><stop offset="0.35" stop-color="#ffd166"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
+    <linearGradient id="cc-mar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c8dff"/><stop offset="1" stop-color="#172a7a"/></linearGradient>
+    <linearGradient id="cc-pasto" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d27f"/><stop offset="1" stop-color="#1b9e63"/></linearGradient>
+    <linearGradient id="cc-suelo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a48"/><stop offset="1" stop-color="#43283d"/></linearGradient>
+    <linearGradient id="cc-roca" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2f6e"/><stop offset="1" stop-color="#15163d"/></linearGradient>
+    <linearGradient id="cc-acuifero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3563c9"/><stop offset="1" stop-color="#22358a"/></linearGradient>
+    <radialGradient id="cc-vineta" cx="0.5" cy="0.45" r="0.78"><stop offset="0.62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.42"/></radialGradient>
+    <pattern id="cc-poros" width="16" height="14" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.8" fill="#bcd6ff" opacity="0.55"/><circle cx="12" cy="10" r="1.4" fill="#bcd6ff" opacity="0.45"/></pattern>
+    <pattern id="cc-granos" width="18" height="16" patternUnits="userSpaceOnUse"><circle cx="3" cy="5" r="1.3" fill="#fff" opacity="0.08"/><circle cx="12" cy="12" r="1.6" fill="#000" opacity="0.12"/></pattern>
+    <marker id="cc-flecha" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#fff"/></marker>`;
 
-  const sol = (x, y) => `<g transform="translate(${x} ${y})"><g class="cc-rayos">${Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="-38" x2="0" y2="-50" transform="rotate(${i * 30})" stroke="#fcc419" stroke-width="4" stroke-linecap="round"/>`).join('')}</g><circle r="30" fill="#fcc419"/><circle r="22" fill="#ffe066"/></g>`;
-  const nube = (x, y, s = 1, extra = '') => `<g transform="translate(${x} ${y}) scale(${s})" class="cc-nube ${extra}">
-    <ellipse cx="0" cy="18" rx="62" ry="12" fill="#dee2e6"/>
-    <circle cx="-38" cy="8" r="22" fill="#fff"/><circle cx="-8" cy="-6" r="30" fill="#fff"/><circle cx="26" cy="4" r="25" fill="#fff"/><circle cx="50" cy="12" r="16" fill="#fff"/>
-    <rect x="-56" y="8" width="112" height="20" rx="10" fill="#fff"/></g>`;
+  const cielo = (solX, solY) => `
+    <rect width="800" height="460" fill="url(#cc-cielo)"/>
+    ${[[120, 30], [260, 18], [380, 42], [520, 22], [600, 50], [760, 30], [330, 70]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 2 ? 1 : 1.4}" fill="#fff" class="cc-estrella" style="animation-delay:${i * 0.4}s"/>`).join('')}
+    <g class="cc-sol-latido"><circle cx="${solX}" cy="${solY}" r="120" fill="url(#cc-sol)" opacity="0.55"/></g>
+    <circle cx="${solX}" cy="${solY}" r="54" fill="url(#cc-sol)"/><circle cx="${solX}" cy="${solY}" r="28" fill="#fff3c4"/>`;
+  const vineta = '<rect width="800" height="460" fill="url(#cc-vineta)" pointer-events="none"/>';
+  const nube = (x, y, s = 1, extra = '', oscura = false) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="cc-nube ${extra}">
+    <rect x="-60" y="-4" width="120" height="26" rx="13" fill="${oscura ? '#8e92d6' : '#fff'}"/>
+    <circle cx="-24" cy="-8" r="22" fill="${oscura ? '#8e92d6' : '#fff'}"/><circle cx="12" cy="-16" r="28" fill="${oscura ? '#9da1e3' : '#fff'}"/><circle cx="40" cy="-2" r="16" fill="${oscura ? '#8e92d6' : '#fff'}"/>
+    <rect x="-60" y="14" width="120" height="8" rx="4" fill="${oscura ? '#6b6fb5' : '#c9d3ff'}"/></g></g>`;
   const arbol = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">
-    <path d="M0,0 C-2,18 -12,32 -22,48 M0,0 C4,22 18,36 32,46 M0,0 L0,44 M-10,26 L-26,30 M12,24 L26,22" stroke="#8d6e63" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-    <path d="M-8,0 L-6,-58 L6,-58 L8,0 Z" fill="#8d6e63"/>
-    <circle cx="-20" cy="-68" r="28" fill="#2f9e44"/><circle cx="20" cy="-70" r="30" fill="#37b24d"/><circle cx="0" cy="-94" r="30" fill="#40c057"/>
-    <circle cx="10" cy="-100" r="10" fill="#69db7c" opacity="0.7"/></g>`;
+    <path d="M0,0 C-2,18 -12,32 -22,48 M0,0 C4,22 18,36 32,46 M0,0 L0,44 M-10,26 L-26,30 M12,24 L26,22" stroke="#e0b08a" stroke-opacity="0.75" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <rect x="-7" y="-62" width="14" height="64" rx="3" fill="#6b4a3a"/><rect x="1" y="-62" width="6" height="64" fill="#553a2f"/>
+    <circle cx="-24" cy="-72" r="27" fill="#27c07a"/><circle cx="24" cy="-74" r="29" fill="#1fae6c"/><circle cx="0" cy="-98" r="32" fill="#2fd186"/>
+    <path d="M0,-130 a32,32 0 0 1 0,64 Z" fill="#1a9a61" opacity="0.55"/>
+    <circle cx="-12" cy="-110" r="9" fill="#7fedb5" opacity="0.6"/></g>`;
+  const montania = (bx0, pico, bx1, base) => `
+    <path d="M${bx0},${base} L${pico[0]},${pico[1]} L${bx1},${base} Z" fill="#3d4a8a"/>
+    <path d="M${pico[0]},${pico[1]} L${bx1},${base} L${pico[0] + (bx1 - pico[0]) * 0.35},${base} Z" fill="#2a3468"/>
+    <path d="M${bx0},${base} L${pico[0]},${pico[1]}" stroke="#9fb0ff" stroke-width="2" opacity="0.7"/>`;
+  const suelo = (d) => `<path d="${d}" fill="url(#cc-suelo)"/><path d="${d}" fill="url(#cc-granos)"/>`;
+  const edificio = (x, yb, w, h, c) => {
+    let v = '';
+    for (let yy = yb - h + 5; yy < yb - 5; yy += 8) for (let xx = x + 4; xx < x + w - 5; xx += 7) {
+      if ((xx * 7 + yy * 3) % 5 > 1) v += `<rect x="${xx}" y="${yy}" width="3" height="4" fill="#ffe8a3" opacity="0.9"/>`;
+    }
+    return `<rect x="${x}" y="${yb - h}" width="${w}" height="${h}" rx="2" fill="${c}"/>${v}`;
+  };
 
   const ESCENAS = {
     agua: `
-      <rect width="800" height="460" fill="url(#cc-cielo)"/>
-      ${sol(80, 70)}
-      <path d="M560,305 L700,122 L840,305 Z" fill="#868e96"/><path d="M700,122 L760,305 L840,305 Z" fill="#6c757d"/>
-      <path d="M652,185 L700,122 L748,185 C734,197 722,186 708,200 C694,190 682,202 668,191 Z" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1.5"/>
+      ${cielo(80, 70)}
+      ${montania(560, [700, 122], 840, 305)}
+      <path d="M652,185 L700,122 L748,185 C734,197 722,186 708,200 C694,190 682,202 668,191 Z" fill="#f1f3ff"/>
+      <path d="M700,122 L748,185 C734,197 722,186 708,200 Z" fill="#c9d1ff"/>
       ${nube(640, 55, 0.6, 'lenta')}
       <rect x="0" y="330" width="270" height="130" fill="url(#cc-mar)"/>
-      <path class="cc-olas" d="M-40,334 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#d0ebff" stroke-width="3"/>
-      <path d="M230,336 C262,318 300,300 350,298 L800,296 L800,460 L230,460 Z" fill="url(#cc-suelo)"/>
-      <path d="M230,336 C262,318 300,300 350,298 L800,296 L800,460 L230,460 Z" fill="url(#cc-granos)"/>
-      <path d="M240,382 C400,372 600,380 800,372 L800,432 C600,440 400,436 240,442 Z" fill="#a5d8ff"/>
+      <ellipse cx="110" cy="338" rx="70" ry="6" fill="#fff" opacity="0.18"/>
+      <path class="cc-olas" d="M-40,334 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#bcd6ff" stroke-opacity="0.7" stroke-width="2.5"/>
+      ${suelo('M230,336 C262,318 300,300 350,298 L800,296 L800,460 L230,460 Z')}
+      <path d="M240,382 C400,372 600,380 800,372 L800,432 C600,440 400,436 240,442 Z" fill="url(#cc-acuifero)"/>
       <path d="M240,382 C400,372 600,380 800,372 L800,432 C600,440 400,436 240,442 Z" fill="url(#cc-poros)"/>
       <path d="M232,442 C400,436 600,440 800,432 L800,460 L232,460 Z" fill="url(#cc-roca)"/>
-      <path d="M230,336 C262,318 300,300 350,298 L800,296" fill="none" stroke="#51cf66" stroke-width="7" stroke-linecap="round"/>
-      <path d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#4dabf7" stroke-width="10" stroke-linecap="round"/>
-      <path class="cc-corriente" d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#e7f5ff" stroke-width="2.5" stroke-dasharray="6 16" stroke-linecap="round"/>
+      <path d="M230,336 C262,318 300,300 350,298 L800,296 L800,306 L350,308 C300,310 262,326 232,344 Z" fill="url(#cc-pasto)"/>
+      <path d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#4c8dff" stroke-width="10" stroke-linecap="round"/>
+      <path class="cc-corriente" d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#e7f5ff" stroke-width="2.2" stroke-dasharray="6 16" stroke-linecap="round"/>
       ${arbol(352, 300)}
-      <g class="cc-vaho" opacity="0.8">${[[165, 230], [195, 215], [220, 232]].map(([x, y]) => `<path d="M${x},${y} q6,-6 0,-12 t0,-12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join('')}</g>
-      ${nube(440, 88, 1)}`,
+      <g class="cc-vaho" opacity="0.85">${[[165, 230], [195, 215], [220, 232]].map(([x, y]) => `<path d="M${x},${y} q6,-6 0,-12 t0,-12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join('')}</g>
+      ${nube(440, 88, 1)}
+      ${vineta}`,
     carbono: `
-      <rect width="800" height="460" fill="url(#cc-cielo)"/>
-      ${sol(730, 62)}
+      ${cielo(730, 62)}
       <rect x="0" y="340" width="200" height="120" fill="url(#cc-mar)"/>
-      <path class="cc-olas" d="M-40,344 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#d0ebff" stroke-width="3"/>
-      <path d="M170,348 C200,332 240,326 280,326 L800,326 L800,460 L170,460 Z" fill="url(#cc-suelo)"/>
-      <path d="M170,348 C200,332 240,326 280,326 L800,326 L800,460 L170,460 Z" fill="url(#cc-granos)"/>
+      <ellipse cx="90" cy="348" rx="60" ry="5" fill="#fff" opacity="0.15"/>
+      <path class="cc-olas" d="M-40,344 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#bcd6ff" stroke-opacity="0.7" stroke-width="2.5"/>
+      ${suelo('M170,348 C200,332 240,326 280,326 L800,326 L800,460 L170,460 Z')}
       <path d="M180,388 C400,382 600,390 800,384 L800,460 L180,460 Z" fill="url(#cc-roca)"/>
-      <path d="M560,420 C570,400 640,394 700,402 C752,408 772,426 742,441 C690,453 600,452 570,441 Z" fill="#212529"/>
-      <path d="M600,412 C630,404 670,404 700,410" fill="none" stroke="#495057" stroke-width="3" stroke-linecap="round"/>
-      <path d="M170,348 C200,332 240,326 280,326 L800,326" fill="none" stroke="#51cf66" stroke-width="7" stroke-linecap="round"/>
-      <line x1="690" y1="402" x2="690" y2="326" stroke="#495057" stroke-width="6"/>
-      <g><rect x="652" y="276" width="100" height="52" rx="3" fill="#adb5bd"/><path d="M652,276 L672,258 L672,276 L692,258 L692,276 L712,258 L712,276 Z" fill="#868e96"/>
-        <rect x="720" y="214" width="18" height="64" fill="#868e96"/><rect x="664" y="292" width="14" height="14" fill="#fff3bf"/><rect x="688" y="292" width="14" height="14" fill="#fff3bf"/></g>
-      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="729" cy="210" r="${9 + i * 2}" fill="#868e96" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
+      <path d="M560,420 C570,400 640,394 700,402 C752,408 772,426 742,441 C690,453 600,452 570,441 Z" fill="#0b0c1f"/>
+      <path d="M598,410 C630,402 670,402 700,408" fill="none" stroke="#5a60b8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+      <path d="M170,348 C200,332 240,326 280,326 L800,326 L800,336 L280,336 C240,336 200,342 172,356 Z" fill="url(#cc-pasto)"/>
+      <line x1="690" y1="402" x2="690" y2="326" stroke="#5a60b8" stroke-width="6"/>
+      <g>${edificio(652, 328, 100, 52, '#5a67d8')}<path d="M652,276 L672,258 L672,276 L692,258 L692,276 L712,258 L712,276 Z" fill="#7382f5"/>
+        <rect x="720" y="214" width="18" height="64" fill="#7f8cff"/><rect x="720" y="214" width="6" height="64" fill="#9aa3ff"/></g>
+      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="729" cy="210" r="${9 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
       ${arbol(240, 330, 1.05)}
       <g transform="translate(440 300)">
-        <rect x="-36" y="-18" width="74" height="34" rx="15" fill="#fff" stroke="#495057" stroke-width="2"/>
-        <path d="M-12,-18 C-4,-8 6,-10 10,-18 Z M16,0 C22,-8 32,-4 30,8 C24,12 18,8 16,0 Z" fill="#343a40"/>
-        <line x1="-26" y1="14" x2="-26" y2="30" stroke="#495057" stroke-width="5" stroke-linecap="round"/><line x1="-12" y1="14" x2="-12" y2="30" stroke="#495057" stroke-width="5" stroke-linecap="round"/>
-        <line x1="18" y1="14" x2="18" y2="30" stroke="#495057" stroke-width="5" stroke-linecap="round"/><line x1="30" y1="14" x2="30" y2="30" stroke="#495057" stroke-width="5" stroke-linecap="round"/>
-        <circle cx="-42" cy="-12" r="13" fill="#fff" stroke="#495057" stroke-width="2"/><ellipse cx="-50" cy="-6" rx="7" ry="5" fill="#fcc2d7"/>
-        <path d="M-44,-24 l-6,-6 M-36,-23 l4,-7" stroke="#495057" stroke-width="3" stroke-linecap="round"/><circle cx="-42" cy="-15" r="1.8" fill="#212529"/></g>
+        <rect x="-36" y="-18" width="74" height="34" rx="15" fill="#f1f3ff"/><rect x="-36" y="4" width="74" height="12" rx="6" fill="#c9d1ff"/>
+        <path d="M-12,-18 C-4,-8 6,-10 10,-18 Z M16,0 C22,-8 32,-4 30,8 C24,12 18,8 16,0 Z" fill="#2b2d42"/>
+        ${[-26, -12, 18, 30].map(x => `<rect x="${x - 3}" y="14" width="6" height="16" rx="3" fill="#2b2d42"/>`).join('')}
+        <circle cx="-42" cy="-12" r="13" fill="#f1f3ff"/><ellipse cx="-50" cy="-6" rx="7" ry="5" fill="#ffb3c7"/>
+        <path d="M-44,-24 l-6,-6 M-36,-23 l4,-7" stroke="#2b2d42" stroke-width="3" stroke-linecap="round"/><circle cx="-42" cy="-15" r="1.8" fill="#2b2d42"/></g>
       <g transform="translate(330 350)">
-        ${[[-26, 4, 20], [-8, 8, -30], [14, 2, 40], [28, 8, -10]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4" transform="rotate(${a} ${x} ${y})" fill="#e8590c" opacity="0.85"/>`).join('')}
-        <rect x="-4" y="-10" width="4" height="12" fill="#f8f9fa"/><path d="M-11,-10 C-10,-20 6,-20 7,-10 Z" fill="#c92a2a"/>
-        <rect x="16" y="-6" width="3" height="9" fill="#f8f9fa"/><path d="M11,-6 C12,-13 23,-13 24,-6 Z" fill="#c92a2a"/></g>
-      <g class="cc-deco">${[[330, 45], [505, 60], [560, 120], [290, 125]].map(([x, y]) => figura('co2', x, y, 1)).join('')}</g>`,
+        ${[[-26, 4, 20], [-8, 8, -30], [14, 2, 40], [28, 8, -10]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4" transform="rotate(${a} ${x} ${y})" fill="#ff9f43"/>`).join('')}
+        <rect x="-4" y="-10" width="4" height="12" fill="#f1f3ff"/><path d="M-11,-10 C-10,-20 6,-20 7,-10 Z" fill="#ff6b6b"/>
+        <rect x="16" y="-6" width="3" height="9" fill="#f1f3ff"/><path d="M11,-6 C12,-13 23,-13 24,-6 Z" fill="#ff6b6b"/></g>
+      <g class="cc-deco" opacity="0.8">${[[330, 45], [505, 60], [560, 120], [290, 125]].map(([x, y]) => figura('co2', x, y, 1)).join('')}</g>
+      ${vineta}`,
     nitrogeno: `
-      <rect width="800" height="460" fill="url(#cc-cielo)"/>
-      <g transform="translate(662 60)"><ellipse cx="0" cy="18" rx="66" ry="14" fill="#868e96"/><circle cx="-36" cy="8" r="24" fill="#adb5bd"/><circle cx="-4" cy="-6" r="30" fill="#ced4da"/><circle cx="30" cy="6" r="24" fill="#adb5bd"/></g>
-      <path class="cc-rayo" d="M654,86 L638,130 L656,130 L640,178 L680,120 L662,120 L676,86 Z" fill="#fcc419" stroke="#f08c00" stroke-width="2"/>
-      <path d="M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z" fill="url(#cc-suelo)"/>
-      <path d="M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z" fill="url(#cc-granos)"/>
-      <path d="M0,304 C200,294 500,300 800,294" fill="none" stroke="#51cf66" stroke-width="7" stroke-linecap="round"/>
-      <g opacity="0.9">${[[250, 390], [280, 410], [335, 395], [360, 418], [300, 425]].map(([x, y]) => figura('nh4', x, y, 0.7)).join('')}
+      ${cielo(-200, -200)}
+      ${nube(662, 64, 1.05, '', true)}
+      <path class="cc-rayo" d="M654,86 L638,130 L656,130 L640,178 L680,120 L662,120 L676,86 Z" fill="#ffd166" stroke="#fff3c4" stroke-width="1.5"/>
+      ${nube(240, 70, 0.6, 'lenta')}
+      ${suelo('M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z')}
+      <path d="M0,304 C200,294 500,300 800,294 L800,304 C500,310 200,304 0,314 Z" fill="url(#cc-pasto)"/>
+      <g opacity="0.95">${[[250, 390], [280, 410], [335, 395], [360, 418], [300, 425]].map(([x, y]) => figura('nh4', x, y, 0.7)).join('')}
         ${[[545, 392], [585, 420], [640, 395], [660, 425], [610, 410]].map(([x, y]) => figura('no3', x, y, 0.7)).join('')}</g>
       <g transform="translate(300 300)">
-        <path d="M0,0 C-2,20 -14,34 -24,50 M0,0 C4,22 16,36 30,48 M0,0 L0,52" stroke="#a9794c" stroke-width="3" fill="none" stroke-linecap="round"/>
-        ${[[-14, 28], [-22, 44], [10, 30], [22, 42], [0, 40], [-6, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#f783ac" stroke="#c2255c" stroke-width="1.2"/>`).join('')}
-        <path d="M0,0 C-2,-30 2,-60 0,-92" stroke="#2f9e44" stroke-width="5" fill="none" stroke-linecap="round"/>
-        ${[[-22, -30, -30], [22, -46, 30], [-20, -66, -25], [18, -82, 20]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="18" ry="8" transform="rotate(${a} ${x} ${y})" fill="#51cf66" stroke="#2f9e44" stroke-width="1.5"/>`).join('')}
-        <path d="M6,-58 C18,-52 22,-40 16,-30" stroke="#94d82d" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+        <path d="M0,0 C-2,20 -14,34 -24,50 M0,0 C4,22 16,36 30,48 M0,0 L0,52" stroke="#e0b08a" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
+        ${[[-14, 28], [-22, 44], [10, 30], [22, 42], [0, 40], [-6, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ff8fb1" stroke="#fff" stroke-width="1"/>`).join('')}
+        <path d="M0,0 C-2,-30 2,-60 0,-92" stroke="#1fae6c" stroke-width="5" fill="none" stroke-linecap="round"/>
+        ${[[-22, -30, -30], [22, -46, 30], [-20, -66, -25], [18, -82, 20]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="18" ry="8" transform="rotate(${a} ${x} ${y})" fill="#2fd186"/><ellipse cx="${x}" cy="${y + 2}" rx="16" ry="4" transform="rotate(${a} ${x} ${y})" fill="#1a9a61" opacity="0.6"/>`).join('')}
+        <path d="M6,-58 C18,-52 22,-40 16,-30" stroke="#b6f36b" stroke-width="7" fill="none" stroke-linecap="round"/></g>
       <g transform="translate(570 270)">
-        <ellipse cx="0" cy="0" rx="30" ry="20" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
-        <circle cx="-28" cy="-12" r="13" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
-        <ellipse cx="-34" cy="-38" rx="5" ry="16" fill="#e9ecef" stroke="#868e96" stroke-width="2"/><ellipse cx="-24" cy="-40" rx="5" ry="16" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
-        <circle cx="30" cy="-2" r="7" fill="#fff" stroke="#868e96" stroke-width="2"/><circle cx="-32" cy="-14" r="2" fill="#212529"/><circle cx="-40" cy="-9" r="2" fill="#f783ac"/></g>
+        <ellipse cx="0" cy="0" rx="30" ry="20" fill="#f1f3ff"/><ellipse cx="4" cy="8" rx="26" ry="10" fill="#c9d1ff"/>
+        <circle cx="-28" cy="-12" r="13" fill="#f1f3ff"/>
+        <ellipse cx="-34" cy="-38" rx="5" ry="16" fill="#f1f3ff"/><ellipse cx="-24" cy="-40" rx="5" ry="16" fill="#f1f3ff"/>
+        <ellipse cx="-24" cy="-40" rx="2" ry="11" fill="#ffb3c7"/>
+        <circle cx="30" cy="-2" r="7" fill="#fff"/><circle cx="-32" cy="-14" r="2" fill="#2b2d42"/><circle cx="-40" cy="-9" r="2" fill="#ff8fb1"/></g>
       <g transform="translate(130 312)">
-        ${[[-30, 4, 20], [-12, 8, -30], [10, 2, 40], [26, 8, -10], [0, -2, 70]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" transform="rotate(${a} ${x} ${y})" fill="#d9480f" opacity="0.85"/>`).join('')}
-        <ellipse cx="40" cy="6" rx="8" ry="5" fill="#6f4518"/></g>`,
+        ${[[-30, 4, 20], [-12, 8, -30], [10, 2, 40], [26, 8, -10], [0, -2, 70]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" transform="rotate(${a} ${x} ${y})" fill="#ff9f43"/>`).join('')}
+        <ellipse cx="40" cy="6" rx="8" ry="5" fill="#6b4a3a"/></g>
+      ${vineta}`,
   };
 
   // ---------- Datos de cada ciclo ----------
@@ -130,14 +154,14 @@ const Ciclos = (function () {
       procesos: [
         { de: 'oceano', a: 'vapor', nombre: 'Evaporación', estilo: 'vapor', ruta: 'M110,330 C112,290 150,255 180,228', desc: 'El Sol calienta el agua del mar y la transforma en vapor.' },
         { de: 'vapor', a: 'nube', nombre: 'Condensación', estilo: 'vapor', ruta: 'M205,196 C260,140 330,105 390,96', desc: 'El vapor sube, se enfría y se convierte en gotitas que forman las nubes.' },
-        { de: 'nube', a: 'oceano', nombre: 'Precipitación (lluvia sobre el mar)', estilo: 'gota', t: 0.62, ruta: 'M405,118 C340,170 260,240 200,325', desc: 'Las gotitas se juntan, pesan más y caen como lluvia.' },
-        { de: 'nube', a: 'rio', nombre: 'Precipitación (lluvia)', estilo: 'gota', ruta: 'M470,118 C495,190 525,250 548,298', desc: 'La lluvia cae sobre la tierra y llena ríos y lagos.' },
+        { de: 'nube', a: 'oceano', nombre: 'Precipitación (lluvia sobre el mar)', estilo: 'gota', t: 0.85, ruta: 'M405,118 C340,170 260,240 200,325', desc: 'Las gotitas se juntan, pesan más y caen como lluvia.' },
+        { de: 'nube', a: 'rio', nombre: 'Precipitación (lluvia)', estilo: 'gota', t: 0.35, ruta: 'M470,118 C495,190 525,250 548,298', desc: 'La lluvia cae sobre la tierra y llena ríos y lagos.' },
         { de: 'nube', a: 'glaciar', nombre: 'Precipitación (nieve)', estilo: 'copo', ruta: 'M492,84 C570,70 640,100 680,140', desc: 'En lugares fríos o altos el agua cae como nieve y forma glaciares.' },
         { de: 'glaciar', a: 'rio', nombre: 'Fusión (deshielo)', estilo: 'gota', ruta: 'M700,195 C690,240 665,285 640,300 C615,305 595,303 575,304', desc: 'Cuando hace más calor, el hielo se derrite y alimenta a los ríos.' },
         { de: 'glaciar', a: 'vapor', nombre: 'Sublimación', estilo: 'vapor', ruta: 'M672,140 C560,30 320,90 212,192', desc: 'Con viento y sol, el hielo pasa directamente a vapor, sin derretirse.' },
         { de: 'rio', a: 'oceano', nombre: 'Escorrentía', estilo: 'gota', ruta: 'M548,306 C500,315 450,318 400,318 C340,320 290,330 240,337', desc: 'El agua corre por la superficie, en ríos y arroyos, hasta el mar.' },
         { de: 'rio', a: 'subterranea', nombre: 'Infiltración', estilo: 'gota', ruta: 'M530,312 C532,340 528,365 522,390', desc: 'Parte del agua se filtra por el suelo y llega a las capas subterráneas.' },
-        { de: 'rio', a: 'vapor', nombre: 'Evaporación', estilo: 'vapor', t: 0.3, ruta: 'M585,298 C540,230 380,160 218,208', desc: 'El agua de ríos y lagos también se evapora con el calor del Sol.' },
+        { de: 'rio', a: 'vapor', nombre: 'Evaporación', estilo: 'vapor', t: 0.12, ruta: 'M585,298 C540,230 380,160 218,208', desc: 'El agua de ríos y lagos también se evapora con el calor del Sol.' },
         { de: 'subterranea', a: 'planta', nombre: 'Absorción por las raíces', estilo: 'gota', ruta: 'M500,398 C440,392 380,375 362,345 C355,325 352,290 352,258', desc: 'Las raíces de las plantas toman el agua del suelo y la llevan hacia las hojas.' },
         { de: 'subterranea', a: 'oceano', nombre: 'Flujo subterráneo', estilo: 'gota', ruta: 'M505,422 C420,430 320,432 240,420 C200,412 170,404 145,398', desc: 'El agua subterránea se mueve lentamente hasta desembocar en el mar.' },
         { de: 'planta', a: 'vapor', nombre: 'Transpiración', estilo: 'vapor', t: 0.3, ruta: 'M322,212 C290,196 252,196 222,208', desc: 'Las plantas liberan vapor de agua por pequeños poros de las hojas.' },

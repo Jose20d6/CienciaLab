@@ -631,19 +631,20 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 @keyframes humo-chimenea { 0% { opacity: 0.8; transform: translate(0, 0) scale(0.6); } 100% { opacity: 0; transform: translate(-30px, -70px) scale(1.8); } }
 .cc-rayo { animation: rayo 4s steps(1) infinite; }
 @keyframes rayo { 0%, 100% { opacity: 0; } 70% { opacity: 1; } 74% { opacity: 0.2; } 78% { opacity: 1; } 84% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .cc-rayos, .cc-olas, .cc-corriente, .cc-nube, .cc-vaho path, .cc-humo circle { animation: none; } .cc-humo circle { opacity: 0.5; } .cc-rayo { animation: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cc-estrella, .cc-sol-latido, .cc-rayos, .cc-olas, .cc-corriente, .cc-nube, .cc-vaho path, .cc-humo circle { animation: none; } .cc-humo circle { opacity: 0.5; } .cc-rayo { animation: none; opacity: 1; } }
 /* Procesos: la ruta solo se dibuja al pedirla o al elegir un proceso */
-.cic-guia { fill: none; stroke: #343a40; stroke-width: 2.2; stroke-dasharray: 7 6; opacity: 0; transition: opacity 0.2s; }
+.cic-guia { fill: none; stroke: #fff; stroke-width: 2.2; stroke-dasharray: 7 6; opacity: 0; transition: opacity 0.2s; }
 .ver-rotulos .cic-guia { opacity: 0.55; }
-.cic-proc.activo .cic-guia { opacity: 1; stroke: #e8590c; stroke-width: 3.5; }
+.cic-proc.activo .cic-guia { opacity: 1; stroke: #ffd166; stroke-width: 3.5; }
 .cic-toque { fill: none; stroke: transparent; stroke-width: 22; }
 .modo-explorar .cic-proc { cursor: pointer; }
 .modo-explorar .cic-proc:hover .cic-guia { opacity: 0.8; }
 .cic-etq { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-.cic-etq rect { fill: #fff; stroke: #343a40; stroke-width: 1; opacity: 0.92; }
-.cic-etq text { font-size: 11.5px; font-weight: 700; fill: #1d2433; }
+.cic-etq rect { fill: #12143a; stroke: rgba(255,255,255,.3); stroke-width: 1; opacity: 0.88; }
+.cic-etq text { font-size: 11.5px; font-weight: 700; fill: #fff; }
 .ver-rotulos .cic-etq, .cic-etq.activo { opacity: 1; }
-.cic-etq.activo rect { stroke: #e8590c; stroke-width: 2; }
+.cic-etq.activo rect { stroke: #ffd166; stroke-width: 2; }
+.cic-etq.activo text { fill: #ffd166; }
 #cic-particulas, #cic-viajero, #cic-etiquetas { pointer-events: none; }
 .cic-part { transition: opacity 0.3s; }
 .con-sel .cic-part:not(.activa) { opacity: 0.2 !important; }
@@ -651,11 +652,17 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 /* Lugares */
 .cic-nodo { cursor: pointer; }
 .cic-zona { fill: transparent; }
-.modo-explorar .cic-nodo:hover .cic-zona, .cic-nodo.marcado .cic-zona { fill: rgba(255, 255, 255, 0.35); stroke: #e8590c; stroke-width: 3; stroke-dasharray: 6 5; }
-.cic-pastilla { fill: #fff; stroke: #495057; stroke-width: 1.2; filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
-.cic-nodo.marcado .cic-pastilla { stroke: #e8590c; stroke-width: 2.5; }
-.cic-pastilla-txt { font-size: 13px; font-weight: 800; fill: #1d2433; }
-.cic-viajero { filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+.modo-explorar .cic-nodo:hover .cic-zona, .cic-nodo.marcado .cic-zona { fill: rgba(255, 209, 102, 0.12); stroke: #ffd166; stroke-width: 2.5; stroke-dasharray: 6 5; }
+.cic-pastilla { fill: rgba(18, 20, 58, 0.85); stroke: rgba(255,255,255,.35); stroke-width: 1.2; filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+.cic-nodo.marcado .cic-pastilla { stroke: #ffd166; stroke-width: 2.5; }
+.cic-pastilla-txt { font-size: 13px; font-weight: 800; fill: #fff; letter-spacing: 0.02em; }
+.cic-nodo.marcado .cic-pastilla-txt { fill: #ffd166; }
+.cic-viajero { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7)); }
+#cic-particulas { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)); }
+.cic-visor { background: #12143a; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.35); }
+.cic-visor .cic-leyenda, .cic-visor .cic-toggle { color: #c9ccf5; }
+.cc-estrella { animation: titilar-estrella 2.6s ease-in-out infinite alternate; }
+.cc-sol-latido { animation: latido-sol 5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 .cic-viajero.reposo { animation: latir 1.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 @keyframes latir { to { transform: scale(1.12); } }
 .cic-asi, .cic-ahora { display: flex; align-items: center; gap: 0.5rem; background: var(--bg); border-radius: 10px; padding: 0.45rem 0.6rem; }
