@@ -10,23 +10,28 @@
 <body>
   <header class="topbar">
     <button class="brand" data-go="inicio">⚗️ QuímicaLab</button>
-    <nav class="tabs">
+    <nav class="tabs" aria-label="Actividades">
       <button data-go="transformaciones">🔄 Transformaciones</button>
       <button data-go="laboratorio">🧪 Laboratorio</button>
       <button data-go="balanceo">⚖️ Balanceo</button>
-      <button data-go="tabla">🧩 Tabla periódica</button>
+      <button data-go="tabla">🧩 Tabla</button>
       <button data-go="atomos">⚛️ Átomos</button>
+      <span class="tabs-sep" aria-hidden="true"></span>
+      <button data-go="invernadero">🌍 Invernadero</button>
+      <button data-go="celula">🔬 Célula</button>
+      <button data-go="ciclos">♻️ Ciclos</button>
     </nav>
-    <button id="btn-proyector" class="ghost" title="Agranda los textos para proyectar en el aula">📽️ Proyector</button>
+    <button id="btn-proyector" class="ghost" title="Modo proyector: agranda los textos para proyectar en el aula" aria-label="Modo proyector">📽️</button>
   </header>
 
   <main>
     <section id="inicio" class="view">
       <div class="hero">
-        <h1>Laboratorio interactivo de Química</h1>
+        <h1>Laboratorio interactivo de Química y Ciencias Naturales</h1>
         <p>Explora, experimenta y ponte a prueba. Elige una actividad para comenzar.</p>
       </div>
 
+      <h2 class="seccion-inicio">⚗️ Química</h2>
       <div class="tarjetas-inicio">
         <button class="tarjeta-modulo" data-go="transformaciones">
           <span class="tm-emoji">🔄</span>
@@ -59,6 +64,28 @@
           <span class="etiqueta">Estructura de la materia</span>
         </button>
       </div>
+
+      <h2 class="seccion-inicio">🌱 Ciencias naturales</h2>
+      <div class="tarjetas-inicio">
+        <button class="tarjeta-modulo" data-go="invernadero">
+          <span class="tm-emoji">🌍</span>
+          <h2>Efecto invernadero</h2>
+          <p>Aumenta o reduce el CO₂ del aire y mira cómo cambia la temperatura de la Tierra a lo largo de los años.</p>
+          <span class="etiqueta">Cambio climático</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="celula">
+          <span class="tm-emoji">🔬</span>
+          <h2>Explorador de la célula</h2>
+          <p>Acércate a una célula animal o vegetal, descubre la función de cada orgánulo y compara ambas.</p>
+          <span class="etiqueta">La célula</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="ciclos">
+          <span class="tm-emoji">♻️</span>
+          <h2>Ciclos de la naturaleza</h2>
+          <p>Sigue el viaje de una gota de agua, un átomo de carbono o de nitrógeno, y ordena las etapas de cada ciclo.</p>
+          <span class="etiqueta">Ciclos biogeoquímicos</span>
+        </button>
+      </div>
     </section>
 
     <section id="transformaciones" class="view" hidden></section>
@@ -66,6 +93,9 @@
     <section id="balanceo" class="view" hidden></section>
     <section id="tabla" class="view" hidden></section>
     <section id="atomos" class="view" hidden></section>
+    <section id="invernadero" class="view" hidden></section>
+    <section id="celula" class="view" hidden></section>
+    <section id="ciclos" class="view" hidden></section>
   </main>
 
   <script src="js/util.js"></script>
@@ -75,6 +105,9 @@
   <script src="js/balanceo.js"></script>
   <script src="js/tabla.js"></script>
   <script src="js/atomos.js"></script>
+  <script src="js/invernadero.js"></script>
+  <script src="js/celula.js"></script>
+  <script src="js/ciclos.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

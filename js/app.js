@@ -1,12 +1,15 @@
 // Navegación entre módulos (usa el # de la URL para poder compartir un enlace directo, p. ej. index.html#tabla).
 (function () {
-  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos'];
+  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos', 'invernadero', 'celula', 'ciclos'];
   const modulos = {
     transformaciones: Transformaciones,
     laboratorio: Laboratorio,
     balanceo: Balanceo,
     tabla: TablaPeriodica,
     atomos: Atomos,
+    invernadero: Invernadero,
+    celula: Celula,
+    ciclos: Ciclos,
   };
   const iniciados = {};
 
