@@ -631,7 +631,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 @keyframes humo-chimenea { 0% { opacity: 0.8; transform: translate(0, 0) scale(0.6); } 100% { opacity: 0; transform: translate(-30px, -70px) scale(1.8); } }
 .cc-rayo { animation: rayo 4s steps(1) infinite; }
 @keyframes rayo { 0%, 100% { opacity: 0; } 70% { opacity: 1; } 74% { opacity: 0.2; } 78% { opacity: 1; } 84% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .cc-estrella, .cc-sol-latido, .cc-rayos, .cc-olas, .cc-corriente, .cc-nube, .cc-vaho path, .cc-humo circle { animation: none; } .cc-humo circle { opacity: 0.5; } .cc-rayo { animation: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cc-pajaro, .cc-ala, .cc-estrella, .cc-sol-latido, .cc-rayos, .cc-olas, .cc-corriente, .cc-nube, .cc-vaho path, .cc-humo circle { animation: none; } .cc-humo circle { opacity: 0.5; } .cc-rayo { animation: none; opacity: 1; } }
 /* Procesos: la ruta solo se dibuja al pedirla o al elegir un proceso */
 .cic-guia { fill: none; stroke: #fff; stroke-width: 2.2; stroke-dasharray: 7 6; opacity: 0; transition: opacity 0.2s; }
 .ver-rotulos .cic-guia { opacity: 0.55; }
@@ -661,6 +661,10 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 #cic-particulas { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)); }
 .cic-visor { background: #12143a; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.35); }
 .cic-visor .cic-leyenda, .cic-visor .cic-toggle { color: #c9ccf5; }
+.cc-pajaro { animation: volar 6s ease-in-out infinite alternate; }
+@keyframes volar { 0% { translate: -14px 4px; } 50% { translate: 0 -6px; } 100% { translate: 14px 2px; } }
+.cc-ala { animation: aletear 0.35s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 30% 80%; }
+@keyframes aletear { to { transform: scaleY(-0.6); } }
 .cc-estrella { animation: titilar-estrella 2.6s ease-in-out infinite alternate; }
 .cc-sol-latido { animation: latido-sol 5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 .cic-viajero.reposo { animation: latir 1.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }

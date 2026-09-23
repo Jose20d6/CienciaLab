@@ -78,18 +78,99 @@ const Ciclos = (function () {
     <path d="M${x},${y - h * 0.72} L${x + h * 0.3},${y - h * 0.18} L${x},${y - h * 0.18} Z" fill="#158553"/>
     <path d="M${x - h * 0.22},${y - h * 0.5} L${x},${y - h} L${x + h * 0.22},${y - h * 0.5} Z" fill="#27c07a"/>
     <path d="M${x},${y - h} L${x + h * 0.22},${y - h * 0.5} L${x},${y - h * 0.5} Z" fill="#1a9a61"/></g>`;
+  // Sombreado en dos tonos (característico del estilo): las formas se pintan con el color claro
+  // y la parte en sombra se recorta con la misma silueta.
+  let idArte = 0;
+  const dosTonos = (formas, claro, oscuro, corte) => {
+    const id = 'cc-dt-' + (idArte++);
+    const zona = corte.x !== undefined
+      ? `<rect x="${corte.x}" y="-2000" width="4000" height="4000" fill="${oscuro}"/>`
+      : `<rect x="-2000" y="${corte.y}" width="4000" height="4000" fill="${oscuro}"/>`;
+    return `${formas.replace(/FILL/g, claro)}<clipPath id="${id}">${formas.replace(/FILL/g, '#000')}</clipPath><g clip-path="url(#${id})">${zona}${corte.extra || ''}</g>`;
+  };
+  // Ojo típico: blanco grande, pupila mirando hacia adelante y un brillito.
+  const ojo = (x, y, r, dir = -1) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x + dir * r * 0.3}" cy="${y + r * 0.1}" r="${r * 0.55}" fill="#15163d"/><circle cx="${x + dir * r * 0.45}" cy="${y - r * 0.2}" r="${r * 0.2}" fill="#fff"/>`;
+
   const arbusto = (x, y, r) => `<g>${sombra(x + 2, y + 1, r * 1.3)}
-    <circle cx="${x - r * 0.6}" cy="${y - r * 0.5}" r="${r * 0.7}" fill="#27c07a"/><circle cx="${x + r * 0.5}" cy="${y - r * 0.55}" r="${r * 0.75}" fill="#1a9a61"/>
-    <circle cx="${x}" cy="${y - r}" r="${r * 0.8}" fill="#2fd186"/><circle cx="${x - r * 0.25}" cy="${y - r * 1.25}" r="${r * 0.25}" fill="#8af0bd" opacity="0.6"/></g>`;
+    ${dosTonos(`<circle cx="${x - r * 0.6}" cy="${y - r * 0.5}" r="${r * 0.7}" fill="FILL"/><circle cx="${x + r * 0.5}" cy="${y - r * 0.55}" r="${r * 0.75}" fill="FILL"/><circle cx="${x}" cy="${y - r}" r="${r * 0.85}" fill="FILL"/>`, '#2fd186', '#1a9a61', { x: x + r * 0.1 })}
+    <circle cx="${x - r * 0.3}" cy="${y - r * 1.3}" r="${r * 0.22}" fill="#9df5c8" opacity="0.7"/></g>`;
+
   const arbol = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">
     <path d="M0,0 C-2,18 -12,32 -22,48 M0,0 C4,22 18,36 32,46 M0,0 L0,44 M-10,26 L-26,30 M12,24 L26,22" stroke="#e0b08a" stroke-opacity="0.75" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-    ${sombra(6, 1, 34)}
-    <path d="M-7,2 L-5,-62 L5,-62 L7,2 Z" fill="#6b4a3a"/><path d="M1,2 L1,-62 L5,-62 L7,2 Z" fill="#553a2f"/>
-    <path d="M0,-40 L-16,-58 M2,-48 L14,-62" stroke="#6b4a3a" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="-26" cy="-70" r="26" fill="#27c07a"/><circle cx="26" cy="-72" r="28" fill="#169a5f"/>
-    <circle cx="-8" cy="-98" r="30" fill="#2fd186"/><circle cx="18" cy="-100" r="26" fill="#1fae6c"/>
-    <circle cx="0" cy="-78" r="24" fill="#23b872"/>
-    <circle cx="-18" cy="-112" r="10" fill="#8af0bd" opacity="0.55"/><circle cx="-34" cy="-80" r="6" fill="#8af0bd" opacity="0.45"/></g>`;
+    ${sombra(8, 1, 36)}
+    ${dosTonos('<path d="M-8,2 C-6,-20 -5,-40 -5,-62 L5,-62 C5,-40 6,-20 8,2 Z" fill="FILL"/>', '#7a543f', '#5a3c30', { x: 1 })}
+    ${dosTonos('<rect x="-44" y="-128" width="88" height="92" rx="44" fill="FILL"/><circle cx="-30" cy="-58" r="22" fill="FILL"/><circle cx="30" cy="-60" r="24" fill="FILL"/>', '#2fd186', '#1a9a61', { x: 4 })}
+    <path d="M-30,-104 a34,34 0 0 1 22,-18" stroke="#9df5c8" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <circle cx="-26" cy="-86" r="4" fill="#9df5c8" opacity="0.6"/></g>`;
+
+  const pajaro = (x, y, s = 1, retraso = 0) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="cc-pajaro" style="animation-delay:${retraso}s">
+    ${dosTonos('<ellipse cx="0" cy="0" rx="11" ry="9" fill="FILL"/>', '#5c7cfa', '#4263eb', { y: 2 })}
+    <ellipse cx="-2" cy="3" rx="6" ry="4.5" fill="#e7ecff"/>
+    <path d="M-10,-1 L-17,1 L-10,3 Z" fill="#ffb347"/>
+    ${ojo(-5, -3, 3)}
+    <g class="cc-ala"><ellipse cx="4" cy="-4" rx="7" ry="4" fill="#3b5bdb" transform="rotate(-25 4 -4)"/></g>
+    <path d="M10,-1 L16,-4 L15,2 Z" fill="#3b5bdb"/></g></g>`;
+
+  // Vaca mirando hacia la izquierda (hacia el árbol).
+  const vaca = (x, y) => {
+    const cuerpo = '<rect x="-38" y="-26" width="80" height="40" rx="20" fill="FILL"/>';
+    return `<g transform="translate(${x} ${y})">
+      ${sombra(2, 30, 46)}
+      <path d="M40,-10 C50,-6 50,6 46,14" stroke="#3b3d5c" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="46" cy="15" r="3.5" fill="#3b3d5c"/>
+      ${[-26, -12, 16, 30].map(lx => `<rect x="${lx - 4}" y="6" width="9" height="24" rx="4.5" fill="#3b3d5c"/><rect x="${lx - 4}" y="24" width="9" height="6" rx="3" fill="#1f2037"/>`).join('')}
+      ${dosTonos(cuerpo, '#f4f1ff', '#d4d0f5', { y: -4, extra: '<path d="M-10,-26 C-4,-14 10,-16 14,-26 Z M20,-4 C28,-14 42,-8 40,6 C32,10 22,6 20,-4 Z M-30,0 C-24,-8 -14,-4 -16,6 C-22,10 -30,8 -30,0 Z" fill="#2b2d42"/>' })}
+      <ellipse cx="18" cy="14" rx="9" ry="5" fill="#ff9fb5"/>
+      <g transform="translate(-44 -14)">
+        <path d="M-6,-16 C-10,-26 -4,-30 -2,-22 M8,-16 C12,-26 6,-30 4,-22" stroke="#ffe8a3" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <ellipse cx="-16" cy="-10" rx="9" ry="5" fill="#f4f1ff" transform="rotate(-20 -16 -10)"/><ellipse cx="-16" cy="-10" rx="5" ry="2.5" fill="#ff9fb5" transform="rotate(-20 -16 -10)"/>
+        ${dosTonos('<rect x="-14" y="-18" width="30" height="32" rx="14" fill="FILL"/>', '#f4f1ff', '#d4d0f5', { x: 4 })}
+        <rect x="-19" y="0" width="28" height="18" rx="9" fill="#ff9fb5"/><rect x="-19" y="10" width="28" height="8" rx="4" fill="#f07f9c"/>
+        <ellipse cx="-12" cy="8" rx="2" ry="2.6" fill="#8a3b52"/><ellipse cx="-3" cy="8" rx="2" ry="2.6" fill="#8a3b52"/>
+        ${ojo(-4, -7, 4.6)}</g></g>`;
+  };
+
+  // Conejo mirando hacia la izquierda.
+  const conejo = (x, y) => `<g transform="translate(${x} ${y})">
+    ${sombra(4, 20, 38)}
+    <circle cx="32" cy="2" r="9" fill="#fff"/>
+    ${dosTonos('<path d="M-14,18 C-34,18 -30,-16 -6,-18 C22,-20 34,-4 30,10 C28,18 20,20 10,20 Z" fill="FILL"/>', '#ece9ff', '#c9c4f3', { y: 4 })}
+    <ellipse cx="4" cy="18" rx="10" ry="4" fill="#c9c4f3"/>
+    <g transform="translate(-26 -14)">
+      <g transform="rotate(-12)">${dosTonos('<rect x="-4" y="-44" width="10" height="40" rx="5" fill="FILL"/>', '#ece9ff', '#c9c4f3', { x: 2 })}<rect x="-1" y="-38" width="4" height="28" rx="2" fill="#ff9fb5"/></g>
+      <g transform="rotate(8)">${dosTonos('<rect x="4" y="-46" width="10" height="42" rx="5" fill="FILL"/>', '#ece9ff', '#c9c4f3', { x: 10 })}<rect x="7" y="-40" width="4" height="30" rx="2" fill="#ff9fb5"/></g>
+      ${dosTonos('<circle cx="0" cy="0" r="15" fill="FILL"/>', '#ece9ff', '#c9c4f3', { x: 6 })}
+      <circle cx="-13" cy="3" r="2.6" fill="#ff7a9c"/>
+      <circle cx="-8" cy="7" r="3" fill="#ffb3c7" opacity="0.7"/>
+      ${ojo(-5, -3, 4.4)}</g></g>`;
+
+  // Hongos y hojas caídas.
+  const hongos = (x, y) => `<g transform="translate(${x} ${y})">
+    ${[[-26, 4, 20], [-8, 8, -30], [14, 4, 40], [30, 8, -10]].map(([hx, hy, a]) => `<ellipse cx="${hx}" cy="${hy}" rx="9" ry="4" transform="rotate(${a} ${hx} ${hy})" fill="#ff9f43"/><ellipse cx="${hx + 2}" cy="${hy + 1}" rx="6" ry="2" transform="rotate(${a} ${hx} ${hy})" fill="#e8762a"/>`).join('')}
+    ${[[-2, 0, 1], [18, 4, 0.7]].map(([hx, hy, e]) => `<g transform="translate(${hx} ${hy}) scale(${e})">
+      ${dosTonos('<rect x="-4" y="-14" width="9" height="16" rx="4" fill="FILL"/>', '#fff1dc', '#e6d3b8', { x: 1 })}
+      ${dosTonos('<path d="M-13,-12 C-13,-28 13,-28 13,-12 Z" fill="FILL"/>', '#ff5d5d', '#d94848', { x: 3 })}
+      <circle cx="-6" cy="-19" r="2" fill="#fff"/><circle cx="2" cy="-23" r="1.6" fill="#fff"/><circle cx="7" cy="-16" r="1.5" fill="#fff" opacity="0.8"/></g>`).join('')}</g>`;
+
+  // Fábrica con chimenea a rayas.
+  const fabrica = (x, yb) => `<g>
+    ${sombra(x + 54, yb + 1, 60)}
+    ${dosTonos(`<rect x="${x}" y="${yb - 52}" width="100" height="54" rx="6" fill="FILL"/>`, '#6272e6', '#4c59c4', { x: x + 70 })}
+    <path d="M${x},${yb - 50} L${x + 20},${yb - 70} L${x + 20},${yb - 50} L${x + 40},${yb - 70} L${x + 40},${yb - 50} L${x + 60},${yb - 70} L${x + 60},${yb - 50} Z" fill="#7f8cff" stroke="#7f8cff" stroke-width="4" stroke-linejoin="round"/>
+    ${[0, 1, 2].map(i => `<rect x="${x + 10 + i * 22}" y="${yb - 38}" width="12" height="12" rx="3" fill="#ffe8a3"/>`).join('')}
+    <rect x="${x + 76}" y="${yb - 24}" width="14" height="26" rx="3" fill="#2b2d42"/>
+    <g>${[0, 1, 2, 3].map(i => `<rect x="${x + 68}" y="${yb - 116 + i * 16}" width="20" height="16" fill="${i % 2 ? '#fff' : '#ff6b6b'}"/>`).join('')}
+      <rect x="${x + 82}" y="${yb - 116}" width="6" height="64" fill="#000" opacity="0.15"/>
+      <rect x="${x + 65}" y="${yb - 122}" width="26" height="8" rx="4" fill="#ff6b6b"/></g></g>`;
+
+  // Legumbre con nódulos en las raíces y vainas.
+  const legumbre = (x, y) => `<g transform="translate(${x} ${y})">
+    ${sombra(4, 1, 26)}
+    <path d="M0,0 C-2,20 -14,34 -24,50 M0,0 C4,22 16,36 30,48 M0,0 L0,52" stroke="#e0b08a" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${[[-14, 28], [-22, 44], [10, 30], [22, 42], [0, 40], [-6, 18]].map(([nx, ny]) => `<circle cx="${nx}" cy="${ny}" r="5.5" fill="#ff8fb1"/><circle cx="${nx - 1.5}" cy="${ny - 1.5}" r="1.6" fill="#fff" opacity="0.7"/>`).join('')}
+    <path d="M0,0 C-2,-30 2,-60 0,-96" stroke="#1fae6c" stroke-width="5" fill="none" stroke-linecap="round"/>
+    ${[[-18, -30, -28], [18, -46, 28], [-16, -66, -24], [15, -82, 20], [0, -98, 0]].map(([lx, ly, a]) => `<g transform="rotate(${a} ${lx} ${ly})">${dosTonos(`<ellipse cx="${lx}" cy="${ly}" rx="${lx ? 16 : 10}" ry="${lx ? 9 : 12}" fill="FILL"/>`, '#2fd186', '#1a9a61', { y: ly + 1 })}</g>`).join('')}
+    <path d="M8,-56 C20,-50 24,-38 18,-28" stroke="#b6f36b" stroke-width="8" fill="none" stroke-linecap="round"/>
+    ${[-50, -42, -34].map(py => `<circle cx="${14 + (py + 50) * 0.2}" cy="${py + 4}" r="2.4" fill="#8fd14f"/>`).join('')}</g>`;
 
   // Suelo en corte: tierra con estratos ondulados y piedritas.
   const suelo = (d, x0, x1, y0, y1) => {
@@ -157,6 +238,7 @@ const Ciclos = (function () {
       ${arbol(352, 300)}
       <g class="cc-vaho" opacity="0.85">${[[165, 230], [195, 215], [220, 232]].map(([x, y]) => `<path d="M${x},${y} q6,-6 0,-12 t0,-12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join('')}</g>
       ${nube(440, 88, 1)}
+      ${pajaro(565, 150, 0.9)}${pajaro(598, 168, 0.7, 0.4)}
       ${vineta}`,
     carbono: `
       ${cielo(730, 62)}
@@ -171,25 +253,14 @@ const Ciclos = (function () {
       ${pasto([[172, 352], [200, 336], [240, 329], [280, 327], [800, 327]])}
       <line x1="690" y1="402" x2="690" y2="330" stroke="#5a60b8" stroke-width="6"/>
       ${sombra(705, 330, 60)}
-      <g>${edificio(652, 328, 100, 52, '#5a67d8')}<path d="M652,276 L672,258 L672,276 L692,258 L692,276 L712,258 L712,276 Z" fill="#7382f5"/>
-        <rect x="720" y="214" width="18" height="64" fill="#7f8cff"/><rect x="732" y="214" width="6" height="64" fill="#5a67d8"/>
-        <rect x="718" y="210" width="22" height="6" rx="2" fill="#9aa3ff"/></g>
-      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="729" cy="206" r="${9 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
+      ${fabrica(652, 328)}
+      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="730" cy="200" r="${9 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
       ${[[560, 327, 24], [580, 326, 30], [600, 327, 22]].map(([x, y, h]) => pino(x, y, h)).join('')}
       ${arbusto(300, 336, 8)}${arbusto(520, 334, 9)}
       ${arbol(240, 330, 1.05)}
-      <g transform="translate(440 300)">
-        ${sombra(0, 31, 44)}
-        <rect x="-36" y="-18" width="74" height="34" rx="15" fill="#f1f3ff"/><rect x="-36" y="4" width="74" height="12" rx="6" fill="#c9d1ff"/>
-        <path d="M-12,-18 C-4,-8 6,-10 10,-18 Z M16,0 C22,-8 32,-4 30,8 C24,12 18,8 16,0 Z" fill="#2b2d42"/>
-        ${[-26, -12, 18, 30].map(x => `<rect x="${x - 3}" y="14" width="6" height="16" rx="3" fill="#2b2d42"/>`).join('')}
-        <path d="M38,-10 q10,4 6,16" stroke="#2b2d42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <circle cx="-42" cy="-12" r="13" fill="#f1f3ff"/><ellipse cx="-50" cy="-6" rx="7" ry="5" fill="#ffb3c7"/>
-        <path d="M-44,-24 l-6,-6 M-36,-23 l4,-7" stroke="#2b2d42" stroke-width="3" stroke-linecap="round"/><circle cx="-42" cy="-15" r="1.8" fill="#2b2d42"/></g>
-      <g transform="translate(330 350)">
-        ${[[-26, 4, 20], [-8, 8, -30], [14, 2, 40], [28, 8, -10]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4" transform="rotate(${a} ${x} ${y})" fill="#ff9f43"/>`).join('')}
-        <rect x="-4" y="-10" width="4" height="12" fill="#f1f3ff"/><path d="M-11,-10 C-10,-20 6,-20 7,-10 Z" fill="#ff6b6b"/><circle cx="-4" cy="-15" r="1.3" fill="#fff"/>
-        <rect x="16" y="-6" width="3" height="9" fill="#f1f3ff"/><path d="M11,-6 C12,-13 23,-13 24,-6 Z" fill="#ff6b6b"/></g>
+      ${vaca(440, 300)}
+      ${hongos(330, 352)}
+      ${pajaro(150, 200, 0.85)}${pajaro(118, 218, 0.65, 0.5)}
       <g class="cc-deco" opacity="0.7">${[[330, 45], [505, 60], [560, 120], [290, 125]].map(([x, y]) => figura('co2', x, y, 1)).join('')}</g>
       ${vineta}`,
     nitrogeno: `
@@ -198,26 +269,15 @@ const Ciclos = (function () {
       ${nube(662, 64, 1.05, '', true)}
       <path class="cc-rayo" d="M654,86 L638,130 L656,130 L640,178 L680,120 L662,120 L676,86 Z" fill="#ffd166" stroke="#fff3c4" stroke-width="1.5"/>
       ${nube(240, 70, 0.6, 'lenta')}
+      ${pajaro(170, 150, 0.85)}${pajaro(205, 168, 0.65, 0.5)}
       ${suelo('M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z', 0, 800, 298, 460)}
       ${pasto([[0, 306], [200, 297], [500, 300], [800, 296]])}
       <g opacity="0.95">${[[250, 390], [280, 410], [335, 395], [360, 418], [300, 425]].map(([x, y]) => figura('nh4', x, y, 0.7)).join('')}
         ${[[545, 392], [585, 420], [640, 395], [660, 425], [610, 410]].map(([x, y]) => figura('no3', x, y, 0.7)).join('')}</g>
       ${[[700, 297, 24], [720, 296, 30], [742, 296, 22], [40, 305, 26], [60, 304, 20]].map(([x, y, h]) => pino(x, y, h)).join('')}
       ${arbusto(430, 300, 8)}${arbusto(470, 300, 6)}
-      <g transform="translate(300 300)">
-        ${sombra(4, 1, 26)}
-        <path d="M0,0 C-2,20 -14,34 -24,50 M0,0 C4,22 16,36 30,48 M0,0 L0,52" stroke="#e0b08a" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
-        ${[[-14, 28], [-22, 44], [10, 30], [22, 42], [0, 40], [-6, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ff8fb1" stroke="#fff" stroke-width="1"/>`).join('')}
-        <path d="M0,0 C-2,-30 2,-60 0,-92" stroke="#1fae6c" stroke-width="5" fill="none" stroke-linecap="round"/>
-        ${[[-22, -30, -30], [22, -46, 30], [-20, -66, -25], [18, -82, 20]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="18" ry="8" transform="rotate(${a} ${x} ${y})" fill="#2fd186"/><ellipse cx="${x}" cy="${y + 2}" rx="16" ry="4" transform="rotate(${a} ${x} ${y})" fill="#1a9a61" opacity="0.6"/>`).join('')}
-        <path d="M6,-58 C18,-52 22,-40 16,-30" stroke="#b6f36b" stroke-width="7" fill="none" stroke-linecap="round"/></g>
-      <g transform="translate(570 270)">
-        ${sombra(0, 22, 36)}
-        <ellipse cx="0" cy="0" rx="30" ry="20" fill="#f1f3ff"/><ellipse cx="4" cy="8" rx="26" ry="10" fill="#c9d1ff"/>
-        <circle cx="-28" cy="-12" r="13" fill="#f1f3ff"/>
-        <ellipse cx="-34" cy="-38" rx="5" ry="16" fill="#f1f3ff"/><ellipse cx="-24" cy="-40" rx="5" ry="16" fill="#f1f3ff"/>
-        <ellipse cx="-24" cy="-40" rx="2" ry="11" fill="#ffb3c7"/>
-        <circle cx="30" cy="-2" r="7" fill="#fff"/><circle cx="-32" cy="-14" r="2" fill="#2b2d42"/><circle cx="-40" cy="-9" r="2" fill="#ff8fb1"/></g>
+      ${legumbre(300, 300)}
+      ${conejo(566, 274)}
       <g transform="translate(130 312)">
         ${[[-30, 4, 20], [-12, 8, -30], [10, 2, 40], [26, 8, -10], [0, -2, 70]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" transform="rotate(${a} ${x} ${y})" fill="#ff9f43"/>`).join('')}
         <ellipse cx="40" cy="6" rx="8" ry="5" fill="#6b4a3a"/></g>
