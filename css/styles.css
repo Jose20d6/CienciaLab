@@ -448,15 +448,23 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .am-paso:disabled { opacity: 0.35; }
 .am-num { text-align: center; font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
 .particula { display: inline-block; width: 14px; height: 14px; border-radius: 50%; flex: none; }
-.particula.proton, #am-svg-atomo .proton { background: #e03131; fill: #e03131; stroke: #a51d1d; }
+.particula.proton, #am-svg-atomo .proton { background: #1c7ed6; fill: #1c7ed6; stroke: #145a9c; }
 .particula.neutron, #am-svg-atomo .neutron { background: #adb5bd; fill: #adb5bd; stroke: #7b858e; }
-.particula.electron, #am-svg-atomo .electron { background: #1c7ed6; fill: #1c7ed6; stroke: #145a9c; }
+.particula.electron, #am-svg-atomo .electron { background: #e03131; fill: #e03131; stroke: #a51d1d; }
+.nucleo { transform-box: view-box; transform-origin: 50% 50%; }
+.nucleo.inestable { animation: vibrar 0.18s linear infinite; }
+@keyframes vibrar {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(1.2px, -0.8px); }
+  50% { transform: translate(-1px, 1px); }
+  75% { transform: translate(0.8px, 1.2px); }
+}
 .am-recordatorio { font-size: 0.88rem; color: var(--suave); margin: 0.75rem 0; }
 .am-visor { display: flex; flex-direction: column; align-items: center; }
 #am-svg-atomo { width: 100%; max-width: 360px; height: auto; color: var(--texto); }
 .orbita { transform-box: view-box; transform-origin: 50% 50%; animation: girar linear infinite; }
 @keyframes girar { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .orbita { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .orbita { animation: none; } .nucleo.inestable { animation-duration: 0.6s; } }
 .am-vacio { fill: var(--suave); font-size: 15px; }
 .am-leyenda { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 0.85rem; color: var(--suave); }
 .am-leyenda span { display: flex; align-items: center; gap: 0.35rem; }

@@ -262,12 +262,16 @@ const Atomos = (function () {
       }
       svg += `<g class="orbita" style="animation-duration:${12 + i * 6}s">${puntos}</g>`;
     });
+    // Si el núcleo es inestable, vibra levemente.
+    const inestable = at.p > 0 && !ESTABLES[at.p].includes(at.n);
+    svg += `<g class="nucleo${inestable ? ' inestable' : ''}">`;
     for (let i = 0; i < total; i++) {
       const esProton = Math.floor((i + 1) * at.p / total) > Math.floor(i * at.p / total);
       const r = 6.3 * Math.sqrt(i + 0.3);
       const a = i * 2.39996;
       svg += `<circle cx="${(160 + r * Math.cos(a)).toFixed(1)}" cy="${(160 + r * Math.sin(a)).toFixed(1)}" r="6.5" class="${esProton ? 'proton' : 'neutron'}"/>`;
     }
+    svg += '</g>';
     if (!total) svg += `<text x="160" y="165" text-anchor="middle" class="am-vacio">Núcleo vacío</text>`;
     raiz.querySelector('#am-svg-atomo').innerHTML = svg;
 
@@ -502,6 +506,7 @@ const Atomos = (function () {
     const c = composicion();
     const clave = claveDe(c);
     const conocida = MOLECULAS[clave];
+    // Suma de los lugares libres de todos los átomos: cada enlace ocupa dos (uno en cada átomo).
     const faltan = atomosMol.reduce((s, a) => s + libres(a), 0);
     const unida = conectada();
     const completa = atomosMol.length > 1 && faltan === 0 && unida;
@@ -513,7 +518,12 @@ const Atomos = (function () {
     if (atomosMol.length < 2) estado = `<p>Agrega al menos dos átomos y únelos.</p>`;
     else if (!completa) {
       const pend = [];
-      if (faltan) pend.push(`Faltan <b>${faltan}</b> enlace${faltan > 1 ? 's' : ''} por formar (mira los números sobre cada átomo).`);
+      if (faltan % 2) {
+        pend.push('Con estos átomos la molécula no se puede completar: la suma de los enlaces libres es impar, así que siempre sobraría uno. Agrega o quita algún átomo.');
+      } else if (faltan) {
+        const n = faltan / 2;
+        pend.push(`Falta${n > 1 ? 'n' : ''} <b>${n}</b> enlace${n > 1 ? 's' : ''} por formar (mira los números sobre cada átomo).`);
+      }
       if (!unida) pend.push('Hay átomos sueltos: todos deben quedar unidos en una sola molécula.');
       estado = `<p class="am-alerta">${pend.join('<br>')}</p>`;
     } else if (conocida) {
