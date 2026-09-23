@@ -619,7 +619,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .cc-olas { animation: olas 3s linear infinite; }
 @keyframes olas { to { transform: translateX(40px); } }
 .cc-corriente { animation: corriente 1.6s linear infinite; }
-@keyframes corriente { to { stroke-dashoffset: 22; } }
+@keyframes corriente { to { stroke-dashoffset: -22; } }
 .cc-nube { animation: flotar 7s ease-in-out infinite alternate; }
 .cc-nube.lenta { animation-duration: 11s; }
 @keyframes flotar { to { translate: 14px 0; } }

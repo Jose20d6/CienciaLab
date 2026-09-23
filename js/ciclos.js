@@ -32,99 +32,187 @@ const Ciclos = (function () {
     <pattern id="cc-granos" width="18" height="16" patternUnits="userSpaceOnUse"><circle cx="3" cy="5" r="1.3" fill="#fff" opacity="0.08"/><circle cx="12" cy="12" r="1.6" fill="#000" opacity="0.12"/></pattern>
     <marker id="cc-flecha" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#fff"/></marker>`;
 
-  const cielo = (solX, solY) => `
+  // ---------- Piezas de ilustración ----------
+  // Luz siempre desde el Sol: caras iluminadas más claras, sombras suaves al pie de cada objeto.
+
+  const cielo = (solX, solY, rayos = true) => `
     <rect width="800" height="460" fill="url(#cc-cielo)"/>
     ${[[120, 30], [260, 18], [380, 42], [520, 22], [600, 50], [760, 30], [330, 70]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 2 ? 1 : 1.4}" fill="#fff" class="cc-estrella" style="animation-delay:${i * 0.4}s"/>`).join('')}
+    ${rayos ? `<g opacity="0.06">${[0, 1, 2, 3, 4].map(i => {
+      const dir = solX < 400 ? 1 : -1, a1 = (18 + i * 14) * Math.PI / 180, a2 = a1 + 6 * Math.PI / 180;
+      return `<path d="M${solX},${solY} L${solX + dir * 900 * Math.cos(a1)},${solY + 900 * Math.sin(a1)} L${solX + dir * 900 * Math.cos(a2)},${solY + 900 * Math.sin(a2)} Z" fill="#fff6d5"/>`;
+    }).join('')}</g>` : ''}
     <g class="cc-sol-latido"><circle cx="${solX}" cy="${solY}" r="120" fill="url(#cc-sol)" opacity="0.55"/></g>
     <circle cx="${solX}" cy="${solY}" r="54" fill="url(#cc-sol)"/><circle cx="${solX}" cy="${solY}" r="28" fill="#fff3c4"/>`;
   const vineta = '<rect width="800" height="460" fill="url(#cc-vineta)" pointer-events="none"/>';
-  const nube = (x, y, s = 1, extra = '', oscura = false) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="cc-nube ${extra}">
-    <rect x="-60" y="-4" width="120" height="26" rx="13" fill="${oscura ? '#8e92d6' : '#fff'}"/>
-    <circle cx="-24" cy="-8" r="22" fill="${oscura ? '#8e92d6' : '#fff'}"/><circle cx="12" cy="-16" r="28" fill="${oscura ? '#9da1e3' : '#fff'}"/><circle cx="40" cy="-2" r="16" fill="${oscura ? '#8e92d6' : '#fff'}"/>
-    <rect x="-60" y="14" width="120" height="8" rx="4" fill="${oscura ? '#6b6fb5' : '#c9d3ff'}"/></g></g>`;
+  const sombra = (x, y, rx) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${Math.max(2, rx * 0.18)}" fill="#0a0c2a" opacity="0.28"/>`;
+
+  // Capas lejanas: cuanto más lejos, más claras y azuladas (perspectiva atmosférica).
+  const lejanas = (d1, d2) => `<path d="${d1}" fill="#6d8fd6" opacity="0.55"/><path d="${d2}" fill="#4f74c4" opacity="0.75"/>`;
+
+  const nube = (x, y, s = 1, extra = '', oscura = false) => {
+    const [c1, c2, c3] = oscura ? ['#8e92d6', '#a5a9ea', '#6b6fb5'] : ['#ffffff', '#ffffff', '#c9d3ff'];
+    return `<g transform="translate(${x} ${y}) scale(${s})"><g class="cc-nube ${extra}">
+      <rect x="-62" y="-4" width="124" height="26" rx="13" fill="${c1}"/>
+      <circle cx="-26" cy="-8" r="22" fill="${c1}"/><circle cx="10" cy="-18" r="29" fill="${c2}"/><circle cx="40" cy="-2" r="17" fill="${c1}"/>
+      <path d="M-62,12 L62,12 L62,9 a13,13 0 0 1 -13,13 L-49,22 a13,13 0 0 1 -13,-13 Z" fill="${c3}"/>
+      <circle cx="0" cy="-26" r="10" fill="#fff" opacity="${oscura ? 0.25 : 0.6}"/></g></g>`;
+  };
+
+  // Montaña facetada con nieve; k = cuánta nieve hay (1 = normal).
+  const montania = (x, base, w, h, nieve = true, k = 1) => {
+    const py = base - h;
+    const n = 0.42 * k;
+    return `<g>
+      <path d="M${x - w},${base} L${x},${py} L${x + w},${base} Z" fill="#46559f"/>
+      <path d="M${x},${py} L${x - w},${base} L${x - w * 0.45},${base} Z" fill="#5b6dc2"/>
+      <path d="M${x},${py} L${x + w},${base} L${x + w * 0.2},${base} L${x + w * 0.12},${base - h * 0.45} Z" fill="#2c376e"/>
+      <path d="M${x - w},${base} L${x},${py}" stroke="#a9b8ff" stroke-width="1.8" opacity="0.7"/>
+      ${nieve ? `<path d="M${x - w * n},${py + h * n} L${x},${py} L${x + w * n},${py + h * n} L${x + w * n * 0.55},${py + h * n * 0.8} L${x + w * n * 0.2},${py + h * n * 1.05} L${x - w * n * 0.2},${py + h * n * 0.78} L${x - w * n * 0.6},${py + h * n * 0.95} Z" fill="#f4f6ff"/>
+        <path d="M${x},${py} L${x + w * n},${py + h * n} L${x + w * n * 0.55},${py + h * n * 0.8} L${x + w * n * 0.2},${py + h * n * 1.05} L${x + w * 0.05},${py + h * n * 0.6} Z" fill="#c3cbff"/>` : ''}</g>`;
+  };
+
+  const pino = (x, y, h) => `<g>${sombra(x + 3, y + 1, h * 0.32)}
+    <rect x="${x - 1.8}" y="${y - h * 0.22}" width="3.6" height="${h * 0.24}" fill="#553a2f"/>
+    <path d="M${x - h * 0.3},${y - h * 0.18} L${x},${y - h * 0.72} L${x + h * 0.3},${y - h * 0.18} Z" fill="#1fae6c"/>
+    <path d="M${x},${y - h * 0.72} L${x + h * 0.3},${y - h * 0.18} L${x},${y - h * 0.18} Z" fill="#158553"/>
+    <path d="M${x - h * 0.22},${y - h * 0.5} L${x},${y - h} L${x + h * 0.22},${y - h * 0.5} Z" fill="#27c07a"/>
+    <path d="M${x},${y - h} L${x + h * 0.22},${y - h * 0.5} L${x},${y - h * 0.5} Z" fill="#1a9a61"/></g>`;
+  const arbusto = (x, y, r) => `<g>${sombra(x + 2, y + 1, r * 1.3)}
+    <circle cx="${x - r * 0.6}" cy="${y - r * 0.5}" r="${r * 0.7}" fill="#27c07a"/><circle cx="${x + r * 0.5}" cy="${y - r * 0.55}" r="${r * 0.75}" fill="#1a9a61"/>
+    <circle cx="${x}" cy="${y - r}" r="${r * 0.8}" fill="#2fd186"/><circle cx="${x - r * 0.25}" cy="${y - r * 1.25}" r="${r * 0.25}" fill="#8af0bd" opacity="0.6"/></g>`;
   const arbol = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">
     <path d="M0,0 C-2,18 -12,32 -22,48 M0,0 C4,22 18,36 32,46 M0,0 L0,44 M-10,26 L-26,30 M12,24 L26,22" stroke="#e0b08a" stroke-opacity="0.75" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-    <rect x="-7" y="-62" width="14" height="64" rx="3" fill="#6b4a3a"/><rect x="1" y="-62" width="6" height="64" fill="#553a2f"/>
-    <circle cx="-24" cy="-72" r="27" fill="#27c07a"/><circle cx="24" cy="-74" r="29" fill="#1fae6c"/><circle cx="0" cy="-98" r="32" fill="#2fd186"/>
-    <path d="M0,-130 a32,32 0 0 1 0,64 Z" fill="#1a9a61" opacity="0.55"/>
-    <circle cx="-12" cy="-110" r="9" fill="#7fedb5" opacity="0.6"/></g>`;
-  const montania = (bx0, pico, bx1, base) => `
-    <path d="M${bx0},${base} L${pico[0]},${pico[1]} L${bx1},${base} Z" fill="#3d4a8a"/>
-    <path d="M${pico[0]},${pico[1]} L${bx1},${base} L${pico[0] + (bx1 - pico[0]) * 0.35},${base} Z" fill="#2a3468"/>
-    <path d="M${bx0},${base} L${pico[0]},${pico[1]}" stroke="#9fb0ff" stroke-width="2" opacity="0.7"/>`;
-  const suelo = (d) => `<path d="${d}" fill="url(#cc-suelo)"/><path d="${d}" fill="url(#cc-granos)"/>`;
+    ${sombra(6, 1, 34)}
+    <path d="M-7,2 L-5,-62 L5,-62 L7,2 Z" fill="#6b4a3a"/><path d="M1,2 L1,-62 L5,-62 L7,2 Z" fill="#553a2f"/>
+    <path d="M0,-40 L-16,-58 M2,-48 L14,-62" stroke="#6b4a3a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="-26" cy="-70" r="26" fill="#27c07a"/><circle cx="26" cy="-72" r="28" fill="#169a5f"/>
+    <circle cx="-8" cy="-98" r="30" fill="#2fd186"/><circle cx="18" cy="-100" r="26" fill="#1fae6c"/>
+    <circle cx="0" cy="-78" r="24" fill="#23b872"/>
+    <circle cx="-18" cy="-112" r="10" fill="#8af0bd" opacity="0.55"/><circle cx="-34" cy="-80" r="6" fill="#8af0bd" opacity="0.45"/></g>`;
+
+  // Suelo en corte: tierra con estratos ondulados y piedritas.
+  const suelo = (d, x0, x1, y0, y1) => {
+    let lineas = '', piedras = '';
+    for (let y = y0 + 14, i = 0; y < y1; y += 16, i++) {
+      let p = `M${x0},${y}`;
+      for (let x = x0; x < x1; x += 40) p += ` q20,${i % 2 ? -4 : 4} 40,0`;
+      lineas += `<path d="${p}" stroke="#000" stroke-opacity="0.13" stroke-width="2" fill="none"/>`;
+    }
+    for (let i = 0; i < 22; i++) {
+      const x = x0 + ((i * 97) % (x1 - x0)), y = y0 + 10 + ((i * 53) % Math.max(10, y1 - y0 - 14));
+      piedras += `<ellipse cx="${x}" cy="${y}" rx="${3 + (i % 3)}" ry="${2 + (i % 2)}" fill="${i % 2 ? '#a8786a' : '#6e4a55'}" opacity="0.8"/>`;
+    }
+    return `<path d="${d}" fill="url(#cc-suelo)"/><clipPath id="cc-clip-${x0}-${y0}"><path d="${d}"/></clipPath>
+      <g clip-path="url(#cc-clip-${x0}-${y0})">${lineas}${piedras}<path d="${d}" fill="url(#cc-granos)"/></g>`;
+  };
+  // Borde de pasto con pequeñas lomas.
+  const pasto = (pts) => {
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`;
+    let lomas = '';
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [xa, ya] = pts[i], [xb, yb] = pts[i + 1];
+      for (let t = 0; t < 1; t += 18 / Math.max(18, xb - xa)) {
+        const x = xa + (xb - xa) * t, y = ya + (yb - ya) * t;
+        lomas += `<circle cx="${x.toFixed(1)}" cy="${(y + 2).toFixed(1)}" r="6" fill="#2fd186"/>`;
+      }
+    }
+    return `${lomas}<path d="${d}" stroke="#34d27f" stroke-width="9" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#8af0bd" stroke-opacity="0.45" stroke-width="2" fill="none" transform="translate(0 -3)"/>`;
+  };
+  const mar = (x, y, w, h) => `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#cc-mar)"/>
+    ${[0, 1, 2, 3].map(i => `<path d="M${x + 10 + (i % 2) * 30},${y + 22 + i * 24} q12,-5 24,0 t24,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
+    <ellipse cx="${x + w * 0.45}" cy="${y + 8}" rx="${w * 0.3}" ry="5" fill="#fff" opacity="0.18"/>
+    <path class="cc-olas" d="M${x - 40},${y + 4} ${'q10,-7 20,0 t20,0 '.repeat(Math.ceil((w + 80) / 40))}" fill="none" stroke="#dbe9ff" stroke-opacity="0.75" stroke-width="2.5"/>`;
   const edificio = (x, yb, w, h, c) => {
     let v = '';
     for (let yy = yb - h + 5; yy < yb - 5; yy += 8) for (let xx = x + 4; xx < x + w - 5; xx += 7) {
       if ((xx * 7 + yy * 3) % 5 > 1) v += `<rect x="${xx}" y="${yy}" width="3" height="4" fill="#ffe8a3" opacity="0.9"/>`;
     }
-    return `<rect x="${x}" y="${yb - h}" width="${w}" height="${h}" rx="2" fill="${c}"/>${v}`;
+    return `<rect x="${x}" y="${yb - h}" width="${w}" height="${h}" rx="2" fill="${c}"/><rect x="${x + w - 6}" y="${yb - h}" width="6" height="${h}" fill="#000" opacity="0.15"/>${v}`;
   };
 
   const ESCENAS = {
     agua: `
       ${cielo(80, 70)}
-      ${montania(560, [700, 122], 840, 305)}
-      <path d="M652,185 L700,122 L748,185 C734,197 722,186 708,200 C694,190 682,202 668,191 Z" fill="#f1f3ff"/>
-      <path d="M700,122 L748,185 C734,197 722,186 708,200 Z" fill="#c9d1ff"/>
+      ${lejanas('M300,300 C360,262 420,270 470,250 C520,232 560,250 600,240 L620,300 Z', 'M330,300 C380,280 430,286 480,272 C520,262 550,275 580,270 L600,300 Z')}
+      ${montania(795, 300, 70, 120, true)}
+      ${montania(700, 305, 140, 183, true)}
+      ${montania(612, 305, 55, 78, false)}
       ${nube(640, 55, 0.6, 'lenta')}
-      <rect x="0" y="330" width="270" height="130" fill="url(#cc-mar)"/>
-      <ellipse cx="110" cy="338" rx="70" ry="6" fill="#fff" opacity="0.18"/>
-      <path class="cc-olas" d="M-40,334 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#bcd6ff" stroke-opacity="0.7" stroke-width="2.5"/>
-      ${suelo('M230,336 C262,318 300,300 350,298 L800,296 L800,460 L230,460 Z')}
+      ${mar(0, 330, 270, 130)}
+      ${suelo('M230,336 C262,318 300,300 350,298 L800,296 L800,460 L230,460 Z', 230, 800, 300, 380)}
       <path d="M240,382 C400,372 600,380 800,372 L800,432 C600,440 400,436 240,442 Z" fill="url(#cc-acuifero)"/>
       <path d="M240,382 C400,372 600,380 800,372 L800,432 C600,440 400,436 240,442 Z" fill="url(#cc-poros)"/>
+      <path d="M240,382 C400,372 600,380 800,372" stroke="#9ec5ff" stroke-opacity="0.5" stroke-width="2" fill="none"/>
       <path d="M232,442 C400,436 600,440 800,432 L800,460 L232,460 Z" fill="url(#cc-roca)"/>
-      <path d="M230,336 C262,318 300,300 350,298 L800,296 L800,306 L350,308 C300,310 262,326 232,344 Z" fill="url(#cc-pasto)"/>
-      <path d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#4c8dff" stroke-width="10" stroke-linecap="round"/>
-      <path class="cc-corriente" d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#e7f5ff" stroke-width="2.2" stroke-dasharray="6 16" stroke-linecap="round"/>
+      <path d="M232,340 C262,322 300,304 350,302" stroke="#e7f5ff" stroke-opacity="0.7" stroke-width="3" fill="none"/>
+      ${pasto([[232, 340], [262, 322], [300, 305], [350, 299], [800, 297]])}
+      <path d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#2a4cb8" stroke-width="14" stroke-linecap="round"/>
+      <path d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#4c8dff" stroke-width="9" stroke-linecap="round"/>
+      <path class="cc-corriente" d="M650,302 C600,310 560,300 520,312 S420,320 380,318 S300,330 246,337" fill="none" stroke="#e7f5ff" stroke-width="2" stroke-dasharray="6 16" stroke-linecap="round"/>
+      ${[[590, 300, 24], [606, 298, 30], [624, 299, 22], [760, 297, 26], [778, 296, 20]].map(([x, y, h]) => pino(x, y, h)).join('')}
+      ${arbusto(440, 314, 9)}${arbusto(470, 312, 7)}${arbusto(292, 318, 8)}
       ${arbol(352, 300)}
       <g class="cc-vaho" opacity="0.85">${[[165, 230], [195, 215], [220, 232]].map(([x, y]) => `<path d="M${x},${y} q6,-6 0,-12 t0,-12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join('')}</g>
       ${nube(440, 88, 1)}
       ${vineta}`,
     carbono: `
       ${cielo(730, 62)}
-      <rect x="0" y="340" width="200" height="120" fill="url(#cc-mar)"/>
-      <ellipse cx="90" cy="348" rx="60" ry="5" fill="#fff" opacity="0.15"/>
-      <path class="cc-olas" d="M-40,344 q10,-7 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" fill="none" stroke="#bcd6ff" stroke-opacity="0.7" stroke-width="2.5"/>
-      ${suelo('M170,348 C200,332 240,326 280,326 L800,326 L800,460 L170,460 Z')}
+      ${lejanas('M180,330 C260,290 330,300 400,286 C470,272 540,292 620,280 L660,330 Z', 'M220,330 C300,306 360,312 430,302 C500,294 560,306 610,300 L640,330 Z')}
+      ${mar(0, 340, 200, 120)}
+      ${suelo('M170,348 C200,332 240,326 280,326 L800,326 L800,460 L170,460 Z', 170, 800, 330, 388)}
       <path d="M180,388 C400,382 600,390 800,384 L800,460 L180,460 Z" fill="url(#cc-roca)"/>
+      <path d="M180,388 C400,382 600,390 800,384" stroke="#6d73c9" stroke-opacity="0.45" stroke-width="2" fill="none"/>
       <path d="M560,420 C570,400 640,394 700,402 C752,408 772,426 742,441 C690,453 600,452 570,441 Z" fill="#0b0c1f"/>
       <path d="M598,410 C630,402 670,402 700,408" fill="none" stroke="#5a60b8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
-      <path d="M170,348 C200,332 240,326 280,326 L800,326 L800,336 L280,336 C240,336 200,342 172,356 Z" fill="url(#cc-pasto)"/>
-      <line x1="690" y1="402" x2="690" y2="326" stroke="#5a60b8" stroke-width="6"/>
+      <path d="M172,352 C200,336 240,330 280,330" stroke="#e7f5ff" stroke-opacity="0.7" stroke-width="3" fill="none"/>
+      ${pasto([[172, 352], [200, 336], [240, 329], [280, 327], [800, 327]])}
+      <line x1="690" y1="402" x2="690" y2="330" stroke="#5a60b8" stroke-width="6"/>
+      ${sombra(705, 330, 60)}
       <g>${edificio(652, 328, 100, 52, '#5a67d8')}<path d="M652,276 L672,258 L672,276 L692,258 L692,276 L712,258 L712,276 Z" fill="#7382f5"/>
-        <rect x="720" y="214" width="18" height="64" fill="#7f8cff"/><rect x="720" y="214" width="6" height="64" fill="#9aa3ff"/></g>
-      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="729" cy="210" r="${9 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
+        <rect x="720" y="214" width="18" height="64" fill="#7f8cff"/><rect x="732" y="214" width="6" height="64" fill="#5a67d8"/>
+        <rect x="718" y="210" width="22" height="6" rx="2" fill="#9aa3ff"/></g>
+      <g class="cc-humo">${[0, 1, 2, 3].map(i => `<circle cx="729" cy="206" r="${9 + i * 2}" fill="#b8bff5" style="animation-delay:${i * 0.8}s"/>`).join('')}</g>
+      ${[[560, 327, 24], [580, 326, 30], [600, 327, 22]].map(([x, y, h]) => pino(x, y, h)).join('')}
+      ${arbusto(300, 336, 8)}${arbusto(520, 334, 9)}
       ${arbol(240, 330, 1.05)}
       <g transform="translate(440 300)">
+        ${sombra(0, 31, 44)}
         <rect x="-36" y="-18" width="74" height="34" rx="15" fill="#f1f3ff"/><rect x="-36" y="4" width="74" height="12" rx="6" fill="#c9d1ff"/>
         <path d="M-12,-18 C-4,-8 6,-10 10,-18 Z M16,0 C22,-8 32,-4 30,8 C24,12 18,8 16,0 Z" fill="#2b2d42"/>
         ${[-26, -12, 18, 30].map(x => `<rect x="${x - 3}" y="14" width="6" height="16" rx="3" fill="#2b2d42"/>`).join('')}
+        <path d="M38,-10 q10,4 6,16" stroke="#2b2d42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
         <circle cx="-42" cy="-12" r="13" fill="#f1f3ff"/><ellipse cx="-50" cy="-6" rx="7" ry="5" fill="#ffb3c7"/>
         <path d="M-44,-24 l-6,-6 M-36,-23 l4,-7" stroke="#2b2d42" stroke-width="3" stroke-linecap="round"/><circle cx="-42" cy="-15" r="1.8" fill="#2b2d42"/></g>
       <g transform="translate(330 350)">
         ${[[-26, 4, 20], [-8, 8, -30], [14, 2, 40], [28, 8, -10]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4" transform="rotate(${a} ${x} ${y})" fill="#ff9f43"/>`).join('')}
-        <rect x="-4" y="-10" width="4" height="12" fill="#f1f3ff"/><path d="M-11,-10 C-10,-20 6,-20 7,-10 Z" fill="#ff6b6b"/>
+        <rect x="-4" y="-10" width="4" height="12" fill="#f1f3ff"/><path d="M-11,-10 C-10,-20 6,-20 7,-10 Z" fill="#ff6b6b"/><circle cx="-4" cy="-15" r="1.3" fill="#fff"/>
         <rect x="16" y="-6" width="3" height="9" fill="#f1f3ff"/><path d="M11,-6 C12,-13 23,-13 24,-6 Z" fill="#ff6b6b"/></g>
-      <g class="cc-deco" opacity="0.8">${[[330, 45], [505, 60], [560, 120], [290, 125]].map(([x, y]) => figura('co2', x, y, 1)).join('')}</g>
+      <g class="cc-deco" opacity="0.7">${[[330, 45], [505, 60], [560, 120], [290, 125]].map(([x, y]) => figura('co2', x, y, 1)).join('')}</g>
       ${vineta}`,
     nitrogeno: `
-      ${cielo(-200, -200)}
+      ${cielo(-200, -200, false)}
+      ${lejanas('M0,300 C80,262 160,272 240,258 C330,244 400,266 480,256 C560,246 640,262 800,250 L800,300 Z', 'M0,302 C100,284 180,288 260,280 C360,270 460,286 560,278 C660,272 740,284 800,280 L800,302 Z')}
       ${nube(662, 64, 1.05, '', true)}
       <path class="cc-rayo" d="M654,86 L638,130 L656,130 L640,178 L680,120 L662,120 L676,86 Z" fill="#ffd166" stroke="#fff3c4" stroke-width="1.5"/>
       ${nube(240, 70, 0.6, 'lenta')}
-      ${suelo('M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z')}
-      <path d="M0,304 C200,294 500,300 800,294 L800,304 C500,310 200,304 0,314 Z" fill="url(#cc-pasto)"/>
+      ${suelo('M0,304 C200,294 500,300 800,294 L800,460 L0,460 Z', 0, 800, 298, 460)}
+      ${pasto([[0, 306], [200, 297], [500, 300], [800, 296]])}
       <g opacity="0.95">${[[250, 390], [280, 410], [335, 395], [360, 418], [300, 425]].map(([x, y]) => figura('nh4', x, y, 0.7)).join('')}
         ${[[545, 392], [585, 420], [640, 395], [660, 425], [610, 410]].map(([x, y]) => figura('no3', x, y, 0.7)).join('')}</g>
+      ${[[700, 297, 24], [720, 296, 30], [742, 296, 22], [40, 305, 26], [60, 304, 20]].map(([x, y, h]) => pino(x, y, h)).join('')}
+      ${arbusto(430, 300, 8)}${arbusto(470, 300, 6)}
       <g transform="translate(300 300)">
+        ${sombra(4, 1, 26)}
         <path d="M0,0 C-2,20 -14,34 -24,50 M0,0 C4,22 16,36 30,48 M0,0 L0,52" stroke="#e0b08a" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
         ${[[-14, 28], [-22, 44], [10, 30], [22, 42], [0, 40], [-6, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ff8fb1" stroke="#fff" stroke-width="1"/>`).join('')}
         <path d="M0,0 C-2,-30 2,-60 0,-92" stroke="#1fae6c" stroke-width="5" fill="none" stroke-linecap="round"/>
         ${[[-22, -30, -30], [22, -46, 30], [-20, -66, -25], [18, -82, 20]].map(([x, y, a]) => `<ellipse cx="${x}" cy="${y}" rx="18" ry="8" transform="rotate(${a} ${x} ${y})" fill="#2fd186"/><ellipse cx="${x}" cy="${y + 2}" rx="16" ry="4" transform="rotate(${a} ${x} ${y})" fill="#1a9a61" opacity="0.6"/>`).join('')}
         <path d="M6,-58 C18,-52 22,-40 16,-30" stroke="#b6f36b" stroke-width="7" fill="none" stroke-linecap="round"/></g>
       <g transform="translate(570 270)">
+        ${sombra(0, 22, 36)}
         <ellipse cx="0" cy="0" rx="30" ry="20" fill="#f1f3ff"/><ellipse cx="4" cy="8" rx="26" ry="10" fill="#c9d1ff"/>
         <circle cx="-28" cy="-12" r="13" fill="#f1f3ff"/>
         <ellipse cx="-34" cy="-38" rx="5" ry="16" fill="#f1f3ff"/><ellipse cx="-24" cy="-40" rx="5" ry="16" fill="#f1f3ff"/>
@@ -340,7 +428,7 @@ const Ciclos = (function () {
     if (modo !== 'seguir') {
       c.procesos.forEach((p, i) => {
         const largo = rutas[i].getTotalLength();
-        [0, 0.5].forEach(desfase => {
+        [0].forEach(desfase => {
           const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           g.setAttribute('class', 'cic-part');
           g.dataset.proc = i;
