@@ -56,6 +56,14 @@ const Alimentacion = (function () {
     snack: () => `${dosTonos('<path d="M-14,-18 L14,-18 L12,-12 L14,18 L-14,18 L-12,-12 Z" fill="FILL"/>', '#ffd43b', '#f5b700', { x: 4 })}<rect x="-14" y="-18" width="28" height="4" fill="#e8590c"/><ellipse cy="2" rx="8" ry="6" fill="#ff922b"/><path d="M-5,2 q5,-4 10,0" stroke="#fff3bf" stroke-width="1.6" fill="none"/>`,
     fiambre: () => `${dosTonos('<circle r="16" fill="FILL"/>', '#ff8fa3', '#e8647f', { x: 4 })}${[[-6, -4], [5, -6], [6, 6], [-5, 6], [0, 0]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="#ffd1dc"/>`).join('')}`,
     manteca: () => `${dosTonos('<path d="M-18,-4 L-8,-12 L18,-12 L18,8 L-18,8 Z" fill="FILL"/>', '#fff3bf', '#ffe066', { y: -4 })}<rect x="-18" y="4" width="36" height="8" rx="2" fill="#ffd43b"/>`,
+    canilla: () => `<rect x="-20" y="-10" width="10" height="16" rx="3" fill="#8a93b8"/>${dosTonos('<path d="M-12,-6 L10,-6 C18,-6 20,0 20,6 L20,12 L12,12 L12,8 C12,4 10,4 8,4 L-12,4 Z" fill="FILL"/>', '#e1e4fa', '#a3a9d1', { y: 0 })}
+      <rect x="-4" y="-16" width="6" height="10" fill="#a3a9d1"/><rect x="-11" y="-20" width="20" height="5" rx="2.5" fill="#e1e4fa"/><rect x="11" y="12" width="10" height="3" rx="1.5" fill="#7a81ad"/>${luz('M-8,-3 h14', 1.6)}`,
+    sandia: () => `${dosTonos('<path d="M-20,-4 A20,20 0 0 0 20,-4 Z" fill="FILL"/>', '#2fd186', '#1a9a61', { x: 6 })}<path d="M-17,-4 A17,17 0 0 0 17,-4 Z" fill="#b2f2bb"/><path d="M-15,-4 A15,15 0 0 0 15,-4 Z" fill="#ff5c7a"/>
+      ${[[-8, 1], [0, 4], [8, 1], [-3, -1], [4, -1]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.1" ry="1.8" fill="#15163d"/>`).join('')}`,
+    uvas: () => `<path d="M0,-16 q2,-6 6,-7" stroke="#6b3f2a" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="7" cy="-16" rx="5" ry="2.6" fill="#51cf66"/>
+      ${[[-8, -9], [0, -9], [8, -9], [-4, -1], [4, -1], [-8, 7], [0, 7], [8, 7], [-4, 14], [4, 14], [0, 20]].filter((_, i) => i < 11).map(([x, y]) => `<circle cx="${x * 0.9}" cy="${y * 0.85}" r="4.6" fill="#8a4fcf"/><circle cx="${x * 0.9 - 1.4}" cy="${y * 0.85 - 1.4}" r="1.3" fill="#d0bfff" opacity="0.8"/>`).join('')}`,
+    pera: () => `${dosTonos('<path d="M0,-16 C6,-16 7,-6 10,0 C16,8 14,18 0,18 C-14,18 -16,8 -10,0 C-7,-6 -6,-16 0,-16 Z" fill="FILL"/>', '#d8f5a2', '#a9e34b', { x: 3 })}<path d="M0,-16 q1,-5 3,-7" stroke="#6b3f2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>${luz('M-7,2 q0,-6 3,-10')}${ojos(0, 6, 2.3)}`,
+    pimiento: () => `${dosTonos('<path d="M-14,-8 C-16,6 -10,18 -4,18 C0,14 0,14 4,18 C10,18 16,6 14,-8 C10,-12 4,-10 0,-12 C-4,-10 -10,-12 -14,-8 Z" fill="FILL"/>', '#ff6b6b', '#e03131', { x: 3 })}<path d="M0,-12 q0,-6 5,-8" stroke="#2f9e44" stroke-width="3.4" fill="none" stroke-linecap="round"/>${luz('M-9,-4 q-1,8 2,14')}`,
     agua: () => `<path d="M-12,-17 L12,-17 L9,17 L-9,17 Z" fill="#dfe3ff" opacity="0.35"/><path d="M-10.5,-5 L10.5,-5 L9,17 L-9,17 Z" fill="#5cc8ff"/><path d="M-10.5,-5 L10.5,-5" stroke="#a5dcff" stroke-width="2"/>
       <path d="M-12,-17 L12,-17 L9,17 L-9,17 Z" fill="none" stroke="#e9ebff" stroke-width="1.6" stroke-linejoin="round"/>${luz('M-7,-12 L-5,10', 2)}`,
     sal: () => `<rect x="-9" y="-6" width="18" height="24" rx="4" fill="#f1f3ff"/><rect x="2" y="-6" width="7" height="24" fill="#c9cdf0"/><path d="M-9,-6 C-9,-18 9,-18 9,-6 Z" fill="#9aa3ff"/>${[[-3, -12], [3, -12], [0, -9]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1" fill="#15163d"/>`).join('')}`,
@@ -86,17 +94,17 @@ const Alimentacion = (function () {
   ];
 
   const OVALO = [
-    { id: 'cereales', n: 'Cereales, sus derivados y legumbres', corto: 'Cereales y\nlegumbres', p: 0.27, c: ['#ffb84d', '#e0922f'], iconos: ['pan', 'fideos', 'legumbres'],
+    { id: 'cereales', n: 'Cereales, sus derivados y legumbres', corto: 'Cereales,\nlegumbres, pastas', p: 0.27, c: ['#ffb84d', '#e0922f'], iconos: ['pan', 'fideos', 'legumbres'],
       nut: ['Carbohidratos (almidón)', 'Fibra', 'Proteínas vegetales'], fun: ['energetica'], x: 'Es el grupo más grande: la base de la energía diaria. Las legumbres (lentejas, porotos, garbanzos) se incluyen aquí.' },
-    { id: 'hortalizas', n: 'Hortalizas y frutas', corto: 'Hortalizas\ny frutas', p: 0.26, c: ['#2fd186', '#1a9a61'], iconos: ['zanahoria', 'manzana', 'tomate'],
+    { id: 'hortalizas', n: 'Hortalizas y frutas', corto: 'Frutas y\nverduras', p: 0.26, c: ['#2fd186', '#1a9a61'], iconos: ['zanahoria', 'manzana', 'tomate'],
       nut: ['Vitaminas', 'Minerales', 'Fibra'], fun: ['reguladora'], x: 'El segundo grupo en tamaño: vitaminas, minerales, fibra y agua. Conviene variar los colores.' },
     { id: 'lacteos', n: 'Leche, yogur y quesos', corto: 'Lácteos', p: 0.14, c: ['#74c0fc', '#4a9fe0'], iconos: ['leche', 'queso'],
       nut: ['Proteínas', 'Calcio'], fun: ['constructora'], x: 'Principal fuente de calcio, necesario sobre todo en el crecimiento.' },
-    { id: 'carnes', n: 'Carnes y huevos', corto: 'Carnes\ny huevos', p: 0.14, c: ['#b197fc', '#8a6cf0'], iconos: ['carne', 'huevo'],
+    { id: 'carnes', n: 'Carnes y huevos', corto: 'Carnes,\nhuevos', p: 0.14, c: ['#b197fc', '#8a6cf0'], iconos: ['carne', 'huevo'],
       nut: ['Proteínas', 'Hierro', 'Vitamina B12'], fun: ['constructora'], x: 'Proteínas de alto valor biológico y hierro de fácil absorción.' },
     { id: 'aceites', n: 'Aceites y grasas', corto: 'Aceites\ny grasas', p: 0.11, c: ['#c0eb75', '#94d82d'], iconos: ['aceite', 'manteca'],
       nut: ['Lípidos', 'Vitamina E'], fun: ['energetica'], x: 'Aportan energía y ácidos grasos esenciales. Se recomiendan con moderación.' },
-    { id: 'azucares', n: 'Azúcar y dulces', corto: 'Azúcar\ny dulces', p: 0.08, c: ['#ff8fb1', '#e0607f'], iconos: ['golosina'],
+    { id: 'azucares', n: 'Azúcar y dulces', corto: 'Azúcares', p: 0.08, c: ['#ff8fb1', '#e0607f'], iconos: ['golosina'],
       nut: ['Azúcares simples'], fun: ['energetica'], x: 'El grupo más chico: solo aportan energía, así que conviene consumirlos poco.' },
   ];
 
@@ -113,12 +121,15 @@ const Alimentacion = (function () {
     { id: 'aceites', n: 'Aceites, frutas secas y semillas', corto: 'Aceites y semillas', p: 0.08, c: ['#c0eb75', '#94d82d'], iconos: ['aceite', 'nueces', 'semillas'], msg: 9,
       nut: ['Lípidos (ácidos grasos esenciales)', 'Vitamina E'], fun: ['energetica'], x: 'Usar el aceite crudo como condimento y sumar frutas secas o semillas.' },
     { id: 'opcionales', n: 'Alimentos de consumo opcional', corto: 'Consumo opcional', p: 0.05, c: ['#ff8fb1', '#e0607f'], iconos: ['golosina', 'gaseosa', 'snack'], msg: 5,
-      nut: ['Azúcares simples', 'Grasas', 'Sodio'], fun: ['energetica'], x: 'Golosinas, gaseosas, snacks, fiambres, manteca, facturas… Tienen mucha azúcar, grasa o sal y pocos nutrientes: por eso quedan <b>afuera</b> del plato y se recomienda limitarlos.' },
+      nut: ['Azúcares simples', 'Grasas', 'Sodio'], fun: ['energetica'], x: 'Golosinas, gaseosas, snacks, fiambres, manteca, facturas… Tienen mucha azúcar, grasa o sal y pocos nutrientes: por eso ocupan la <b>franja más chica</b> del plato y se recomienda limitarlos.' },
   ];
   const EXTRAS_PLATO = {
     agua: { n: 'Agua segura', c: ['#5cc8ff', '#3aa0d8'], msg: 2, nut: ['Agua'], fun: ['reguladora'], x: 'Más de la mitad del cuerpo es agua: transporta nutrientes, regula la temperatura y elimina desechos. Se recomiendan 8 vasos por día, y el agua debe ser segura (potable).' },
     sal: { n: 'Menos sal', c: ['#dfe3ff', '#9aa3ff'], msg: 4, nut: ['Sodio'], fun: [], x: 'El exceso de sodio aumenta la presión arterial. Cocinar sin sal, no llevar el salero a la mesa y leer las etiquetas de los alimentos envasados.' },
     actividad: { n: 'Actividad física', c: ['#ffd166', '#f0a830'], msg: 1, nut: [], fun: [], x: 'Alimentarse bien va de la mano con moverse: al menos 30 minutos de actividad física por día.' },
+  };
+  const EXTRAS_OVALO = {
+    agua: { n: 'El agua', c: ['#5cc8ff', '#3aa0d8'], porc: 'Consumo diario: 1,5 a 2 litros', nut: ['Agua'], fun: ['reguladora'], x: 'El óvalo incorpora el agua como elemento fundamental de la dieta, pues está presente en todos los procesos metabólicos y en la eliminación de toxinas. Por eso el recorrido empieza en la canilla.' },
   };
   const MENSAJES = [
     'Incorporar a diario alimentos de todos los grupos y realizar al menos 30 minutos de actividad física.',
@@ -278,105 +289,204 @@ const Alimentacion = (function () {
     return s;
   }
 
-  // ---------- Óvalo nutricional ----------
   function sectorAnillo(cx, cy, r0, r1, a0, a1) {
     const p = (r, a) => `${(cx + r * Math.cos(rad(a))).toFixed(1)},${(cy + r * Math.sin(rad(a))).toFixed(1)}`;
     const grande = a1 - a0 > 180 ? 1 : 0;
     return `M${p(r1, a0)} A${r1},${r1} 0 ${grande} 1 ${p(r1, a1)} L${p(r0, a1)} A${r0},${r0} 0 ${grande} 0 ${p(r0, a0)} Z`;
   }
 
+  // ---------- Óvalo nutricional argentino ----------
+  // Una pista azul en perspectiva que nace en una canilla (el agua). Lo que está adelante (abajo) se ve más grande:
+  // así el dibujo sugiere las proporciones.
+  const OVALO_POS = { azucares: 204, aceites: 236, carnes: 271, lacteos: 311, hortalizas: 352, cereales: 404 };
+  const OVALO_ICONOS = {
+    azucares: ['golosina', 'galletita'], aceites: ['aceite', 'manteca', 'nueces'], carnes: ['huevo', 'pollo', 'carne', 'pescado'],
+    lacteos: ['queso', 'leche', 'yogur'], hortalizas: ['sandia', 'brocoli', 'uvas', 'zapallo', 'pera', 'tomate', 'zanahoria', 'lechuga'],
+    cereales: ['arroz', 'legumbres', 'fideos', 'avena', 'choclo', 'pan', 'papa'],
+  };
+  const PILA = [[0, 0], [-26, 6], [26, 6], [-13, -15], [13, -15], [-39, -4], [39, -4], [0, -28]];
+
   function dibujarOvalo() {
-    const CX = 380, CY = 222, R = 166, K = 1.36; // el óvalo es un círculo estirado en x
-    let s = fondo() + `<ellipse cx="${CX}" cy="${CY}" rx="${R * K + 60}" ry="${R + 40}" fill="url(#ali-halo)"/><ellipse cx="${CX}" cy="444" rx="250" ry="10" fill="#05061a" opacity="0.5"/>`;
-    let a = 100;
-    const huecos = [];
-    OVALO.forEach(g => {
-      const a1 = a + g.p * 360;
-      const medio = rad((a + a1) / 2);
-      s += `<g class="ali-sector" data-g="${g.id}"><g transform="translate(${CX} ${CY}) scale(${K} 1)">
-          <path d="${sectorAnillo(0, 0, 58, R, a + 0.8, a1 - 0.8)}" fill="${g.c[0]}"/>
-          <path d="${sectorAnillo(0, 0, R - 22, R, a + 0.8, a1 - 0.8)}" fill="${g.c[1]}"/></g>`;
-      const rIc = g.p < 0.1 ? 112 : 108, n = g.iconos.length;
-      g.iconos.forEach((id, i) => {
-        const aa = rad(a + (a1 - a) * (i + 0.5) / n);
-        s += icono(id, CX + Math.cos(aa) * rIc * K, CY + Math.sin(aa) * rIc, g.p < 0.1 ? 0.9 : 1);
-      });
-      s += `</g>`;
-      huecos.push({ g, x: CX + Math.cos(medio) * (R * K + 18), y: CY + Math.sin(medio) * (R + 22) + 4, izq: Math.cos(medio) < -0.2, der: Math.cos(medio) > 0.2 });
-      a = a1;
+    const CX = 385, CY = 226, RX = 292, RY = 146;
+    const P = a => [CX + RX * Math.cos(rad(a)), CY + RY * Math.sin(rad(a))];
+    const prof = y => (y - (CY - RY)) / (2 * RY); // 0 = atrás, 1 = adelante
+    let s = fondo() + `<ellipse cx="${CX}" cy="${CY}" rx="${RX + 70}" ry="${RY + 90}" fill="url(#ali-halo)"/>`;
+    // Pista: tramos cortos cada vez más anchos hacia adelante; se desvanece al final.
+    const A0 = 126, A1 = 452;
+    let pista = '', brillo = '';
+    for (let a = A0; a < A1; a += 2.5) {
+      const [x0, y0] = P(a), [x1, y1] = P(a + 3), w = 5 + 30 * prof((y0 + y1) / 2);
+      const op = a > 420 ? Math.max(0, (A1 - a) / 32) : a < A0 + 12 ? 0.5 + (a - A0) / 24 : 1;
+      pista += `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#1d4fb8" stroke-width="${w.toFixed(1)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+      brillo += `<line x1="${x0.toFixed(1)}" y1="${(y0 - w * 0.22).toFixed(1)}" x2="${x1.toFixed(1)}" y2="${(y1 - w * 0.22).toFixed(1)}" stroke="#4d8dff" stroke-width="${(w * 0.45).toFixed(1)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+    }
+    s += `<g opacity="0.55" transform="translate(6 10)">${pista.replace(/#1d4fb8/g, '#05061a')}</g>${pista}${brillo}`;
+    // Canilla con gotas: el agua inicia el recorrido.
+    const [fx, fy] = P(A0);
+    s += `<g class="ali-sector" data-g="agua"><circle cx="${fx - 14}" cy="${fy + 6}" r="40" fill="transparent"/>
+      ${icono('canilla', fx - 24, fy - 6, 1.7)}<g class="ali-gotas">${[0, 1].map(i => `<path class="ali-gota" style="animation-delay:${i * 0.7}s" d="M${fx - 8},${fy + 22} c5,6 4,11 0,11 c-4,0 -5,-5 0,-11 Z" fill="#5cc8ff"/>`).join('')}</g></g>`;
+    s += etiqueta(fx - 26, fy + 66, 'Agua', '1,5 a 2 litros por día', 'middle');
+    // Grupos a lo largo de la pista, de atrás hacia adelante.
+    const grupos = OVALO.map(g => {
+      const a = OVALO_POS[g.id], [x, y] = P(a), esc = 0.72 + 0.62 * prof(y);
+      return { g, a, x, y, esc };
+    }).sort((u, v) => u.y - v.y);
+    grupos.forEach(({ g, a, x, y, esc }) => {
+      const ids = OVALO_ICONOS[g.id];
+      const piezas = ids.map((id, i) => ({ id, x: x + PILA[i][0] * esc * 1.05, y: y - 10 * esc + PILA[i][1] * esc })).sort((u, v) => u.y - v.y);
+      s += `<g class="ali-sector" data-g="${g.id}">
+        <ellipse cx="${x + 4}" cy="${y + 8 * esc}" rx="${(34 + ids.length * 5) * esc}" ry="${9 * esc}" fill="#05061a" opacity="0.4"/>
+        <circle cx="${x}" cy="${y - 12 * esc}" r="${(30 + ids.length * 4) * esc}" fill="transparent"/>
+        ${piezas.map(p => icono(p.id, p.x, p.y, esc)).join('')}</g>`;
+      // Rótulo junto a cada grupo, en el mismo lugar que en la gráfica original.
+      const [dx, dy, ancla] = { azucares: [-6, 34, 'end'], aceites: [0, -46, 'middle'], carnes: [0, -50, 'middle'], lacteos: [26, -44, 'start'], hortalizas: [0, -78, 'middle'], cereales: [0, 44, 'middle'] }[g.id];
+      s += etiqueta(x + dx * (ancla === 'middle' ? 1 : esc), y + dy * esc, g.corto, '', ancla);
     });
-    huecos.forEach(h => { s += etiqueta(h.x, h.y, h.g.corto, '', h.izq ? 'end' : h.der ? 'start' : 'middle'); });
-    s += `<g transform="translate(${CX} ${CY}) scale(${K} 1)"><circle r="56" fill="#12143a"/><circle r="56" fill="none" stroke="#fff" stroke-opacity="0.2" stroke-width="2"/></g>
-      <text x="${CX}" y="${CY - 4}" text-anchor="middle" class="ali-centro">ÓVALO</text><text x="${CX}" y="${CY + 14}" text-anchor="middle" class="ali-centro">NUTRICIONAL</text>
-      <text x="740" y="444" text-anchor="end" class="ali-pie">Guías Alimentarias para la Población Argentina, 2000</text>`;
+    s += `<text x="${CX}" y="${CY - 8}" text-anchor="middle" class="ali-centro">LAS PROPORCIONES</text>
+      <text x="${CX}" y="${CY + 12}" text-anchor="middle" class="ali-centro-txt">Lo más cercano y grande</text>
+      <text x="${CX}" y="${CY + 28}" text-anchor="middle" class="ali-centro-txt">se come en mayor cantidad</text>
+      <text x="740" y="448" text-anchor="end" class="ali-pie">Óvalo nutricional · Guías Alimentarias para la Población Argentina, 2000</text>`;
     return s;
   }
 
   // ---------- Plato: Gráfica de la Alimentación Diaria ----------
-  function dibujarPlato() {
-    const CX = 290, CY = 228, R = 168;
-    let s = fondo() + `<ellipse cx="${CX}" cy="${CY}" rx="260" ry="220" fill="url(#ali-halo)"/>
-      <ellipse cx="${CX + 8}" cy="${CY + 16}" rx="${R + 34}" ry="${R + 30}" fill="#05061a" opacity="0.45"/>
-      ${dosTonos(`<circle cx="${CX}" cy="${CY}" r="${R + 30}" fill="FILL"/>`, '#f1f3ff', '#c9cdf0', { x: CX + 60 })}
-      <circle cx="${CX}" cy="${CY}" r="${R + 6}" fill="#dfe3ff"/>
-      <path d="M${CX - R - 18},${CY - 40} a${R + 20},${R + 20} 0 0 1 ${R * 0.7},${-R * 0.72}" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/>`;
-    let a = -90;
-    // Sectores del plato; cada uno con sus alimentos en un anillo y su nombre en una pastilla.
-    const ICONOS_PLATO = { verduras: ['brocoli', 'tomate', 'zanahoria', 'manzana', 'banana', 'lechuga'], cereales: ['pan', 'papa', 'legumbres', 'fideos'], lacteos: ['leche', 'queso'], carnes: ['carne', 'huevo'], aceites: ['aceite'] };
-    const ROTULO = { verduras: 'Verduras\ny frutas', cereales: 'Legumbres, cereales,\npapa, pan y pastas', lacteos: 'Lácteos', carnes: 'Carnes\ny huevos' };
-    const rotulos = [];
-    PLATO.forEach(g => {
-      if (g.id === 'opcionales') return;
-      const a1 = a + g.p / 0.95 * 360;
-      s += `<g class="ali-sector" data-g="${g.id}"><path d="${sectorAnillo(CX, CY, 0, R, a + 0.6, a1 - 0.6)}" fill="${g.c[0]}"/>
-        <path d="${sectorAnillo(CX, CY, R - 20, R, a + 0.6, a1 - 0.6)}" fill="${g.c[1]}"/>`;
-      const ids = ICONOS_PLATO[g.id], n = ids.length;
-      ids.forEach((id, i) => {
-        const aa = rad(a + (a1 - a) * (i + 0.5) / n);
-        s += icono(id, CX + Math.cos(aa) * (R - 44), CY + Math.sin(aa) * (R - 44), g.p < 0.1 ? 0.85 : 0.95);
-      });
-      s += `</g>`;
-      const medio = rad((a + a1) / 2), rr = g.p > 0.2 ? R * 0.42 : R * 0.5;
-      if (ROTULO[g.id]) rotulos.push(pastilla(CX + Math.cos(medio) * rr, CY + Math.sin(medio) * rr, ROTULO[g.id]));
-      a = a1;
+  // Mitad izquierda: verduras y frutas. Mitad derecha: franjas. Al centro, el agua. En el aro: actividad física y sal.
+  const FRANJAS = [['cereales', -1], ['lacteos', -0.27], ['carnes', 0.21], ['aceites', 0.5], ['opcionales', 0.72]];
+  const ROTULO_PLATO = {
+    verduras: 'VERDURAS\nY FRUTAS', cereales: 'LEGUMBRES, CEREALES,\nPAPA, PAN Y PASTAS', lacteos: 'LECHE, YOGUR\nY QUESO',
+    carnes: 'CARNES\nY HUEVOS', aceites: 'ACEITES, FRUTAS\nSECAS Y SEMILLAS', opcionales: 'OPCIONALES:\nDULCES Y GRASAS',
+  };
+  const PLATO_ICONOS = {
+    verduras: ['brocoli', 'lechuga', 'zapallo', 'pimiento', 'tomate', 'zanahoria', 'sandia', 'pera', 'manzana', 'uvas', 'banana', 'naranja'],
+    cereales: ['arroz', 'pan', 'legumbres', 'avena', 'fideos', 'papa', 'choclo'], lacteos: ['leche', 'yogur', 'queso'],
+    carnes: ['pescado', 'carne', 'huevo', 'pollo'], aceites: ['nueces', 'semillas', 'aceite'], opcionales: ['golosina', 'galletita', 'gaseosa'],
+  };
+  let nPlato = 0;
+  const arco = (cx, cy, r, a0, a1, sentido = 1) => {
+    const p = a => `${(cx + r * Math.cos(rad(a))).toFixed(1)},${(cy + r * Math.sin(rad(a))).toFixed(1)}`;
+    return `M${p(a0)} A${r},${r} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} ${sentido} ${p(a1)}`;
+  };
+
+  function geometriaPlato(cx, cy, R) {
+    const div = -0.06 * R, rw = 0.27 * R, wx = cx + div, wy = cy - 0.02 * R;
+    const franja = k => [cy + FRANJAS[k][1] * R, k + 1 < FRANJAS.length ? cy + FRANJAS[k + 1][1] * R : cy + R];
+    const x0 = cx + div + 9;
+    // Rótulos: arriba a la izquierda en las franjas anchas; a la izquierda y centrados en las angostas.
+    const rotulos = {};
+    FRANJAS.forEach(([id], k) => {
+      const [y0, y1] = franja(k), lineas = ROTULO_PLATO[id].split('\n');
+      const w = Math.max(...lineas.map(l => l.length)) * 5.6, alto = lineas.length * 11;
+      // La franja de arriba es angosta cerca del borde: el rótulo va más abajo, donde el plato es más ancho.
+      // La de los lácteos queda al lado del agua; la de los opcionales, arriba de todo en su franja.
+      const angosta = y1 - y0 < 60;
+      let x = x0, y = angosta ? (y0 + y1) / 2 - alto / 2 + 9 : y0 + 14;
+      if (id === 'cereales') y = cy - R * 0.66;
+      if (id === 'lacteos') { x = wx + rw + 10; y = y0 + 16; }
+      if (id === 'opcionales') y = y0 + 13;
+      rotulos[id] = { x, y, w, alto, lineas };
     });
-    s += rotulos.join('');
-    s += etiqueta(CX, 18, 'Aceites, frutas secas y semillas', '', 'middle');
-    // Consumo opcional: una porción separada, fuera del plato.
-    const op = PLATO.find(g => g.id === 'opcionales');
-    s += `<g class="ali-sector" data-g="opcionales"><path d="${sectorAnillo(CX, CY, R + 40, R + 76, 118, 150)}" fill="${op.c[0]}"/>
-      <path d="${sectorAnillo(CX, CY, R + 64, R + 76, 118, 150)}" fill="${op.c[1]}"/>
-      ${icono('golosina', CX + Math.cos(rad(127)) * (R + 56), CY + Math.sin(rad(127)) * (R + 56), 0.62)}${icono('gaseosa', CX + Math.cos(rad(142)) * (R + 56), CY + Math.sin(rad(142)) * (R + 56), 0.62)}</g>`;
-    s += etiqueta(18, 440, 'Consumo opcional', '', 'start') + `<text x="18" y="454" class="ali-etq-sub">fuera del plato: limitar</text>`;
-    // Agua, sal y actividad física.
-    const extra = (id, x, y, dib, t1, t2) => `<g class="ali-sector" data-g="${id}"><circle cx="${x}" cy="${y}" r="34" fill="#1f2256"/><circle cx="${x}" cy="${y}" r="34" fill="none" stroke="#3a3e85" stroke-width="2"/>${dib}</g>${etiqueta(x + 46, y - 2, t1, t2, 'start')}`;
-    s += extra('agua', 562, 90, icono('agua', 562, 90, 1.2), 'Agua segura', '8 vasos por día');
-    s += extra('sal', 562, 230, `${icono('sal', 562, 230, 1.1)}<line x1="540" y1="252" x2="584" y2="208" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round"/>`, 'Menos sal', 'y sodio');
-    s += extra('actividad', 562, 370, corredor(562, 372), 'Actividad física', '30 min por día');
-    s += `<text x="740" y="448" text-anchor="end" class="ali-pie">Gráfica de la Alimentación Diaria · Guías Alimentarias para la Población Argentina, 2016</text>`;
+    rotulos.verduras = { x: cx - R * 0.62, y: cy + R * 0.06, w: 60, alto: 22, lineas: ROTULO_PLATO.verduras.split('\n'), centrado: true };
+    const dentroDeRotulo = (x, y) => Object.values(rotulos).some(r => {
+      const rx0 = r.centrado ? r.x - r.w / 2 : r.x;
+      return x > rx0 - 14 && x < rx0 + r.w + 14 && y > r.y - 20 && y < r.y + r.alto + 8;
+    });
+    const region = (x, y) => {
+      if (Math.hypot(x - cx, y - cy) > R) return null;
+      if (Math.hypot(x - wx, y - wy) < rw) return 'agua';
+      if (x < cx + div) return 'verduras';
+      const k = FRANJAS.findIndex((f, i) => y >= franja(i)[0] && y < franja(i)[1]);
+      return k < 0 ? null : FRANJAS[k][0];
+    };
+    // Lugares para los alimentos: una grilla, lejos de los bordes, del agua y de los rótulos.
+    const lugares = {};
+    for (let y = cy - R + 18, fila = 0; y < cy + R - 8; y += R * 0.135, fila++) {
+      for (let x = cx - R + 16 + (fila % 2) * R * 0.08; x < cx + R - 10; x += R * 0.16) {
+        const r = region(x, y);
+        if (!r || r === 'agua') continue;
+        if (Math.hypot(x - cx, y - cy) > R - 17 || Math.hypot(x - wx, y - wy) < rw + 16 || Math.abs(x - (cx + div)) < 15 || dentroDeRotulo(x, y)) continue;
+        if (r !== 'verduras') { const [y0, y1] = franja(FRANJAS.findIndex(f => f[0] === r)); if (y - y0 < 13 || y1 - y < 9) continue; }
+        (lugares[r] = lugares[r] || []).push([x, y]);
+      }
+    }
+    return { cx, cy, R, div, rw, wx, wy, franja, lugares, rotulos };
+  }
+
+  // Reparte los alimentos en los lugares de su región, de manera pareja.
+  function repartir(G, region, ids, esc) {
+    const L = G.lugares[region] || [];
+    if (!L.length || !ids.length) return '';
+    const orden = region === 'verduras' ? L.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]) : L.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const n = Math.min(ids.length, orden.length);
+    const usados = Array.from({ length: n }, (_, k) => orden[Math.floor((k + 0.5) * orden.length / n)]);
+    return usados.map(([x, y], k) => ({ id: ids[k], x, y })).sort((a, b) => a.y - b.y)
+      .map(p => `<ellipse cx="${p.x + 2}" cy="${p.y + 15 * esc}" rx="${15 * esc}" ry="${4 * esc}" fill="#05061a" opacity="0.25"/>${icono(p.id, p.x, p.y, esc)}`).join('');
+  }
+
+  function platoSVG(G, contenido, esc) {
+    const { cx, cy, R, div, rw, wx, wy } = G, Ra = R * 1.2;
+    const id = 'ali-pl' + (nPlato++);
+    const colores = Object.fromEntries(PLATO.map(g => [g.id, g.c]));
+    const rotulo = (gid) => {
+      const r = G.rotulos[gid];
+      return `<text class="ali-banda" text-anchor="${r.centrado ? 'middle' : 'start'}">${r.lineas.map((l, i) => `<tspan x="${r.x}" y="${r.y + i * 11}">${l}</tspan>`).join('')}</text>`;
+    };
+    let s = `<defs><clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>
+        <path id="${id}-arr" d="${arco(cx, cy, (R + Ra) / 2 - 5, 200, 340)}"/><path id="${id}-aba" d="${arco(cx, cy, (R + Ra) / 2 + 6, 150, 30, 0)}"/></defs>
+      <ellipse cx="${cx + 12}" cy="${cy + 20}" rx="${Ra + 4}" ry="${Ra}" fill="#05061a" opacity="0.5"/>
+      ${dosTonos(`<circle cx="${cx}" cy="${cy}" r="${Ra}" fill="FILL"/>`, '#a3a9d1', '#7a81ad', { y: cy + Ra * 0.3 })}
+      <path d="${arco(cx, cy, Ra - 4, 195, 300)}" stroke="#e1e4fa" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.8"/>
+      <g class="ali-sector" data-g="actividad"><path class="ali-aro-zona" d="${sectorAnillo(cx, cy, R + 4, Ra, 196, 344)}"/>
+        <text class="ali-aro"><textPath href="#${id}-arr" startOffset="54%" text-anchor="middle">ACTIVIDAD FÍSICA</textPath></text>
+        <g transform="translate(${cx + ((R + Ra) / 2) * Math.cos(rad(214))} ${cy + ((R + Ra) / 2) * Math.sin(rad(214))})"><circle r="${R * 0.07}" fill="#e1e4fa"/><path d="M${-R * 0.035},0 h${R * 0.07} M0,${-R * 0.035} v${R * 0.07}" stroke="#5a60a0" stroke-width="2.6" stroke-linecap="round"/></g></g>
+      <g class="ali-sector" data-g="sal"><path class="ali-aro-zona" d="${sectorAnillo(cx, cy, R + 4, Ra, 64, 116)}"/>
+        <text class="ali-aro"><textPath href="#${id}-aba" startOffset="44%" text-anchor="middle">SAL</textPath></text>
+        <g transform="translate(${cx + ((R + Ra) / 2) * Math.cos(rad(107))} ${cy + ((R + Ra) / 2) * Math.sin(rad(107))})"><circle r="${R * 0.07}" fill="#e1e4fa"/><path d="M${-R * 0.035},0 h${R * 0.07}" stroke="#5a60a0" stroke-width="2.6" stroke-linecap="round"/></g></g>
+      <circle cx="${cx}" cy="${cy}" r="${R + 4}" fill="#3a3f72"/>
+      <g clip-path="url(#${id})">`;
+    // Verduras y frutas (mitad izquierda).
+    const c = colores.verduras;
+    s += `<g class="ali-sector" data-g="verduras">${dosTonos(`<rect x="${cx - R}" y="${cy - R}" width="${R + div}" height="${2 * R}" fill="FILL"/>`, c[0], c[1], { y: cy + R * 0.35 })}${repartir(G, 'verduras', contenido('verduras'), esc)}${rotulo('verduras')}</g>`;
+    // Franjas de la mitad derecha.
+    FRANJAS.forEach(([gid], k) => {
+      const [y0, y1] = G.franja(k), col = colores[gid];
+      s += `<g class="ali-sector" data-g="${gid}">${dosTonos(`<rect x="${cx + div}" y="${y0}" width="${R - div}" height="${y1 - y0}" fill="FILL"/>`, col[0], col[1], { y: y0 + (y1 - y0) * 0.66 })}
+        <rect x="${cx + div}" y="${y0}" width="${R - div}" height="2.5" fill="#fff" opacity="0.35"/>${repartir(G, gid, contenido(gid), esc)}${rotulo(gid)}</g>`;
+    });
+    // Separaciones, sombra interior del borde y agua al centro.
+    s += FRANJAS.slice(1).map(([, f]) => `<line x1="${cx + div}" x2="${cx + R}" y1="${cy + f * R}" y2="${cy + f * R}" stroke="#2b2f63" stroke-width="3.5"/>`).join('')
+      + `<line x1="${cx + div}" x2="${cx + div}" y1="${cy - R}" y2="${cy + R}" stroke="#2b2f63" stroke-width="4"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#000" stroke-width="16" opacity="0.2"/></g>
+      <g class="ali-sector" data-g="agua"><circle cx="${wx}" cy="${wy}" r="${rw + 9}" fill="#5cc8ff" opacity="0.22"/><circle cx="${wx}" cy="${wy}" r="${rw + 4}" fill="#2b2f63"/>
+        ${dosTonos(`<circle cx="${wx}" cy="${wy}" r="${rw}" fill="FILL"/>`, '#3fb8f5', '#2396db', { y: wy + rw * 0.25 })}
+        <path d="${arco(wx, wy, rw - 6, 200, 260)}" stroke="#bfe8ff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+        ${icono('canilla', wx - rw * 0.12, wy - rw * 0.32, rw / 34)}
+        <text x="${wx + rw * 0.05}" y="${wy + rw * 0.52}" text-anchor="middle" class="ali-agua-txt" style="font-size:${(rw * 0.3).toFixed(1)}px">AGUA</text></g>`;
     return s;
   }
 
-  const corredor = (x, y) => `<g transform="translate(${x} ${y})"><circle cx="4" cy="-20" r="6" fill="#ffd166"/>
-    <path d="M2,-12 L-2,4 M-2,4 L-12,16 M-2,4 L8,10 L6,20 M1,-8 L-10,-2 M1,-8 L12,-12" stroke="#ffd166" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M-20,-6 h-8 M-18,4 h-10 M-16,14 h-6" stroke="#ffe8a3" stroke-width="2" stroke-linecap="round" opacity="0.6"/></g>`;
+  function dibujarPlato() {
+    const G = geometriaPlato(380, 222, 172);
+    return fondo() + `<ellipse cx="380" cy="222" rx="300" ry="230" fill="url(#ali-halo)"/>` + platoSVG(G, gid => PLATO_ICONOS[gid] || [], 0.8)
+      + `<text x="740" y="450" text-anchor="end" class="ali-pie">Gráfica de la Alimentación Diaria · Guías Alimentarias para la Población Argentina, 2016</text>`;
+  }
 
   // ---------- Ficha del grupo seleccionado ----------
   function pintarInfo() {
     const info = raiz.querySelector('#ali-info');
     const lista = modo === 'piramide' ? PIRAMIDE : modo === 'ovalo' ? OVALO : PLATO;
-    const g = sel && (lista.find(x => x.id === sel) || (modo === 'plato' && EXTRAS_PLATO[sel] && { id: sel, ...EXTRAS_PLATO[sel] }));
+    const extras = modo === 'plato' ? EXTRAS_PLATO : modo === 'ovalo' ? EXTRAS_OVALO : {};
+    const g = sel && (lista.find(x => x.id === sel) || (extras[sel] && { id: sel, ...extras[sel] }));
     if (!g) {
       const intro = {
         piramide: `<h2>🔺 Pirámide nutricional</h2>
           <p>Creada en <b>Estados Unidos en 1992</b>. Ordena los alimentos en pisos: los de la <b>base</b> se deben comer en mayor cantidad y los de la <b>punta</b>, muy poco.</p>
           <p>Fue muy usada en todo el mundo, pero recibió críticas: ponía todas las harinas en la base sin distinguir las integrales, y todas las grasas en la punta, sin separar los aceites saludables. En 2011 Estados Unidos la reemplazó por un plato (<i>MyPlate</i>).</p>`,
         ovalo: `<h2>🥚 Óvalo nutricional</h2>
-          <p>Fue la gráfica de las <b>Guías Alimentarias para la Población Argentina del año 2000</b>. Reúne los alimentos en <b>6 grupos</b> y el tamaño de cada sector indica en qué proporción conviene consumirlos.</p>
-          <p>La forma de óvalo busca mostrar que <b>todos los grupos son necesarios</b>: la clave está en la variedad y en las proporciones. Sus mensajes también invitaban a tomar abundante agua potable y a hacer actividad física.</p>`,
+          <p>Fue la gráfica de las <b>Guías Alimentarias para la Población Argentina del año 2000</b>. Sugiere una variedad de alimentos cotidianos, que se adecuan a nuestra cultura y costumbres, y que aportan los nutrientes necesarios para una alimentación completa y saludable.</p>
+          <p><b>¿Cómo se lee?</b> El recorrido empieza en la <b>canilla</b>: el agua es la base de todo. Luego el uso de la <b>perspectiva</b> sugiere las proporciones: lo que está adelante y se ve más grande (cereales, frutas y verduras) se come en mayor cantidad; lo que está atrás y se ve chico (aceites, azúcares), en menor cantidad.</p>`,
         plato: `<h2>🍽️ Gráfica de la Alimentación Diaria</h2>
           <p>Es la gráfica actual de las <b>Guías Alimentarias para la Población Argentina (Ministerio de Salud, 2016)</b>. Tiene forma de <b>plato</b> para imaginar las proporciones en cada comida.</p>
-          <p>Incluye 6 grupos: los alimentos de <b>consumo opcional</b> quedan afuera del plato. Además suma el <b>agua segura</b>, la <b>reducción de la sal</b> y la <b>actividad física</b>.</p>
+          <p>¿Cómo se lee? La <b>mitad izquierda</b> son verduras y frutas; la otra mitad se divide en franjas que van de mayor a menor: legumbres y cereales, lácteos, carnes y huevos, aceites y semillas, y los opcionales. En el <b>centro está el agua</b>, y el aro recuerda sumar <b>actividad física (+)</b> y reducir la <b>sal (−)</b>.</p>
           <h3>Los 10 mensajes de las Guías</h3>
           <ol class="ali-mensajes">${MENSAJES.map(m => `<li>${m}</li>`).join('')}</ol>`,
       }[modo];
@@ -408,14 +518,14 @@ const Alimentacion = (function () {
           <thead><tr><th></th><th>🔺 Pirámide</th><th>🥚 Óvalo</th><th>🍽️ Plato</th></tr></thead>
           <tbody>
             ${fila('Origen', 'Estados Unidos, 1992', 'Argentina, 2000', 'Argentina, Ministerio de Salud, 2016')}
-            ${fila('Forma', 'Pisos: la base se come más y la punta, poco', 'Sectores de distinto tamaño dentro de un óvalo', 'Un plato dividido en sectores, como una comida real')}
+            ${fila('Forma', 'Pisos: la base se come más y la punta, poco', 'Un óvalo en perspectiva: lo más cercano y grande se come en mayor cantidad', 'Un plato: mitad verduras y frutas; la otra mitad en franjas')}
             ${fila('Qué transmite', 'Una jerarquía entre los alimentos', 'Variedad y proporción, sin jerarquías', 'Proporciones en el plato y hábitos saludables')}
-            ${fila('Grupos', '6 (verduras y frutas separadas)', '6', '6 (el de consumo opcional, fuera del plato)')}
+            ${fila('Grupos', '6 (verduras y frutas separadas)', '6, más el agua', '6, con el agua en el centro')}
             ${fila('Papa, legumbres', 'Papa con las verduras; legumbres con las carnes', 'Legumbres con los cereales', 'Papa, batata, choclo, mandioca y legumbres con los cereales')}
             ${fila('Grasas', 'Todas juntas en la punta', 'Aceites y grasas en un mismo grupo', 'Aceites, frutas secas y semillas por un lado; manteca y grasas de consumo opcional')}
-            ${fila('Agua', 'No aparece', 'En sus mensajes', '8 vasos de agua segura, en la gráfica')}
-            ${fila('Actividad física', 'No aparece', 'En sus mensajes', '30 minutos por día, en la gráfica')}
-            ${fila('Sal', 'No aparece', 'En sus mensajes', 'Reducir la sal y el sodio, en la gráfica')}
+            ${fila('Agua', 'No aparece', 'La canilla inicia el recorrido: 1,5 a 2 litros por día', 'En el centro del plato: 8 vasos de agua segura')}
+            ${fila('Actividad física', 'No aparece', 'En sus mensajes', 'En el aro del plato (+): 30 minutos por día')}
+            ${fila('Sal', 'No aparece', 'En sus mensajes', 'En el aro del plato (−): reducir la sal y el sodio')}
           </tbody></table></div>
         <p class="ali-ayuda">💡 Las guías cambian a medida que la ciencia aprende más sobre nutrición y según los alimentos y costumbres de cada país. Las tres coinciden en lo esencial: <b>comer variado</b>, mucha <b>verdura y fruta</b> y poco <b>azúcar, grasa y sal</b>. Toca un dibujo para explorarlo.</p>
       </div>`;
@@ -465,30 +575,11 @@ const Alimentacion = (function () {
 
   function pintarDia() {
     const c = cuenta();
-    // Plato: sectores con la proporción recomendada y los alimentos elegidos adentro.
-    const CX = 250, CY = 208, R = 150;
+    // El mismo plato de la gráfica, con los alimentos elegidos en su sector.
+    const G = geometriaPlato(230, 206, 148);
+    const elegidosDe = gid => dia.elegidos.filter(id => ALIMENTOS.find(x => x.id === id).g === gid);
     let s = `<defs><radialGradient id="ali-fondo-d" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stop-color="#272b78"/><stop offset="1" stop-color="#0c0e30"/></radialGradient></defs>
-      <rect width="760" height="420" rx="14" fill="url(#ali-fondo-d)"/>
-      <ellipse cx="${CX + 8}" cy="${CY + 14}" rx="${R + 32}" ry="${R + 28}" fill="#05061a" opacity="0.45"/>
-      ${dosTonos(`<circle cx="${CX}" cy="${CY}" r="${R + 28}" fill="FILL"/>`, '#f1f3ff', '#c9cdf0', { x: CX + 60 })}<circle cx="${CX}" cy="${CY}" r="${R + 5}" fill="#dfe3ff"/>`;
-    let a = -90;
-    PLATO.filter(g => g.id !== 'opcionales').forEach(g => {
-      const a1 = a + g.p / 0.95 * 360;
-      s += `<path d="${sectorAnillo(CX, CY, 0, R, a + 0.6, a1 - 0.6)}" fill="${g.c[0]}" opacity="0.22"/>
-        <path d="${sectorAnillo(CX, CY, R - 8, R, a + 0.6, a1 - 0.6)}" fill="${g.c[0]}" opacity="0.8"/>`;
-      // Ubica los alimentos del grupo en una grilla dentro del sector.
-      const ids = dia.elegidos.filter(id => ALIMENTOS.find(x => x.id === id).g === g.id);
-      ids.forEach((id, k) => {
-        const filas = [55, 88, 120], fila = filas[k % 3], porFila = Math.max(1, Math.ceil(ids.length / 3));
-        const t = (Math.floor(k / 3) + 0.5) / porFila, aa = rad(a + 6 + (a1 - a - 12) * t);
-        s += icono(id, CX + Math.cos(aa) * fila, CY + Math.sin(aa) * fila, 0.72);
-      });
-      a = a1;
-    });
-    const nOp = c.opcionales;
-    s += `<path d="${sectorAnillo(CX, CY, R + 38, R + 72, 20, 60)}" fill="#ff8fb1" opacity="${nOp ? 0.9 : 0.25}"/>
-      ${dia.elegidos.filter(id => ALIMENTOS.find(x => x.id === id).g === 'opcionales').slice(0, 4).map((id, k) => icono(id, CX + Math.cos(rad(26 + k * 10)) * (R + 55), CY + Math.sin(rad(26 + k * 10)) * (R + 55), 0.55)).join('')}
-      <text x="${CX + Math.cos(rad(64)) * (R + 60)}" y="${CY + Math.sin(rad(64)) * (R + 60) + 16}" class="ali-etq-sub" text-anchor="middle">opcional</text>`;
+      <rect width="760" height="420" rx="14" fill="url(#ali-fondo-d)"/>` + platoSVG(G, elegidosDe, 0.66);
     // Vasos de agua.
     s += `<text x="470" y="46" class="ali-etq">Agua: ${dia.vasos} de 8 vasos</text>`;
     for (let k = 0; k < 8; k++) {
@@ -534,16 +625,12 @@ const Alimentacion = (function () {
   function vistaGrupos() {
     juego = { lista: Util.tomar('ali-grupos', ALIMENTOS, 10, x => x.id), i: 0, puntos: 0, errores: [] };
     raiz.querySelector('#ali-vista').innerHTML = `
-      <div class="grid-juego">
+      <div class="ali-juego">
         <div class="panel">
           <div class="marcador"><span id="ali-prog"></span><span id="ali-pts"></span></div>
           <div class="barra"><div id="ali-barra"></div></div>
           <div id="ali-juego"></div>
         </div>
-        <aside class="panel ali-guia">
-          <h2>Los grupos del plato</h2>
-          ${PLATO.map(g => `<div class="ali-guia-item"><i class="ali-punto" style="background:${g.c[0]}"></i><div><b>${g.n}</b><p>${g.iconos.map(id => miniIcono(id, 22)).join('')}</p></div></div>`).join('')}
-        </aside>
       </div>`;
     mostrarAlimento();
   }
