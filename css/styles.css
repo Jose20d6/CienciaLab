@@ -1046,6 +1046,58 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 @keyframes ali-gota { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(26px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .ali-gota { animation: none; opacity: 1; } }
 
+.nu-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1rem; align-items: start; }
+.nu-escena { background: #12143a; color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.35); padding: 0.9rem; }
+#nu-svg { width: 100%; height: auto; display: block; border-radius: 12px; }
+.nu-sistema { cursor: pointer; transition: opacity 0.3s, filter 0.3s; }
+.nu-sistema:hover { filter: brightness(1.1); }
+#nu-svg.con-sel .nu-sistema:not(.sel) { opacity: 0.4; }
+#nu-svg .nu-sistema.sel { filter: drop-shadow(0 0 8px rgba(255, 209, 102, 0.85)); }
+.nu-off { filter: grayscale(1) brightness(0.7); opacity: 0.45; }
+.nu-latido { animation: nu-latido 0.9s ease-in-out infinite; transform-box: view-box; transform-origin: 312px 222px; }
+@keyframes nu-latido { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.12); } 30% { transform: scale(1); } 45% { transform: scale(1.07); } }
+.nu-off .nu-latido { animation: none; }
+.nu-rotulo { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
+.nu-sub { font-size: 11px; font-weight: 700; fill: #ffd166; }
+.nu-num { font-size: 10px; font-weight: 800; fill: #ffd166; }
+.nu-refs { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; justify-content: center; margin-top: 0.5rem; font-size: 0.82rem; color: #c9ccf5; }
+.nu-refs span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.nu-ayuda-esc { text-align: center; color: #c9ccf5; font-size: 0.9rem; margin: 0.6rem 0 0; }
+.nu-viajeros, .nu-desconectar { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; align-items: center; margin-top: 0.7rem; }
+.nu-desconectar span { color: #c9ccf5; font-weight: 700; font-size: 0.9rem; }
+.nu-viajeros button, .nu-desconectar button { display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid #3a3e85; background: #1f2256; color: #e9ebff; border-radius: 999px; padding: 0.35rem 0.8rem; font-weight: 700; font-size: 0.88rem; }
+.nu-viajeros button:hover, .nu-desconectar button:hover { border-color: #ffd166; }
+.nu-viajeros button.activo, .nu-desconectar button.activo { background: #ffd166; color: #12143a; border-color: #ffd166; }
+.nu-info h2 { display: flex; align-items: center; gap: 0.45rem; }
+.nu-info h3 { font-size: 0.95rem; margin: 0.8rem 0 0.35rem; }
+.nu-info p { margin: 0 0 0.6rem; }
+.nu-punto { width: 0.8rem; height: 0.8rem; border-radius: 50%; display: inline-block; flex: none; }
+.nu-lista { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.8rem; }
+.nu-lista button { display: flex; align-items: center; gap: 0.5rem; text-align: left; border: 2px solid transparent; background: var(--bg); color: var(--texto); border-radius: 10px; padding: 0.5rem 0.7rem; font-weight: 700; }
+.nu-lista button:hover { border-color: var(--primario); }
+.nu-lista i { width: 0.8rem; height: 0.8rem; border-radius: 50%; }
+.nu-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.nu-chips span { background: var(--primario-suave); color: var(--primario); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+.nu-io { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.nu-io ul { margin: 0; padding-left: 1.1rem; font-size: 0.88rem; }
+.nu-analogia { background: var(--aviso-suave); border-radius: 10px; padding: 0.5rem 0.7rem; margin-top: 0.8rem !important; }
+.nu-ayuda { color: var(--suave); font-size: 0.9rem; }
+.nu-pregunta { font-weight: 700; margin-top: 0.8rem !important; }
+.nu-opciones { display: flex; flex-direction: column; gap: 0.4rem; }
+.nu-opciones .btn-opcion { flex: none; font-size: 0.98rem; padding: 0.7rem 0.9rem; text-align: left; }
+.nu-pasos { padding-left: 1.3rem; margin: 0.4rem 0 0.6rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.92rem; }
+.nu-error { background: var(--mal-suave); color: var(--mal); border-radius: 10px; padding: 0.5rem 0.7rem; }
+.nu-nivel { margin-bottom: 0.55rem; }
+.nu-nivel-cab { display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.2rem; }
+.nu-nivel-barra { height: 10px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.nu-nivel-barra div { height: 100%; border-radius: 99px; background: var(--ok); }
+.nu-nivel.mal b { color: var(--mal); }
+.nu-nivel.mal .nu-nivel-barra div { background: var(--mal); }
+.nu-consecuencia { border-radius: 10px; padding: 0.6rem 0.8rem; margin-top: 0.6rem; font-size: 0.93rem; }
+.nu-consecuencia.ok { background: var(--ok-suave); }
+.nu-consecuencia.mal { background: var(--mal-suave); }
+@media (prefers-reduced-motion: reduce) { .nu-latido { animation: none; } }
+
 /* ---------- Pantallas chicas ---------- */
 @media (prefers-reduced-motion: reduce) {
   .burbuja, .gases span { animation-duration: 3s !important; }
@@ -1056,7 +1108,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .reactivo { flex: 1 1 200px; }
   .grid-juego { grid-template-columns: 1fr; }
   .am-grid { grid-template-columns: 1fr; }
-  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles, .bm-emparejar, .ali-grid, .ali-comp, .ali-opciones { grid-template-columns: minmax(0, 1fr); }
+  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles, .bm-emparejar, .ali-grid, .ali-comp, .ali-opciones, .nu-grid, .nu-io { grid-template-columns: minmax(0, 1fr); }
   .topbar { flex-wrap: wrap; }
   .tabs { order: 3; flex-basis: 100%; }
   .am-visor { order: -1; }

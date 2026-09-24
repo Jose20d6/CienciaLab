@@ -690,5 +690,6 @@ const Alimentacion = (function () {
     });
   }
 
-  return { iniciar };
+  // Los alimentos ilustrados también se usan en otras secciones.
+  return { iniciar, alimento: icono };
 })();

@@ -1,6 +1,6 @@
 // Navegación entre módulos (usa el # de la URL para poder compartir un enlace directo, p. ej. index.html#tabla).
 (function () {
-  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos', 'invernadero', 'celula', 'ciclos', 'biomoleculas', 'alimentacion'];
+  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos', 'invernadero', 'celula', 'ciclos', 'biomoleculas', 'alimentacion', 'nutricion'];
   const modulos = {
     transformaciones: Transformaciones,
     laboratorio: Laboratorio,
@@ -10,7 +10,7 @@
     invernadero: Invernadero,
     celula: Celula,
     ciclos: Ciclos,
-    biomoleculas: Biomoleculas, alimentacion: Alimentacion,
+    biomoleculas: Biomoleculas, alimentacion: Alimentacion, nutricion: Nutricion,
   };
   const iniciados = {};
 
