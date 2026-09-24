@@ -11,18 +11,27 @@
   <header class="topbar">
     <button class="brand" data-go="inicio">⚗️ QuímicaLab</button>
     <nav class="tabs" aria-label="Actividades">
-      <button data-go="transformaciones">🔄 Transformaciones</button>
-      <button data-go="laboratorio">🧪 Laboratorio</button>
-      <button data-go="balanceo">⚖️ Balanceo</button>
-      <button data-go="tabla">🧩 Tabla</button>
-      <button data-go="atomos">⚛️ Átomos</button>
-      <span class="tabs-sep" aria-hidden="true"></span>
-      <button data-go="invernadero">🌍 Invernadero</button>
-      <button data-go="celula">🔬 Célula</button>
-      <button data-go="ciclos">♻️ Ciclos</button>
-      <button data-go="biomoleculas">🧬 Biomoléculas</button>
-      <button data-go="alimentacion">🥗 Alimentación</button>
-      <button data-go="nutricion">🫀 Nutrición</button>
+      <div class="grupo">
+        <button class="grupo-btn" aria-haspopup="true" aria-expanded="false">⚗️ Química <span class="grupo-actual"></span><span class="flecha" aria-hidden="true">▾</span></button>
+        <div class="grupo-menu" hidden>
+          <button data-go="transformaciones">🔄 Transformaciones</button>
+          <button data-go="laboratorio">🧪 Laboratorio</button>
+          <button data-go="balanceo">⚖️ Balanceo</button>
+          <button data-go="tabla">🧩 Tabla periódica</button>
+          <button data-go="atomos">⚛️ Átomos</button>
+        </div>
+      </div>
+      <div class="grupo">
+        <button class="grupo-btn" aria-haspopup="true" aria-expanded="false">🌱 Ciencias naturales <span class="grupo-actual"></span><span class="flecha" aria-hidden="true">▾</span></button>
+        <div class="grupo-menu" hidden>
+          <button data-go="invernadero">🌍 Efecto invernadero</button>
+          <button data-go="celula">🔬 Célula</button>
+          <button data-go="ciclos">♻️ Ciclos</button>
+          <button data-go="biomoleculas">🧬 Biomoléculas</button>
+          <button data-go="alimentacion">🥗 Alimentación saludable</button>
+          <button data-go="nutricion">🫀 Sistemas de la nutrición</button>
+        </div>
+      </div>
     </nav>
     <button id="btn-tema" class="ghost" title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
     <button id="btn-proyector" class="ghost" title="Modo proyector: agranda los textos para proyectar en el aula" aria-label="Modo proyector">📽️</button>

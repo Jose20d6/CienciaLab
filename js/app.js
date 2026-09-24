@@ -17,7 +17,13 @@
   function mostrar(id) {
     if (!vistas.includes(id)) id = 'inicio';
     vistas.forEach(v => { document.getElementById(v).hidden = v !== id; });
-    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('activo', b.dataset.go === id));
+    document.querySelectorAll('.grupo').forEach(g => {
+      const actual = g.querySelector(`.grupo-menu [data-go="${id}"]`);
+      g.querySelectorAll('.grupo-menu button').forEach(b => b.classList.toggle('activo', b === actual));
+      g.querySelector('.grupo-btn').classList.toggle('activo', !!actual);
+      g.querySelector('.grupo-actual').textContent = actual ? '· ' + actual.textContent.replace(/^\S+\s/, '') : '';
+    });
+    cerrarMenus();
     if (modulos[id] && !iniciados[id]) {
       modulos[id].iniciar(document.getElementById(id));
       iniciados[id] = true;
@@ -25,9 +31,36 @@
     window.scrollTo(0, 0);
   }
 
+  // Menús desplegables de la barra: Química y Ciencias naturales.
+  function cerrarMenus(excepto) {
+    document.querySelectorAll('.grupo').forEach(g => {
+      if (g === excepto) return;
+      g.querySelector('.grupo-menu').hidden = true;
+      g.querySelector('.grupo-btn').setAttribute('aria-expanded', 'false');
+    });
+  }
+  document.querySelectorAll('.grupo-btn').forEach(btn => btn.addEventListener('click', () => {
+    const g = btn.parentElement, menu = g.querySelector('.grupo-menu');
+    cerrarMenus(g);
+    menu.hidden = !menu.hidden;
+    btn.setAttribute('aria-expanded', String(!menu.hidden));
+    if (!menu.hidden) (menu.querySelector('.activo') || menu.querySelector('button')).focus();
+  }));
+  document.addEventListener('keydown', e => {
+    const abierto = document.querySelector('.grupo-menu:not([hidden])');
+    if (!abierto) return;
+    if (e.key === 'Escape') { cerrarMenus(); abierto.parentElement.querySelector('.grupo-btn').focus(); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const items = [...abierto.querySelectorAll('button')], i = items.indexOf(document.activeElement);
+      items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+    }
+  });
+
   document.addEventListener('click', e => {
+    if (!e.target.closest('.grupo')) cerrarMenus();
     const b = e.target.closest('[data-go]');
-    if (b) location.hash = b.dataset.go;
+    if (b) { location.hash = b.dataset.go; cerrarMenus(); }
   });
   window.addEventListener('hashchange', () => mostrar(location.hash.slice(1)));
 
