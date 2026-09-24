@@ -296,55 +296,64 @@ const Alimentacion = (function () {
   }
 
   // ---------- Óvalo nutricional argentino ----------
-  // Una pista azul en perspectiva que nace en una canilla (el agua). Lo que está adelante (abajo) se ve más grande:
-  // así el dibujo sugiere las proporciones.
-  const OVALO_POS = { azucares: 204, aceites: 236, carnes: 271, lacteos: 311, hortalizas: 352, cereales: 404 };
+  // Una pista azul que nace en una canilla (el agua) y se lee en sentido contrario a las agujas del reloj:
+  // cereales, frutas y verduras, lácteos, carnes, aceites y azúcares. La pista y los grupos se achican
+  // a lo largo del recorrido para sugerir las proporciones.
+  const OVALO_POS = { cereales: 62, hortalizas: 6, lacteos: -40, carnes: -90, aceites: -130, azucares: -163 };
+  const OVALO_ESC = { cereales: 1.55, hortalizas: 1.4, lacteos: 1.2, carnes: 0.85, aceites: 0.72, azucares: 0.62 };
   const OVALO_ICONOS = {
-    azucares: ['golosina', 'galletita'], aceites: ['aceite', 'manteca', 'nueces'], carnes: ['huevo', 'pollo', 'carne', 'pescado'],
-    lacteos: ['queso', 'leche', 'yogur'], hortalizas: ['sandia', 'brocoli', 'uvas', 'zapallo', 'pera', 'tomate', 'zanahoria', 'lechuga'],
-    cereales: ['arroz', 'legumbres', 'fideos', 'avena', 'choclo', 'pan', 'papa'],
+    cereales: ['arroz', 'legumbres', 'fideos', 'avena', 'choclo', 'pan', 'papa', 'batata', 'pan'],
+    hortalizas: ['sandia', 'brocoli', 'uvas', 'zapallo', 'pera', 'tomate', 'zanahoria', 'lechuga', 'pimiento'],
+    lacteos: ['queso', 'leche', 'yogur', 'leche', 'queso'],
+    carnes: ['huevo', 'pollo', 'carne', 'pescado'], aceites: ['aceite', 'manteca', 'nueces'], azucares: ['golosina', 'galletita'],
   };
-  const PILA = [[0, 0], [-26, 6], [26, 6], [-13, -15], [13, -15], [-39, -4], [39, -4], [0, -28]];
+  const PILA = [[0, 0], [-26, 6], [26, 6], [-13, -15], [13, -15], [-39, -4], [39, -4], [0, -28], [-26, -26], [26, -26]];
 
   function dibujarOvalo() {
-    const CX = 385, CY = 226, RX = 292, RY = 146;
+    const CX = 385, CY = 222, RX = 290, RY = 142;
     const P = a => [CX + RX * Math.cos(rad(a)), CY + RY * Math.sin(rad(a))];
-    const prof = y => (y - (CY - RY)) / (2 * RY); // 0 = atrás, 1 = adelante
     let s = fondo() + `<ellipse cx="${CX}" cy="${CY}" rx="${RX + 70}" ry="${RY + 90}" fill="url(#ali-halo)"/>`;
-    // Pista: tramos cortos cada vez más anchos hacia adelante; se desvanece al final.
-    const A0 = 126, A1 = 452;
-    let pista = '', brillo = '';
-    for (let a = A0; a < A1; a += 2.5) {
-      const [x0, y0] = P(a), [x1, y1] = P(a + 3), w = 5 + 30 * prof((y0 + y1) / 2);
-      const op = a > 420 ? Math.max(0, (A1 - a) / 32) : a < A0 + 12 ? 0.5 + (a - A0) / 24 : 1;
+    // Pista: de la canilla hacia la derecha (sentido antihorario en pantalla), cada vez más angosta.
+    const A0 = 128, A1 = -208;
+    let pista = '', brillo = '', flechas = '';
+    for (let a = A0; a > A1; a -= 2.5) {
+      const t = (A0 - a) / (A0 - A1), [x0, y0] = P(a), [x1, y1] = P(a - 3);
+      const w = 7 + 30 * (1 - t);
+      const op = t > 0.9 ? Math.max(0, (1 - t) / 0.1) : t < 0.03 ? 0.5 + t / 0.06 : 1;
       pista += `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#1d4fb8" stroke-width="${w.toFixed(1)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
-      brillo += `<line x1="${x0.toFixed(1)}" y1="${(y0 - w * 0.22).toFixed(1)}" x2="${x1.toFixed(1)}" y2="${(y1 - w * 0.22).toFixed(1)}" stroke="#4d8dff" stroke-width="${(w * 0.45).toFixed(1)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+      brillo += `<line x1="${x0.toFixed(1)}" y1="${(y0 - w * 0.22).toFixed(1)}" x2="${x1.toFixed(1)}" y2="${(y1 - w * 0.22).toFixed(1)}" stroke="#4d8dff" stroke-width="${(w * 0.42).toFixed(1)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
     }
-    s += `<g opacity="0.55" transform="translate(6 10)">${pista.replace(/#1d4fb8/g, '#05061a')}</g>${pista}${brillo}`;
+    // Flechas sobre la pista: indican el sentido de lectura.
+    [108, 30, -18, -66, -112, -148, -186].forEach(a => {
+      const [x, y] = P(a), [x2, y2] = P(a - 4), ang = Math.atan2(y2 - y, x2 - x) * 180 / Math.PI;
+      flechas += `<path d="M-5,-5 L3,0 L-5,5" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang.toFixed(0)})" stroke="#dbe9ff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
+    });
+    s += `<g opacity="0.55" transform="translate(6 10)">${pista.replace(/#1d4fb8/g, '#05061a')}</g>${pista}${brillo}${flechas}`;
     // Canilla con gotas: el agua inicia el recorrido.
     const [fx, fy] = P(A0);
     s += `<g class="ali-sector" data-g="agua"><circle cx="${fx - 14}" cy="${fy + 6}" r="40" fill="transparent"/>
-      ${icono('canilla', fx - 24, fy - 6, 1.7)}<g class="ali-gotas">${[0, 1].map(i => `<path class="ali-gota" style="animation-delay:${i * 0.7}s" d="M${fx - 8},${fy + 22} c5,6 4,11 0,11 c-4,0 -5,-5 0,-11 Z" fill="#5cc8ff"/>`).join('')}</g></g>`;
-    s += etiqueta(fx - 26, fy + 66, 'Agua', '1,5 a 2 litros por día', 'middle');
-    // Grupos a lo largo de la pista, de atrás hacia adelante.
+      ${icono('canilla', fx - 30, fy - 8, 1.7)}<g class="ali-gotas">${[0, 1].map(i => `<path class="ali-gota" style="animation-delay:${i * 0.7}s" d="M${fx - 14},${fy + 20} c5,6 4,11 0,11 c-4,0 -5,-5 0,-11 Z" fill="#5cc8ff"/>`).join('')}</g></g>`;
+    s += etiqueta(fx - 34, fy + 64, 'Agua', '1,5 a 2 litros por día', 'middle');
+    // Grupos a lo largo de la pista (se dibujan de atrás hacia adelante).
     const grupos = OVALO.map(g => {
-      const a = OVALO_POS[g.id], [x, y] = P(a), esc = 0.72 + 0.62 * prof(y);
-      return { g, a, x, y, esc };
+      const a = OVALO_POS[g.id], [x, y] = P(a);
+      return { g, a, x, y, esc: OVALO_ESC[g.id] * (0.85 + 0.3 * (y - (CY - RY)) / (2 * RY)) };
     }).sort((u, v) => u.y - v.y);
-    grupos.forEach(({ g, a, x, y, esc }) => {
+    grupos.forEach(({ g, x, y, esc }) => {
       const ids = OVALO_ICONOS[g.id];
-      const piezas = ids.map((id, i) => ({ id, x: x + PILA[i][0] * esc * 1.05, y: y - 10 * esc + PILA[i][1] * esc })).sort((u, v) => u.y - v.y);
+      const piezas = ids.map((id, i) => ({ id, x: x + PILA[i][0] * esc * 0.95, y: y - 10 * esc + PILA[i][1] * esc * 0.9 })).sort((u, v) => u.y - v.y);
       s += `<g class="ali-sector" data-g="${g.id}">
-        <ellipse cx="${x + 4}" cy="${y + 8 * esc}" rx="${(34 + ids.length * 5) * esc}" ry="${9 * esc}" fill="#05061a" opacity="0.4"/>
-        <circle cx="${x}" cy="${y - 12 * esc}" r="${(30 + ids.length * 4) * esc}" fill="transparent"/>
+        <ellipse cx="${x + 4}" cy="${y + 8 * esc}" rx="${(34 + ids.length * 4) * esc}" ry="${9 * esc}" fill="#05061a" opacity="0.4"/>
+        <circle cx="${x}" cy="${y - 14 * esc}" r="${(30 + ids.length * 3) * esc}" fill="transparent"/>
         ${piezas.map(p => icono(p.id, p.x, p.y, esc)).join('')}</g>`;
       // Rótulo junto a cada grupo, en el mismo lugar que en la gráfica original.
-      const [dx, dy, ancla] = { azucares: [-6, 34, 'end'], aceites: [0, -46, 'middle'], carnes: [0, -50, 'middle'], lacteos: [26, -44, 'start'], hortalizas: [0, -78, 'middle'], cereales: [0, 44, 'middle'] }[g.id];
-      s += etiqueta(x + dx * (ancla === 'middle' ? 1 : esc), y + dy * esc, g.corto, '', ancla);
+      const [dx, dy, ancla] = { cereales: [0, 34, 'middle'], hortalizas: [8, 46, 'middle'], lacteos: [0, -56, 'middle'], carnes: [0, -46, 'middle'], aceites: [0, -46, 'middle'], azucares: [-8, 34, 'end'] }[g.id];
+      s += etiqueta(x + dx * esc, y + dy * esc, g.corto, '', ancla);
     });
-    s += `<text x="${CX}" y="${CY - 8}" text-anchor="middle" class="ali-centro">LAS PROPORCIONES</text>
-      <text x="${CX}" y="${CY + 12}" text-anchor="middle" class="ali-centro-txt">Lo más cercano y grande</text>
-      <text x="${CX}" y="${CY + 28}" text-anchor="middle" class="ali-centro-txt">se come en mayor cantidad</text>
+    s += `<text x="${CX - 10}" y="${CY - 44}" text-anchor="middle" class="ali-centro">¿CÓMO SE LEE?</text>
+      <text x="${CX - 10}" y="${CY - 24}" text-anchor="middle" class="ali-centro-txt">Desde el agua, en sentido contrario</text>
+      <text x="${CX - 10}" y="${CY - 8}" text-anchor="middle" class="ali-centro-txt">a las agujas del reloj ↺,</text>
+      <text x="${CX - 10}" y="${CY + 8}" text-anchor="middle" class="ali-centro-txt">de lo que más se come a lo que menos</text>
       <text x="740" y="448" text-anchor="end" class="ali-pie">Óvalo nutricional · Guías Alimentarias para la Población Argentina, 2000</text>`;
     return s;
   }
@@ -483,7 +492,8 @@ const Alimentacion = (function () {
           <p>Fue muy usada en todo el mundo, pero recibió críticas: ponía todas las harinas en la base sin distinguir las integrales, y todas las grasas en la punta, sin separar los aceites saludables. En 2011 Estados Unidos la reemplazó por un plato (<i>MyPlate</i>).</p>`,
         ovalo: `<h2>🥚 Óvalo nutricional</h2>
           <p>Fue la gráfica de las <b>Guías Alimentarias para la Población Argentina del año 2000</b>. Sugiere una variedad de alimentos cotidianos, que se adecuan a nuestra cultura y costumbres, y que aportan los nutrientes necesarios para una alimentación completa y saludable.</p>
-          <p><b>¿Cómo se lee?</b> El recorrido empieza en la <b>canilla</b>: el agua es la base de todo. Luego el uso de la <b>perspectiva</b> sugiere las proporciones: lo que está adelante y se ve más grande (cereales, frutas y verduras) se come en mayor cantidad; lo que está atrás y se ve chico (aceites, azúcares), en menor cantidad.</p>`,
+          <p><b>¿Cómo se lee?</b> El recorrido empieza en la <b>canilla</b>, porque el agua es la base de todo, y sigue en <b>sentido contrario a las agujas del reloj</b>: cereales y legumbres → frutas y verduras → lácteos → carnes y huevos → aceites y grasas → azúcares.</p>
+          <p>El orden y el tamaño sugieren las <b>proporciones</b>: los primeros grupos, más grandes, se comen en mayor cantidad; los últimos, más chicos, en menor cantidad.</p>`,
         plato: `<h2>🍽️ Gráfica de la Alimentación Diaria</h2>
           <p>Es la gráfica actual de las <b>Guías Alimentarias para la Población Argentina (Ministerio de Salud, 2016)</b>. Tiene forma de <b>plato</b> para imaginar las proporciones en cada comida.</p>
           <p>¿Cómo se lee? La <b>mitad izquierda</b> son verduras y frutas; la otra mitad se divide en franjas que van de mayor a menor: legumbres y cereales, lácteos, carnes y huevos, aceites y semillas, y los opcionales. En el <b>centro está el agua</b>, y el aro recuerda sumar <b>actividad física (+)</b> y reducir la <b>sal (−)</b>.</p>
