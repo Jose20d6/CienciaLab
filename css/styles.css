@@ -837,6 +837,33 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .bm-incog h3 { margin: 0 0 0.3rem; font-size: 1rem; }
 .bm-incog .btn { margin-top: 0.4rem; }
 .bm-incog .feedback { margin-top: 0.6rem; }
+.bm-glu-num { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; }
+#bm-cuerpo, #bm-glu-graf { width: 100%; height: auto; display: block; border-radius: 12px; }
+#bm-glu-graf { margin-top: 0.6rem; touch-action: pan-y; cursor: crosshair; }
+.bm-g-txt.oscuro { fill: #9aa3ff; }
+.bm-g-zona { font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; opacity: 0.55; }
+.bm-g-tip { font-size: 11px; fill: #e9ebff; font-weight: 600; }
+.bm-comidas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+.bm-comidas button { display: flex; align-items: center; gap: 0.4rem; text-align: left; border: 2px solid transparent; background: var(--bg); border-radius: 10px; padding: 0.35rem 0.5rem; font-size: 0.86rem; font-weight: 600; }
+.bm-comidas button span { font-size: 1.15rem; }
+.bm-comidas button:hover:not(:disabled) { border-color: var(--primario); }
+.bm-comidas button:disabled { opacity: 0.45; }
+.bm-punto-color { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.35rem; vertical-align: middle; }
+.bm-ayuda-juego { margin: 0 0 0.8rem; color: var(--suave); }
+.bm-emparejar { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr) minmax(0, 0.9fr); gap: 0.8rem; }
+.bm-emparejar h3 { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--suave); margin: 0 0 0.4rem; }
+.bm-emparejar > div > div { display: flex; flex-direction: column; gap: 0.4rem; }
+.bm-carta { position: relative; text-align: left; border: 2px solid var(--linea); background: var(--panel); border-radius: 10px; padding: 0.5rem 0.6rem 0.5rem 1.6rem; font-size: 0.88rem; line-height: 1.3; min-height: 3rem; }
+.bm-carta i { position: absolute; left: 0.5rem; top: 50%; width: 0.7rem; height: 0.7rem; margin-top: -0.35rem; border-radius: 50%; background: var(--c); }
+.bm-carta:not(.funcion):not(.asignada) { padding-left: 0.6rem; }
+.bm-carta.funcion { font-weight: 800; border-color: var(--c); }
+.bm-carta.funcion.activa { background: var(--c); color: #15163d; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08); }
+.bm-carta.funcion.activa i { background: #fff; }
+.bm-carta.funcion.completa::after { content: '✓'; position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); font-weight: 800; }
+.bm-carta.asignada { border-color: var(--c); }
+.bm-carta.ejemplo { font-weight: 700; }
+.bm-carta.ok { background: var(--ok-suave); }
+.bm-carta.mal { background: var(--mal-suave); text-decoration: line-through; }
 @media (prefers-reduced-motion: reduce) { .bm-pieza, .bm-ribosoma { transition: none; } .bm-gota, .bm-llama, .bm-hueco.actual { animation: none; } }
 
 /* ---------- Pantallas chicas ---------- */
@@ -849,7 +876,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .reactivo { flex: 1 1 200px; }
   .grid-juego { grid-template-columns: 1fr; }
   .am-grid { grid-template-columns: 1fr; }
-  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles { grid-template-columns: minmax(0, 1fr); }
+  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles, .bm-emparejar { grid-template-columns: minmax(0, 1fr); }
   .topbar { flex-wrap: wrap; }
   .tabs { order: 3; flex-basis: 100%; }
   .am-visor { order: -1; }

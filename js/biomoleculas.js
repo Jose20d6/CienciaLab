@@ -245,6 +245,7 @@ const Biomoleculas = (function () {
         <button data-m="armar">🧩 Armar</button>
         <button data-m="gen">🧬 Del gen a la proteína</button>
         <button data-m="enzimas">⚗️ Enzimas</button>
+        <button data-m="glucemia">📈 Glucemia</button>
         <button data-m="reconocer">🧪 Laboratorio</button>
         <button data-m="clasificar">🗂️ Clasificar</button>
       </div>
@@ -257,9 +258,10 @@ const Biomoleculas = (function () {
     modo = m;
     cancelAnimationFrame(animGiro);
     cancelAnimationFrame(animEnz);
+    cancelAnimationFrame(animGlu);
     girar = false;
     raiz.querySelectorAll('#bm-modos button').forEach(b => b.classList.toggle('activo', b.dataset.m === m));
-    ({ armar: vistaArmar, gen: vistaGen, enzimas: vistaEnzimas, reconocer: vistaReconocer, clasificar: vistaClasificar })[m]();
+    ({ armar: vistaArmar, gen: vistaGen, enzimas: vistaEnzimas, glucemia: vistaGlucemia, reconocer: vistaReconocer, clasificar: vistaClasificar })[m]();
   }
 
   function avisar(html, error) {
@@ -1263,6 +1265,287 @@ const Biomoleculas = (function () {
   }
 
   // =====================================================================
+  // GLUCEMIA: insulina, glucagón, índice glucémico y diabetes
+  // =====================================================================
+
+  // IG de referencia (tablas internacionales, valores aproximados). La fibra enlentece la absorción.
+  const COMIDAS = [
+    { id: 'glucosa', e: '🧪', n: 'Solución de glucosa', ig: 100, fibra: 0, x: 'Es glucosa pura: se absorbe sin necesidad de digerirla. Es la referencia del IG (100).' },
+    { id: 'blanco', e: '🍞', n: 'Pan blanco', ig: 75, fibra: 0, x: 'La harina refinada perdió el salvado: su almidón se digiere rápido.' },
+    { id: 'integral', e: '🥖', n: 'Pan integral', ig: 50, fibra: 1, x: 'La fibra del salvado enlentece la digestión del almidón.' },
+    { id: 'gaseosa', e: '🥤', n: 'Gaseosa', ig: 63, fibra: 0, x: 'Tiene mucho azúcar libre (sacarosa o jarabe de maíz) y nada de fibra.' },
+    { id: 'manzana', e: '🍎', n: 'Manzana entera', ig: 36, fibra: 1, x: 'La fibra (pectina y celulosa) y la fructosa hacen que la glucemia suba poco y despacio.' },
+    { id: 'jugo', e: '🧃', n: 'Jugo de manzana', ig: 41, fibra: 0, x: 'Al exprimirla se pierde casi toda la fibra: el azúcar pasa más rápido a la sangre que con la fruta entera.' },
+    { id: 'madura', e: '🍌', n: 'Banana madura', ig: 62, fibra: 0.4, x: 'Al madurar, el almidón se hidroliza a azúcares simples: es más dulce y sube más la glucemia.' },
+    { id: 'verde', e: '🟢', n: 'Banana verde', ig: 42, fibra: 0.8, x: 'Todavía tiene mucho almidón resistente, que se digiere lentamente.' },
+  ];
+  const PERSONAS = ['Sin diabetes', 'Diabetes tipo 1', 'Diabetes tipo 2'];
+  const COLORES_CURVA = ['#ffd166', '#5cc8ff', '#ff8fb1', '#2fd186'];
+  const MIN_POR_SEG = 8;
+
+  function nuevaSimulacion(comida) {
+    const s = { comida, t: 0, G: 90, I: 0, X: 0, Gc: 0, iny: 0, ejHasta: -1, glucogeno: 55, pts: [90], Ra: 0, captacion: 0, liberacion: 0 };
+    if (comida) {
+      s.tp = 20 + (100 - comida.ig) * 0.4 + comida.fibra * 10;
+      s.amp = (80 + 130 * comida.ig / 100) / (s.tp * Math.E);
+    }
+    return s;
+  }
+
+  // Modelo simplificado: absorción intestinal, secreción de insulina y glucagón, captación por las células.
+  function pasoGlucemia(s, dt) {
+    const tipo = glu.tipo;
+    s.Ra = s.comida && s.t > 0 ? s.amp * (s.t / s.tp) * Math.exp(1 - s.t / s.tp) : 0;
+    const secrecion = tipo === 1 ? 0 : 0.035 * Math.max(0, s.G - 92) * (tipo === 2 ? 0.8 : 1);
+    s.I += (secrecion + s.iny * 0.08 - 0.08 * s.I) * dt;
+    s.iny -= 0.08 * s.iny * dt;
+    const resistencia = tipo === 2 ? 0.15 : 1;
+    s.X += 0.035 * (s.I * resistencia * 0.0035 - s.X) * dt;
+    s.Gc += ((s.G < 88 ? 0.05 * (88 - s.G) : 0) - 0.08 * s.Gc) * dt;
+    s.liberacion = s.glucogeno > 0 ? 1.5 * s.Gc : 0;
+    const ejercicio = s.t < s.ejHasta ? 0.9 : 0;
+    s.captacion = s.X * s.G + ejercicio;
+    const renal = s.G > 180 ? 0.004 * (s.G - 180) : 0;
+    s.G += (s.Ra - 0.006 * (s.G - 90) - s.X * s.G + s.liberacion + (tipo ? 0 : 0.002 * (90 - s.G)) - renal - ejercicio) * dt;
+    s.glucogeno = Math.max(0, Math.min(100, s.glucogeno + (s.X * s.G * 0.3 - s.liberacion * 0.8) * dt * 0.08));
+    s.t += dt;
+  }
+
+  let glu = null, animGlu = null;
+
+  function vistaGlucemia() {
+    glu = { tipo: 0, curvas: [], sim: nuevaSimulacion(null), corriendo: false, rapido: false, ultimo: 0, hover: null };
+    raiz.querySelector('#bm-vista').innerHTML = `
+      <div class="bm-grid">
+        <div class="panel bm-mesa">
+          <svg id="bm-cuerpo" viewBox="0 0 760 260" role="img" aria-label="Regulación de la glucosa en el cuerpo"></svg>
+          <svg id="bm-glu-graf" viewBox="0 0 760 250" role="img" aria-label="Gráfico de glucemia en función del tiempo"></svg>
+          <div class="bm-acciones">
+            <button class="btn chico" id="bm-glu-insulina" hidden>💉 Aplicar insulina</button>
+            <button class="btn chico" id="bm-glu-ej">🏃 Hacer ejercicio (30 min)</button>
+            <button class="btn chico" id="bm-glu-vel">⏩ Más rápido</button>
+            <button class="btn chico" id="bm-glu-borrar">🗑 Borrar gráfico</button>
+          </div>
+        </div>
+        <aside class="panel bm-info">
+          <h2>📈 Glucemia</h2>
+          <p>La <b>glucemia</b> es la concentración de glucosa en la sangre. En ayunas lo normal es entre <b>70 y 100 mg/dl</b>. Elige una persona y un alimento, y observa cómo el cuerpo la regula.</p>
+          <h3>1. La persona</h3>
+          <div class="segmentado chico" id="bm-glu-persona">${PERSONAS.map((p, i) => `<button data-p="${i}">${p}</button>`).join('')}</div>
+          <h3>2. Qué come (50 g de carbohidratos)</h3>
+          <div class="bm-comidas" id="bm-comidas">${COMIDAS.map(c => `<button data-c="${c.id}"><span>${c.e}</span>${c.n}</button>`).join('')}</div>
+          <h3>📋 Resultados</h3>
+          <div class="tabla-scroll"><table class="bm-tabla" id="bm-glu-tabla"></table></div>
+          <p class="bm-aviso" id="bm-aviso"></p>
+          <p class="bm-ayuda">Modelo simplificado con fines didácticos: la respuesta real cambia de persona a persona.</p>
+        </aside>
+      </div>`;
+    const q = s => raiz.querySelector(s);
+    raiz.querySelectorAll('#bm-glu-persona button').forEach(b => b.addEventListener('click', () => {
+      if (glu.corriendo) return;
+      glu.tipo = +b.dataset.p;
+      pintarControlesGlu();
+      avisar(glu.tipo === 0
+        ? 'Persona <b>sin diabetes</b>: el páncreas libera insulina cuando sube la glucemia y glucagón cuando baja.'
+        : glu.tipo === 1
+          ? '<b>Diabetes tipo 1</b>: el sistema inmune destruyó las células del páncreas que fabrican insulina. Sin insulina la glucosa no puede entrar a las células. Se trata con <b>inyecciones de insulina</b>.'
+          : '<b>Diabetes tipo 2</b>: el páncreas fabrica insulina, pero las células casi no le responden (<b>resistencia a la insulina</b>). Se asocia al sedentarismo y a la alimentación; se trata con dieta, ejercicio y medicamentos.');
+    }));
+    raiz.querySelectorAll('#bm-comidas button').forEach(b => b.addEventListener('click', () => comer(COMIDAS.find(c => c.id === b.dataset.c))));
+    q('#bm-glu-insulina').addEventListener('click', () => {
+      glu.sim.iny += 16;
+      avisar('💉 Se inyectó <b>insulina</b>: actúa como una llave que abre las células para que entre la glucosa.');
+    });
+    q('#bm-glu-ej').addEventListener('click', () => {
+      if (!glu.corriendo) { glu.sim = nuevaSimulacion(null); glu.sim.soloEjercicio = true; glu.corriendo = true; pintarControlesGlu(); }
+      glu.sim.ejHasta = glu.sim.t + 30;
+      avisar('🏃 Durante el ejercicio los músculos consumen mucha glucosa, incluso con poca insulina. Si la glucemia baja, el páncreas libera <b>glucagón</b> y el hígado rompe glucógeno (<b>glucogenólisis</b>).');
+    });
+    q('#bm-glu-vel').addEventListener('click', () => { glu.rapido = !glu.rapido; q('#bm-glu-vel').textContent = glu.rapido ? '▶ Velocidad normal' : '⏩ Más rápido'; });
+    q('#bm-glu-borrar').addEventListener('click', () => { glu.curvas = []; pintarTablaGlu(); dibujarGraficoGlu(); });
+    const graf = q('#bm-glu-graf');
+    const mover = ev => {
+      const r = graf.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / r.width * 760;
+      glu.hover = x >= 50 && x <= 740 ? Math.round((x - 50) / 690 * 180) : null;
+      dibujarGraficoGlu();
+    };
+    graf.addEventListener('pointermove', mover);
+    graf.addEventListener('pointerdown', mover);
+    graf.addEventListener('pointerleave', () => { glu.hover = null; dibujarGraficoGlu(); });
+    pintarControlesGlu();
+    pintarTablaGlu();
+    avisar('👆 Elige un alimento. Luego compara varios: por ejemplo <b>glucosa, pan blanco y pan integral</b>, como en el gráfico del trabajo práctico.');
+    glu.ultimo = performance.now();
+    animGlu = requestAnimationFrame(bucleGlucemia);
+  }
+
+  function pintarControlesGlu() {
+    raiz.querySelectorAll('#bm-glu-persona button').forEach(b => { b.classList.toggle('activo', +b.dataset.p === glu.tipo); b.disabled = glu.corriendo; });
+    raiz.querySelectorAll('#bm-comidas button').forEach(b => { b.disabled = glu.corriendo; });
+    raiz.querySelector('#bm-glu-insulina').hidden = !(glu.tipo === 1 && glu.corriendo);
+  }
+
+  function comer(c) {
+    if (glu.corriendo) return;
+    glu.sim = nuevaSimulacion(c);
+    glu.corriendo = true;
+    pintarControlesGlu();
+    avisar(`${c.e} Comió <b>${c.n.toLowerCase()}</b>. En la boca y el intestino, las enzimas (amilasas, maltasa, sacarasa, lactasa) hidrolizan los carbohidratos hasta <b>monosacáridos</b>, que pasan a la sangre.`);
+  }
+
+  function bucleGlucemia(t) {
+    if (modo !== 'glucemia' || !raiz.querySelector('#bm-cuerpo')) return;
+    const dtReal = Math.min(0.1, (t - glu.ultimo) / 1000);
+    glu.ultimo = t;
+    const s = glu.sim;
+    if (glu.corriendo) {
+      let min = dtReal * MIN_POR_SEG * (glu.rapido ? 3 : 1);
+      while (min > 0 && s.t < 180) {
+        const dt = Math.min(0.5, min);
+        pasoGlucemia(s, dt);
+        min -= dt;
+        const m = Math.floor(s.t);
+        while (s.pts.length <= m && s.pts.length <= 180) s.pts.push(s.G);
+      }
+      comentarGlucemia(s);
+      if (s.t >= 180) terminarSimulacion();
+    }
+    dibujarCuerpo(t / 1000);
+    dibujarGraficoGlu();
+    animGlu = requestAnimationFrame(bucleGlucemia);
+  }
+
+  function comentarGlucemia(s) {
+    const fase = s.G > 180 ? 'hiper' : s.G < 70 ? 'hipo' : s.liberacion > 0.3 ? 'glucagon' : s.X * s.G > 0.6 ? 'insulina' : null;
+    if (!fase || fase === s.fase) return;
+    s.fase = fase;
+    avisar({
+      hiper: `⚠️ <b>Hiperglucemia</b> (más de 180 mg/dl). ${glu.tipo === 1 ? 'Sin insulina, la glucosa se acumula en la sangre. Prueba <b>💉 aplicar insulina</b>.' : glu.tipo === 2 ? 'Hay insulina, pero las células casi no le responden.' : ''} Por encima de ~180 mg/dl los riñones empiezan a eliminar glucosa por la orina.`,
+      hipo: '⚠️ <b>Hipoglucemia</b> (menos de 70 mg/dl): puede causar mareos, temblores y confusión. El <b>glucagón</b> hace que el hígado libere glucosa.',
+      glucagon: '🟠 La glucemia bajó: el páncreas libera <b>glucagón</b> y el hígado degrada glucógeno (glucogenólisis) para devolver glucosa a la sangre.',
+      insulina: '🔑 El páncreas liberó <b>insulina</b>: las células captan glucosa y el hígado la guarda como <b>glucógeno</b> (glucogénesis). La glucemia empieza a bajar.',
+    }[fase]);
+  }
+
+  function terminarSimulacion() {
+    const s = glu.sim;
+    glu.corriendo = false;
+    if (!s.comida && s.soloEjercicio) s.comida = { e: '🏃', n: 'Ejercicio en ayunas', ig: '—', x: 'Sin comer, el ejercicio bajó la glucemia y el <b>glucagón</b> hizo que el hígado usara su glucógeno para recuperarla.' };
+    if (s.comida) {
+      const pts = s.pts.slice(0, 181);
+      let pico = 0, tPico = 0;
+      if (s.soloEjercicio) { pico = Infinity; pts.forEach((g, i) => { if (g < pico) { pico = g; tPico = i; } }); }
+      else pts.forEach((g, i) => { if (g > pico) { pico = g; tPico = i; } });
+      const vuelta = pts.findIndex((g, i) => i > tPico && g < 110);
+      glu.curvas.push({ nombre: s.comida.n + (glu.tipo ? ` (${PERSONAS[glu.tipo].toLowerCase()})` : ''), comida: s.comida, pts, pico, tPico, vuelta, minimo: !!s.soloEjercicio });
+      if (glu.curvas.length > 4) glu.curvas.shift();
+      glu.curvas.forEach((c, i) => { c.color = COLORES_CURVA[i]; });
+      avisar(`✅ Pasaron 3 horas. ${s.soloEjercicio ? 'Mínimo' : 'Pico'} de <b>${Math.round(pico)} mg/dl</b> a los <b>${tPico} min</b>. ${s.comida.x} Pasa el dedo o el mouse por el gráfico para leer los valores.`);
+    }
+    glu.sim = nuevaSimulacion(null);
+    glu.sim.G = s.G;
+    glu.sim.glucogeno = s.glucogeno;
+    pintarControlesGlu();
+    pintarTablaGlu();
+  }
+
+  function pintarTablaGlu() {
+    raiz.querySelector('#bm-glu-tabla').innerHTML = glu.curvas.length
+      ? `<thead><tr><th>Alimento</th><th>Pico</th><th>Minuto</th><th>IG</th></tr></thead>
+        <tbody>${glu.curvas.map(c => `<tr><td><i class="bm-punto-color" style="background:${c.color}"></i>${c.comida.e} ${c.nombre}</td><td>${c.minimo ? 'mín. ' : ''}${Math.round(c.pico)}</td><td>${c.tPico}</td><td>${c.comida.ig}</td></tr>`).join('')}</tbody>`
+      : '<tbody><tr><td class="bm-sin">Todavía no hay mediciones.</td></tr></tbody>';
+  }
+
+  function dibujarGraficoGlu() {
+    const X = m => 50 + m / 180 * 690, Y = g => 222 - (g - 40) / 240 * 205;
+    const lineas = pts => pts.map((g, i) => `${X(i).toFixed(1)},${Y(Math.max(40, Math.min(280, g))).toFixed(1)}`).join(' ');
+    let svg = `<rect width="760" height="250" rx="12" fill="#0e1033"/>
+      <rect x="50" y="${Y(280)}" width="690" height="${Y(180) - Y(280)}" fill="#ff6b6b" opacity="0.08"/>
+      <rect x="50" y="${Y(140)}" width="690" height="${Y(70) - Y(140)}" fill="#2fd186" opacity="0.08"/>
+      <rect x="50" y="${Y(70)}" width="690" height="${Y(40) - Y(70)}" fill="#5cc8ff" opacity="0.1"/>
+      <text x="736" y="${Y(270)}" text-anchor="end" class="bm-g-zona">HIPERGLUCEMIA</text>
+      <text x="736" y="${Y(76)}" text-anchor="end" class="bm-g-zona">NORMAL</text>
+      <text x="736" y="${Y(46)}" text-anchor="end" class="bm-g-zona">HIPOGLUCEMIA</text>`;
+    for (let g = 40; g <= 280; g += 40) svg += `<line x1="50" x2="740" y1="${Y(g)}" y2="${Y(g)}" stroke="#2d3070"/><text x="44" y="${Y(g) + 4}" text-anchor="end" class="bm-g-txt oscuro">${g}</text>`;
+    for (let m = 0; m <= 180; m += 30) svg += `<text x="${X(m)}" y="240" text-anchor="middle" class="bm-g-txt oscuro">${m}</text>`;
+    svg += `<text x="395" y="249" text-anchor="middle" class="bm-g-txt oscuro">minutos después de comer</text>
+      <text x="12" y="120" text-anchor="middle" transform="rotate(-90 12 120)" class="bm-g-txt oscuro">glucemia (mg/dl)</text>`;
+    glu.curvas.forEach(c => { svg += `<polyline points="${lineas(c.pts)}" fill="none" stroke="${c.color}" stroke-width="3" stroke-linejoin="round"/>`; });
+    if (glu.corriendo && (glu.sim.comida || glu.sim.soloEjercicio)) svg += `<polyline points="${lineas(glu.sim.pts)}" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>
+      <circle cx="${X(glu.sim.pts.length - 1)}" cy="${Y(glu.sim.G)}" r="5" fill="#fff"/>`;
+    if (glu.hover !== null && glu.curvas.length) {
+      const m = glu.hover, filas = glu.curvas.map(c => [c.color, `${c.nombre}: ${Math.round(c.pts[m])} mg/dl`]);
+      const bx = X(m) > 460 ? X(m) - 284 : X(m) + 10;
+      svg += `<line x1="${X(m)}" x2="${X(m)}" y1="${Y(280)}" y2="${Y(40)}" stroke="#fff" stroke-dasharray="3 3" opacity="0.7"/>
+        ${glu.curvas.map(c => `<circle cx="${X(m)}" cy="${Y(c.pts[m])}" r="4.5" fill="${c.color}" stroke="#0e1033" stroke-width="1.5"/>`).join('')}
+        <rect x="${bx}" y="14" width="274" height="${22 + filas.length * 16}" rx="8" fill="#1f2256" stroke="#3a3e85"/>
+        <text x="${bx + 10}" y="30" class="bm-g-tip"><tspan font-weight="800">Minuto ${m}</tspan></text>
+        ${filas.map(([col, t], i) => `<text x="${bx + 10}" y="${47 + i * 16}" class="bm-g-tip" fill="${col}">${t}</text>`).join('')}`;
+    }
+    raiz.querySelector('#bm-glu-graf').innerHTML = svg;
+  }
+
+  // Escena del cuerpo: intestino → sangre → células, con páncreas e hígado regulando.
+  function dibujarCuerpo(seg) {
+    const s = glu.sim;
+    const flujo = (n, dur, fn) => Array.from({ length: n }, (_, k) => fn(((seg / dur) + k / n) % 1, k)).join('');
+    const glucosa = (x, y, r = 5) => `<polygon points="${poligono(puntos(r, [-90, -30, 30, 90, 150, 210]).map(([a, b]) => [a + x, b + y]))}" fill="#ffd166"/>`;
+    const llave = (x, y) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle r="4.5" fill="none" stroke="#5cc8ff" stroke-width="2.4"/><path d="M4,0 h9 M9,0 v4 M12,0 v3" stroke="#5cc8ff" stroke-width="2.4" stroke-linecap="round"/></g>`;
+    const gota = (x, y) => `<path d="M${x},${y - 6} C${x + 5},${y} ${x + 4},${y + 5} ${x},${y + 5} C${x - 4},${y + 5} ${x - 5},${y} ${x},${y - 6} Z" fill="#ff9f43"/>`;
+    const G = s.G;
+    const estado = G > 180 ? ['HIPERGLUCEMIA', '#ff6b6b'] : G < 70 ? ['HIPOGLUCEMIA', '#5cc8ff'] : G > 140 ? ['ELEVADA', '#ffa94d'] : ['NORMAL', '#2fd186'];
+    const nSangre = Math.max(3, Math.min(30, Math.round((G - 30) / 8)));
+    const insulina = s.I;
+    const ejercicio = s.t < s.ejHasta;
+    let svg = `<defs><radialGradient id="bm-fondo-cuerpo" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stop-color="#23266b"/><stop offset="1" stop-color="#0e1033"/></radialGradient></defs>
+      <rect width="760" height="260" rx="12" fill="url(#bm-fondo-cuerpo)"/>
+      <g transform="translate(0 -10)"><path d="M40,222 C60,190 100,250 130,222 S190,196 210,226 S160,256 120,250" fill="none" stroke="#d6336c" stroke-width="26" stroke-linecap="round"/>
+      <path d="M40,222 C60,190 100,250 130,222 S190,196 210,226 S160,256 120,250" fill="none" stroke="#ff8fab" stroke-width="18" stroke-linecap="round"/></g>
+      <text x="236" y="236" class="bm-rotulo">INTESTINO</text>
+      <rect x="10" y="126" width="740" height="44" rx="22" fill="#9c1f4a"/><rect x="10" y="132" width="740" height="32" rx="16" fill="#c2255c"/>
+      <rect x="30" y="136" width="700" height="4" rx="2" fill="#ff8fab" opacity="0.35"/>
+      <text x="740" y="120" text-anchor="end" class="bm-rotulo">SANGRE</text>`;
+    // Páncreas con cara.
+    svg += `<g transform="translate(330 62)">
+      ${Arte.dosTonos('<path d="M-70,6 C-70,-20 -30,-26 0,-18 C30,-10 60,-26 78,-10 C92,4 70,24 40,20 C10,16 -20,28 -50,24 C-66,22 -70,14 -70,6 Z" fill="FILL"/>', '#ffd166', '#f0a830', { y: 6 })}
+      ${Arte.ojo(-24, 0, 7)}${Arte.ojo(0, -2, 7)}<path d="M-18,12 q8,${glu.tipo === 1 ? -4 : 5} 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <text x="0" y="-32" text-anchor="middle" class="bm-rotulo">PÁNCREAS</text>
+      ${glu.tipo === 1 ? '<text x="0" y="44" text-anchor="middle" class="bm-letra chica" fill="#ff8787">no fabrica insulina</text>' : ''}</g>`;
+    // Hígado con cara y reserva de glucógeno.
+    svg += `<g transform="translate(590 60)">
+      ${Arte.dosTonos('<path d="M-80,-10 C-70,-40 20,-44 70,-24 C96,-12 84,20 50,30 C10,42 -40,40 -66,24 C-84,14 -86,2 -80,-10 Z" fill="FILL"/>', '#d9644a', '#b04a36', { y: 8 })}
+      ${Arte.ojo(-30, -6, 7)}${Arte.ojo(-6, -8, 7)}<path d="M-24,8 q8,5 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <text x="0" y="-44" text-anchor="middle" class="bm-rotulo">HÍGADO</text>
+      <rect x="18" y="-12" width="50" height="10" rx="5" fill="#15163d" opacity="0.5"/>
+      <rect x="18" y="-12" width="${(s.glucogeno / 2).toFixed(1)}" height="10" rx="5" fill="#ffd166"/>
+      <text x="43" y="14" text-anchor="middle" class="bm-letra chica" fill="#fff">glucógeno ${Math.round(s.glucogeno)} %</text></g>`;
+    // Células musculares con "cerraduras" (receptores de insulina).
+    svg += `<g transform="translate(540 222) scale(${ejercicio ? (1 + 0.04 * Math.sin(seg * 10)).toFixed(3) : 1})">
+      ${[-60, 0, 60].map(dx => `<g transform="translate(${dx} 0)">${Arte.dosTonos('<ellipse rx="26" ry="20" fill="FILL"/>', '#7c86ff', '#5a63d8', { x: 8 })}<rect x="-5" y="-22" width="10" height="7" rx="2" fill="#15163d" opacity="0.6"/><circle r="6" fill="#b197fc"/></g>`).join('')}
+      <text x="96" y="6" class="bm-rotulo">CÉLULAS${ejercicio ? ' 🏃' : ''}</text></g>`;
+    // Glucosa en la sangre (más partículas cuanto mayor la glucemia).
+    svg += flujo(nSangre, 9, (p, k) => glucosa(15 + p * 730, 140 + ((k * 37) % 20)));
+    // Absorción desde el intestino.
+    if (s.Ra > 0.08) svg += flujo(Math.min(5, Math.ceil(s.Ra * 3)), 1.6, p => glucosa(150 - p * 10, 210 - p * 60, 4.5));
+    // Insulina desde el páncreas hacia la sangre y las células.
+    const nIns = Math.min(7, Math.round(insulina / 1.2));
+    if (nIns > 0) svg += flujo(nIns, 3, p => p < 0.4 ? llave(330 + p * 100, 88 + p / 0.4 * 50) : llave(370 + (p - 0.4) / 0.6 * 170, 146 + (p - 0.4) / 0.6 * 52));
+    // Glucagón hacia el hígado.
+    if (s.Gc > 0.15) svg += flujo(Math.min(5, Math.ceil(s.Gc * 2)), 2.2, p => gota(380 + p * 150, 70 - Math.sin(p * Math.PI) * 30));
+    // Glucosa que entra a las células.
+    if (s.captacion > 0.3) svg += flujo(Math.min(6, Math.ceil(s.captacion * 2.5)), 1.4, (p, k) => glucosa(480 + (k % 3) * 60, 166 + p * 44, 4));
+    // Glucosa liberada por el hígado.
+    if (s.liberacion > 0.2) svg += flujo(Math.min(5, Math.ceil(s.liberacion * 2)), 1.6, p => glucosa(600, 92 + p * 44, 4.5));
+    // Marcador de glucemia.
+    svg += `<g transform="translate(18 16)"><rect width="176" height="84" rx="12" fill="#12143a" stroke="${estado[1]}" stroke-width="2"/>
+      <text x="14" y="22" class="bm-rotulo">GLUCEMIA</text>
+      <text x="14" y="58" class="bm-glu-num" fill="${estado[1]}">${Math.round(G)}</text><text x="${Math.round(G) >= 100 ? 92 : 76}" y="58" class="bm-letra" fill="#c9ccf5">mg/dl</text>
+      <text x="14" y="76" class="bm-letra chica" fill="${estado[1]}">${estado[0]}${glu.corriendo ? ` · minuto ${Math.floor(s.t)}` : ''}</text></g>`;
+    raiz.querySelector('#bm-cuerpo').innerHTML = svg;
+  }
+
+  // =====================================================================
   // LABORATORIO DE RECONOCIMIENTO
   // =====================================================================
 
@@ -1429,13 +1712,109 @@ const Biomoleculas = (function () {
   // CLASIFICAR
   // =====================================================================
 
+  // ---------- Juego: funciones de las proteínas (unir función, descripción y ejemplo) ----------
+  const FUNCIONES = [
+    { id: 'estructural', n: 'Estructural', c: '#ffd166', desc: 'Constituyen estructuras fundamentales del cuerpo humano (piel, pelo, uñas, etc.).',
+      ej: [['Queratina', 'forma el pelo, las uñas y la capa externa de la piel.'], ['Colágeno', 'da resistencia a tendones, huesos, cartílagos y piel.'], ['Elastina', 'da elasticidad a la piel, los pulmones y los vasos sanguíneos.']] },
+    { id: 'transporte', n: 'Transporte', c: '#ff6b6b', desc: 'Transportan sustancias en la sangre.',
+      ej: [['Hemoglobina', 'lleva el O₂ en los glóbulos rojos; cada grupo hemo tiene un átomo de hierro.'], ['Mioglobina', 'guarda y transporta O₂ dentro de los músculos.'], ['Lipoproteínas', 'transportan lípidos, como el colesterol, por la sangre.']] },
+    { id: 'enzimatica', n: 'Enzimática', c: '#2fd186', desc: 'Favorecen las reacciones químicas.',
+      ej: [['Lactasa', 'hidroliza la lactosa de la leche en glucosa y galactosa.'], ['Pepsina', 'digiere proteínas en el estómago.'], ['Amilasa', 'hidroliza el almidón en la boca y el intestino.']] },
+    { id: 'reguladora', n: 'Reguladora (hormonal)', c: '#b197fc', desc: 'Intervienen en la regulación de diversas funciones corporales (metabolismo, crecimiento, etc.).',
+      ej: [['Insulina', 'baja la glucemia: permite que la glucosa entre a las células.'], ['Glucagón', 'sube la glucemia: hace que el hígado libere glucosa.'], ['Hormona del crecimiento', 'la produce la hipófisis y estimula el crecimiento.']] },
+    { id: 'contractil', n: 'Contráctil', c: '#ff9f43', desc: 'Permiten las contracciones musculares.',
+      ej: [['Actina y miosina', 'forman las miofibrillas que acortan el músculo al contraerse.']] },
+    { id: 'inmunologica', n: 'Inmunológica', c: '#5cc8ff', desc: 'Intervienen en la protección del organismo contra agentes extraños que pudieran atacarlo.',
+      ej: [['Inmunoglobulina', 'es un anticuerpo producido por los linfocitos B que se une a un antígeno específico.']] },
+    { id: 'reserva', n: 'Reserva', c: '#ff8fb1', desc: 'Se utilizan para reservar o producir energía.',
+      ej: [['Albúmina', 'la ovoalbúmina de la clara es la reserva de aminoácidos del embrión.'], ['Lactoalbúmina', 'es la reserva de aminoácidos de la leche.'], ['Gliadina', 'es la reserva del grano de trigo (forma parte del gluten).']] },
+  ];
+  // Primera ronda: los ejemplos del trabajo práctico.
+  const EJEMPLOS_TP = { estructural: 'Queratina', transporte: 'Hemoglobina', enzimatica: 'Lactasa', reguladora: 'Insulina', contractil: 'Actina y miosina', inmunologica: 'Inmunoglobulina', reserva: 'Albúmina' };
+  let emparejar = null, rondasFunciones = 0;
+
+  function vistaFunciones(cont) {
+    const ejemplos = FUNCIONES.map(f => {
+      const par = rondasFunciones === 0 ? f.ej.find(e => e[0] === EJEMPLOS_TP[f.id]) : Util.elegir(f.ej);
+      return { f: f.id, n: par[0], x: par[1] };
+    });
+    rondasFunciones++;
+    emparejar = { activa: null, desc: {}, ej: {}, ejemplos, descOrden: Util.mezclar(FUNCIONES.map(f => f.id)), ejOrden: Util.mezclar(ejemplos), revisado: false };
+    cont.innerHTML = `
+      <div class="panel">
+        <p class="bm-ayuda-juego">👆 Toca una <b>función</b> y después su <b>descripción</b> y su <b>ejemplo</b>. Cada función tiene su color. Si te equivocas, vuelve a tocar para cambiarlo.</p>
+        <div class="bm-emparejar">
+          <div><h3>Función</h3><div id="bm-col-f"></div></div>
+          <div><h3>Descripción</h3><div id="bm-col-d"></div></div>
+          <div><h3>Ejemplo</h3><div id="bm-col-e"></div></div>
+        </div>
+        <div class="bm-acciones"><button class="btn primario" id="bm-emp-ok" disabled>Comprobar</button><button class="btn" id="bm-emp-otra">🔄 Otra ronda</button></div>
+        <div id="bm-emp-fb"></div>
+      </div>`;
+    cont.querySelector('#bm-emp-ok').addEventListener('click', revisarEmparejar);
+    cont.querySelector('#bm-emp-otra').addEventListener('click', () => vistaFunciones(cont));
+    pintarEmparejar();
+  }
+
+  function pintarEmparejar() {
+    const E = emparejar, color = id => FUNCIONES.find(f => f.id === id).c;
+    const marca = (asignada, correcta) => E.revisado ? (asignada === correcta ? ' ok' : ' mal') : '';
+    raiz.querySelector('#bm-col-f').innerHTML = FUNCIONES.map(f => {
+      const completa = Object.values(E.desc).includes(f.id) && Object.values(E.ej).includes(f.id);
+      return `<button class="bm-carta funcion${E.activa === f.id ? ' activa' : ''}${completa ? ' completa' : ''}" data-f="${f.id}" style="--c:${f.c}"><i></i>${f.n}</button>`;
+    }).join('');
+    raiz.querySelector('#bm-col-d').innerHTML = E.descOrden.map(id => {
+      const a = E.desc[id];
+      return `<button class="bm-carta${a ? ' asignada' : ''}${marca(a, id)}" data-d="${id}" style="${a ? `--c:${color(a)}` : ''}">${a ? '<i></i>' : ''}${FUNCIONES.find(f => f.id === id).desc}</button>`;
+    }).join('');
+    raiz.querySelector('#bm-col-e').innerHTML = E.ejOrden.map(ej => {
+      const a = E.ej[ej.n];
+      return `<button class="bm-carta ejemplo${a ? ' asignada' : ''}${marca(a, ej.f)}" data-e="${ej.n}" style="${a ? `--c:${color(a)}` : ''}">${a ? '<i></i>' : ''}${ej.n}</button>`;
+    }).join('');
+    raiz.querySelectorAll('.bm-carta').forEach(b => b.addEventListener('click', () => {
+      if (E.revisado) return;
+      if (b.dataset.f) E.activa = E.activa === b.dataset.f ? null : b.dataset.f;
+      else if (!E.activa) return avisarEmparejar('Primero toca una <b>función</b> de la primera columna.');
+      else if (b.dataset.d) {
+        Object.keys(E.desc).forEach(k => { if (E.desc[k] === E.activa) delete E.desc[k]; });
+        E.desc[b.dataset.d] = E.activa;
+      } else {
+        Object.keys(E.ej).forEach(k => { if (E.ej[k] === E.activa) delete E.ej[k]; });
+        E.ej[b.dataset.e] = E.activa;
+      }
+      pintarEmparejar();
+    }));
+    raiz.querySelector('#bm-emp-ok').disabled = E.revisado || Object.keys(E.desc).length < 7 || Object.keys(E.ej).length < 7;
+  }
+
+  function avisarEmparejar(html) { raiz.querySelector('#bm-emp-fb').innerHTML = `<p class="bm-aviso">${html}</p>`; }
+
+  function revisarEmparejar() {
+    const E = emparejar;
+    E.revisado = true;
+    E.activa = null;
+    const bienD = FUNCIONES.filter(f => E.desc[f.id] === f.id).length;
+    const bienE = E.ejemplos.filter(ej => E.ej[ej.n] === ej.f).length;
+    pintarEmparejar();
+    raiz.querySelector('#bm-emp-fb').innerHTML = `
+      <div class="feedback ${bienD + bienE === 14 ? 'ok' : 'mal'}">
+        <p class="fb-titulo">${bienD + bienE === 14 ? '🎉 ¡Perfecto!' : '📚 Revisa las marcadas en rojo'} · ${bienD + bienE} de 14</p>
+        <ul class="lista-repaso">${FUNCIONES.map(f => {
+          const ej = E.ejemplos.find(x => x.f === f.id);
+          return `<li><b style="color:${f.c}">●</b> <b>${f.n}:</b> ${f.desc} Ejemplo: <b>${ej.n}</b>, que ${ej.x}</li>`;
+        }).join('')}</ul>
+        <p>💡 Todas las proteínas cumplen su función de la misma manera: <b>uniéndose de forma selectiva a otras moléculas</b> (el anticuerpo al antígeno, la hemoglobina al O₂, la enzima a su sustrato, la hormona a su receptor).</p>
+      </div>`;
+  }
+
   function vistaClasificar() {
-    const lista = conjunto === 'moleculas' ? MOLECULAS : ALIMENTOS;
+    const lista = conjunto === 'alimentos' ? ALIMENTOS : MOLECULAS;
     juego = { lista: Util.mezclar(lista).slice(0, 10), i: 0, puntos: 0, errores: [] };
     raiz.querySelector('#bm-vista').innerHTML = `
       <div class="segmentado" id="bm-conjunto">
         <button data-c="moleculas">🔬 Moléculas y funciones</button>
         <button data-c="alimentos">🍽️ Alimentos</button>
+        <button data-c="funciones">🧩 Funciones de las proteínas</button>
       </div>
       <div class="grid-juego">
         <div class="panel">
@@ -1455,6 +1834,11 @@ const Biomoleculas = (function () {
       b.classList.toggle('activo', b.dataset.c === conjunto);
       b.addEventListener('click', () => { conjunto = b.dataset.c; vistaClasificar(); });
     });
+    if (conjunto === 'funciones') {
+      const g = raiz.querySelector('.grid-juego');
+      g.className = '';
+      return vistaFunciones(g);
+    }
     mostrarItem();
   }
 
