@@ -1341,7 +1341,7 @@ const Biomoleculas = (function () {
     raiz.querySelector('#bm-vista').innerHTML = `
       <div class="bm-grid bm-glu">
         <div class="panel bm-mesa">
-          <svg id="bm-cuerpo" viewBox="0 0 760 300" role="img" aria-label="Regulación de la glucosa en el cuerpo"></svg>
+          <svg id="bm-cuerpo" viewBox="0 0 760 320" role="img" aria-label="Regulación de la glucosa en el cuerpo"></svg>
           <div class="bm-refs" aria-label="Referencias de la escena">
             <span>${ICONO.glucosa}Glucosa</span><span>${ICONO.globulo}Glóbulo rojo</span><span>${ICONO.insulina}Insulina</span>
             <span>${ICONO.glucagon}Glucagón</span><span>${ICONO.glucogeno}Glucógeno</span>
@@ -1590,10 +1590,18 @@ const Biomoleculas = (function () {
     GX1 = W - 20;
     const Y = g => 236 - (Math.max(40, Math.min(300, g)) - 40) / 260 * 222;
     const linea = (pts, y) => pts.map((v, i) => `${gx(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const defsGraf = (h, id) => `<defs><radialGradient id="${id}-bg" cx="0.5" cy="0.3" r="0.9"><stop offset="0" stop-color="#1c1f5e"/><stop offset="1" stop-color="#0c0e30"/></radialGradient>
+      <filter id="${id}-halo" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="3.5"/></filter>
+      ${COLORES_CURVA.map((c, i) => `<linearGradient id="${id}-area${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity="0.55"/><stop offset="1" stop-color="${c}" stop-opacity="0.04"/></linearGradient>`).join('')}
+      <linearGradient id="${id}-hiper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6b6b" stop-opacity="0.16"/><stop offset="1" stop-color="#ff6b6b" stop-opacity="0.02"/></linearGradient>
+      <linearGradient id="${id}-hipo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5cc8ff" stop-opacity="0.03"/><stop offset="1" stop-color="#5cc8ff" stop-opacity="0.18"/></linearGradient></defs>`;
+    // Línea con halo luminoso debajo (estilo ilustración) y trazo nítido encima.
+    const trazo = (pts, col, id) => `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="7" opacity="0.45" filter="url(#${id}-halo)"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
     const C = glu.curvas, s = glu.sim, corriendo = glu.corriendo && (s.comida || s.soloEjercicio);
-    let svg = `<rect width="${W}" height="270" rx="12" fill="#0e1033"/>
-      <rect x="${GX0}" y="${Y(300)}" width="${GX1 - GX0}" height="${Y(180) - Y(300)}" fill="#e66767" opacity="0.07"/>
-      <rect x="${GX0}" y="${Y(70)}" width="${GX1 - GX0}" height="${Y(40) - Y(70)}" fill="#3987e5" opacity="0.1"/>`;
+    let svg = `${defsGraf(270, 'gg')}<rect width="${W}" height="270" rx="14" fill="url(#gg-bg)"/>
+      <rect x="${GX0}" y="${Y(300)}" width="${GX1 - GX0}" height="${Y(180) - Y(300)}" fill="url(#gg-hiper)"/>
+      <rect x="${GX0}" y="${Y(70)}" width="${GX1 - GX0}" height="${Y(40) - Y(70)}" fill="url(#gg-hipo)"/>
+      <text x="${GX0 + 8}" y="${Y(290)}" class="bm-gg-zona">HIPERGLUCEMIA</text><text x="${GX0 + 8}" y="${Y(46)}" class="bm-gg-zona">HIPOGLUCEMIA</text>`;
     for (let g = 40; g <= 300; g += 20) if (g % 40 === 0) svg += `<line x1="${GX0}" x2="${GX1}" y1="${Y(g)}" y2="${Y(g)}" class="bm-gg-grilla"/><text x="${GX0 - 8}" y="${Y(g) + 4}" text-anchor="end" class="bm-gg-eje">${g}</text>`;
     for (let m = 0; m <= 180; m += W < 600 ? 60 : 30) svg += `<line x1="${gx(m)}" x2="${gx(m)}" y1="${Y(300)}" y2="${Y(40)}" class="bm-gg-grilla v"/><text x="${gx(m)}" y="254" text-anchor="middle" class="bm-gg-eje">${m}</text>`;
     // Líneas de referencia.
@@ -1608,9 +1616,10 @@ const Biomoleculas = (function () {
     if (glu.area && ultima && !ultima.minimo) {
       const base = ultima.pts[0];
       const tope = ultima.pts.slice(0, 121).map((g, i) => `${gx(i).toFixed(1)},${Y(Math.max(g, base)).toFixed(1)}`).join(' ');
-      svg += `<polygon points="${gx(0)},${Y(base)} ${tope} ${gx(120)},${Y(base)}" fill="${ultima.color}" opacity="0.22"/>`;
+      svg += `<polygon points="${gx(0)},${Y(base)} ${tope} ${gx(120)},${Y(base)}" fill="url(#gg-area${COLORES_CURVA.indexOf(ultima.color)})"/>
+        <text x="${gx(60)}" y="${Y(base) - 6}" text-anchor="middle" class="bm-gg-area">área (2 h)</text>`;
     }
-    C.forEach(c => { svg += `<polyline points="${linea(c.pts, Y)}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`; });
+    C.forEach(c => { svg += trazo(linea(c.pts, Y), c.color, 'gg'); });
     if (corriendo) svg += `<polyline points="${linea(s.pts, Y)}" fill="none" stroke="#e9ebff" stroke-width="2.5" stroke-dasharray="6 4"/><circle cx="${gx(s.pts.length - 1)}" cy="${Y(s.G)}" r="5" fill="#e9ebff" stroke="#0e1033" stroke-width="2"/>`;
     // Etiquetas directas en el pico (o mínimo) de cada curva, sin superponerse.
     const etiquetas = C.map(c => ({ c, x: gx(c.tExtremo), y: Y(c.extremo) })).sort((a, b) => a.y - b.y);
@@ -1618,7 +1627,7 @@ const Biomoleculas = (function () {
       let ly = e.c.minimo ? e.y + 18 : e.y - 10;
       for (let k = 0; k < i; k++) if (Math.abs(etiquetas[k].ly - ly) < 14 && Math.abs(etiquetas[k].x - e.x) < 130) ly = etiquetas[k].ly + 14;
       e.ly = ly;
-      svg += `<circle cx="${e.x}" cy="${e.y}" r="5" fill="${e.c.color}" stroke="#0e1033" stroke-width="2"/>
+      svg += `<circle cx="${e.x}" cy="${e.y}" r="9" fill="${e.c.color}" opacity="0.3"/><circle cx="${e.x}" cy="${e.y}" r="5" fill="${e.c.color}" stroke="#0e1033" stroke-width="2"/>
         <text x="${e.x + 8}" y="${ly}" class="bm-gg-etiq">${e.c.corto} · ${Math.round(e.c.extremo)}</text>`;
     });
     if (!C.length && !corriendo) svg += `<text x="${(GX0 + GX1) / 2}" y="${Y(200)}" text-anchor="middle" class="bm-gg-vacio">Elige un alimento para ver su curva de glucemia</text>`;
@@ -1628,11 +1637,11 @@ const Biomoleculas = (function () {
     // Gráfico de insulina (pequeño múltiplo con el mismo eje de tiempo).
     const maxI = Math.max(8, ...C.flatMap(c => c.ins), ...(corriendo ? s.ins : [0]));
     const YI = v => 90 - v / maxI * 76;
-    let si = `<rect width="${W}" height="110" rx="12" fill="#0e1033"/>
+    let si = `${defsGraf(110, 'gi')}<rect width="${W}" height="110" rx="14" fill="url(#gi-bg)"/>
       <line x1="${GX0}" x2="${GX1}" y1="${YI(0)}" y2="${YI(0)}" class="bm-gg-ejeline"/>
       <text x="${GX0 - 8}" y="${YI(0) + 4}" text-anchor="end" class="bm-gg-eje">0</text><text x="${GX0 - 8}" y="${YI(maxI) + 8}" text-anchor="end" class="bm-gg-eje">máx.</text>`;
     for (let m = 0; m <= 180; m += W < 600 ? 60 : 30) si += `<line x1="${gx(m)}" x2="${gx(m)}" y1="${YI(maxI)}" y2="${YI(0)}" class="bm-gg-grilla v"/><text x="${gx(m)}" y="106" text-anchor="middle" class="bm-gg-eje">${m}</text>`;
-    C.forEach(c => { si += `<polyline points="${linea(c.ins, YI)}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linejoin="round"/>`; });
+    C.forEach(c => { si += `<polygon points="${gx(0)},${YI(0)} ${linea(c.ins, YI)} ${gx(c.ins.length - 1)},${YI(0)}" fill="url(#gi-area${COLORES_CURVA.indexOf(c.color)})" opacity="0.6"/>` + trazo(linea(c.ins, YI), c.color, 'gi'); });
     if (corriendo) si += `<polyline points="${linea(s.ins, YI)}" fill="none" stroke="#e9ebff" stroke-width="2.5" stroke-dasharray="6 4"/>`;
     const sinIns = C.find(c => c.tipo === 1) || (corriendo && glu.tipo === 1);
     if (sinIns) si += `<text x="${gx(90)}" y="${YI(0) - 8}" text-anchor="middle" class="bm-gg-reftxt">diabetes tipo 1: la insulina queda en cero</text>`;
@@ -1666,82 +1675,182 @@ const Biomoleculas = (function () {
     cont.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { glu.curvas.splice(+b.dataset.i, 1); dibujarGraficosGlu(); }));
   }
 
-  // ---------- Escena del cuerpo ----------
+  // ---------- Escena del cuerpo (estilo ilustración de divulgación) ----------
+  // Capa fija (fondo y órganos, se redibuja solo cuando cambia el ánimo de los órganos) y capa animada (partículas).
+
+  // Vaso sanguíneo: curva suave; vasoY(x) da su centro para que las partículas sigan la curva.
+  const VASO = 'M-20,160 C150,138 300,182 450,160 S650,140 780,158';
+  const VASO_PTS = (() => {
+    const bez = (p0, p1, p2, p3, t) => { const u = 1 - t; return p0 * u * u * u + 3 * p1 * u * u * t + 3 * p2 * u * t * t + p3 * t * t * t; };
+    const tramos = [[[-20, 160], [150, 138], [300, 182], [450, 160]], [[450, 160], [600, 138], [650, 140], [780, 158]]];
+    const pts = [];
+    tramos.forEach(([a, b, c, d]) => { for (let i = 0; i <= 100; i++) { const t = i / 100; pts.push([bez(a[0], b[0], c[0], d[0], t), bez(a[1], b[1], c[1], d[1], t)]); } });
+    return pts;
+  })();
+  function vasoY(x) {
+    let i = VASO_PTS.findIndex(p => p[0] >= x);
+    if (i <= 0) return VASO_PTS[Math.max(0, i)][1];
+    const [a, b] = [VASO_PTS[i - 1], VASO_PTS[i]];
+    return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0] || 1);
+  }
+
+  // Cara de los órganos: ojos grandes y una boca que cambia según lo que les pasa.
+  function cara(x, y, r, animo) {
+    const boca = {
+      feliz: `<path d="M${x - r * 0.9},${y + r * 1.5} q${r * 0.9},${r * 0.9} ${r * 1.8},0" stroke="#15163d" stroke-width="${r * 0.32}" fill="none" stroke-linecap="round"/>`,
+      triste: `<path d="M${x - r * 0.8},${y + r * 2} q${r * 0.8},${-r * 0.8} ${r * 1.6},0" stroke="#15163d" stroke-width="${r * 0.32}" fill="none" stroke-linecap="round"/>`,
+      preocupado: `<path d="M${x - r * 0.8},${y + r * 1.8} q${r * 0.4},${-r * 0.4} ${r * 0.8},0 t${r * 0.8},0" stroke="#15163d" stroke-width="${r * 0.3}" fill="none" stroke-linecap="round"/>`,
+      comiendo: `<ellipse cx="${x}" cy="${y + r * 1.7}" rx="${r * 0.6}" ry="${r * 0.55}" fill="#15163d"/><ellipse cx="${x}" cy="${y + r * 1.95}" rx="${r * 0.35}" ry="${r * 0.2}" fill="#ff8fab"/>`,
+      esfuerzo: `<path d="M${x - r * 0.9},${y + r * 1.6} h${r * 1.8}" stroke="#15163d" stroke-width="${r * 0.32}" stroke-linecap="round"/>`,
+    }[animo] || '';
+    const cejas = animo === 'preocupado' || animo === 'triste'
+      ? `<path d="M${x - r * 2.2},${y - r * 1.5} l${r * 1.4},${r * 0.5} M${x + r * 2.2},${y - r * 1.5} l${-r * 1.4},${r * 0.5}" stroke="#15163d" stroke-width="${r * 0.28}" stroke-linecap="round"/>` : '';
+    const mejillas = animo === 'feliz' || animo === 'comiendo' ? `<circle cx="${x - r * 2.1}" cy="${y + r * 1.1}" r="${r * 0.55}" fill="#ff6b9d" opacity="0.45"/><circle cx="${x + r * 2.1}" cy="${y + r * 1.1}" r="${r * 0.55}" fill="#ff6b9d" opacity="0.45"/>` : '';
+    return `${Arte.ojo(x - r * 1.2, y, r)}${Arte.ojo(x + r * 1.2, y, r)}${cejas}${mejillas}${boca}`;
+  }
+
+  // Tejido de fondo: células grandes y lejanas, apenas visibles, que dan profundidad.
+  const TEJIDO = [[70, 60, 60], [250, 250, 46], [420, 40, 40], [560, 300, 54], [760, 70, 58], [380, 300, 30], [150, 130, 26], [700, 200, 30]]
+    .map(([x, y, r], i) => `<g opacity="0.5"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.82}" fill="#1b1f5c"/><ellipse cx="${x + r * 0.15}" cy="${y - r * 0.1}" rx="${r * 0.36}" ry="${r * 0.3}" fill="#232867"/>
+      <path d="M${x - r * 0.7},${y - r * 0.35} a${r * 0.8},${r * 0.65} 0 0 1 ${r * 0.55},${-r * 0.35}" stroke="#2b3079" stroke-width="${2 + (i % 2)}" fill="none" stroke-linecap="round"/></g>`).join('');
+  function animosOrganos(s) {
+    const t1 = glu.tipo === 1, t2 = glu.tipo === 2;
+    return {
+      estomago: s.comida && glu.corriendo && s.Ra > 0.05 ? 'comiendo' : 'feliz',
+      pancreas: t1 ? 'triste' : s.G > 180 ? 'preocupado' : s.I > 2 || s.Gc > 0.15 ? 'esfuerzo' : 'feliz',
+      higado: s.liberacion > 0.2 ? 'esfuerzo' : s.X * s.G > 0.3 ? 'comiendo' : 'feliz',
+      celulas: s.t < s.ejHasta ? 'esfuerzo' : s.captacion > 0.3 ? 'comiendo' : (t1 || t2) && s.G > 150 ? 'triste' : 'feliz',
+      rinon: s.renal > 0.02 ? 'preocupado' : 'feliz',
+    };
+  }
+
+  function escenaFija(a) {
+    const esofago = 'M52,206 C46,180 54,150 70,130';
+    return `
+      <rect width="760" height="320" rx="12" fill="url(#bm-c-fondo)"/>
+      ${TEJIDO}
+      <!-- Estómago e intestino -->
+      <path d="${esofago}" stroke="#c9486b" stroke-width="16" fill="none" stroke-linecap="round"/><path d="${esofago}" stroke="#ff8fab" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M100,262 C130,300 170,250 205,282 S265,300 292,268" stroke="#b83a5e" stroke-width="30" fill="none" stroke-linecap="round"/>
+      <path d="M100,262 C130,300 170,250 205,282 S265,300 292,268" stroke="#ff8fab" stroke-width="20" fill="none" stroke-linecap="round"/>
+      <path d="M104,256 C132,292 170,244 205,275 S262,292 288,262" stroke="#ffd1dc" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <path d="M100,262 C130,300 170,250 205,282 S265,300 292,268" stroke="#ffc2d1" stroke-width="9" fill="none" stroke-dasharray="2 8" stroke-linecap="round" opacity="0.8"/>
+      <g transform="translate(66 246) scale(0.9)">
+        ${Arte.dosTonos('<path d="M-22,-50 C6,-66 44,-50 44,-14 C44,22 16,46 -16,44 C-44,42 -58,18 -48,-2 C-40,-18 -34,-38 -22,-50 Z" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 14 })}
+        <path d="M-30,-30 q10,6 4,18 M-36,4 q12,2 12,14 M-8,-44 q-4,10 4,16" stroke="#ffd1dc" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"/>
+        <path d="M-12,-54 a50,40 0 0 1 36,2" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.4"/>
+        ${cara(2, -6, 6, a.estomago)}</g>
+      <text x="60" y="310" text-anchor="middle" class="bm-rotulo">ESTÓMAGO</text>
+      <text x="306" y="282" class="bm-rotulo">INTESTINO</text>
+      <!-- Vaso sanguíneo -->
+      <path d="${VASO}" stroke="#4a0d27" stroke-width="66" fill="none" opacity="0.5"/>
+      <path d="${VASO}" stroke="#7a1838" stroke-width="60" fill="none"/>
+      <path d="${VASO}" stroke="#a51f4c" stroke-width="46" fill="none"/>
+      <path d="${VASO}" stroke="#8c1a41" stroke-width="16" fill="none" transform="translate(0 15)" opacity="0.7"/>
+      <path d="${VASO}" stroke="#ff8fab" stroke-width="3" fill="none" transform="translate(0 -18)" opacity="0.45"/>
+      <path d="${VASO}" stroke="#ff8fab" stroke-width="6" fill="none" transform="translate(0 -12)" opacity="0.18"/>
+      <text x="122" y="202" class="bm-rotulo">SANGRE</text>
+      <!-- Páncreas -->
+      <g transform="translate(330 62)">
+        ${Arte.dosTonos(`<path d="M-80,6 C-80,-18 -40,-26 -4,-18 C30,-10 64,-28 84,-12 C98,2 76,24 44,20 C12,16 -22,28 -54,24 C-72,22 -80,14 -80,6 Z" fill="FILL"/>${[[-62, -8, 12], [-38, -18, 13], [-12, -16, 12], [16, -12, 12], [44, -20, 13], [70, -16, 11]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="FILL"/>`).join('')}`, '#ffd166', '#f0a830', { y: 6 })}
+        <path d="M-68,-8 a12,10 0 0 1 16,-8 M-44,-18 a12,10 0 0 1 16,-4" stroke="#fff3c4" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+        ${cara(-22, 0, 6.5, a.pancreas)}
+        <text x="0" y="-40" text-anchor="middle" class="bm-rotulo">PÁNCREAS</text></g>
+      <!-- Hígado -->
+      <g transform="translate(612 66)">
+        ${Arte.dosTonos('<path d="M-92,-10 C-84,-44 10,-50 70,-30 C104,-18 96,18 58,30 C22,42 -24,44 -58,30 C-86,20 -96,6 -92,-10 Z" fill="FILL"/>', '#e0694e', '#b54c38', { y: 8 })}
+        <path d="M-6,-44 C-10,-10 -6,20 2,38" stroke="#b54c38" stroke-width="4" fill="none" opacity="0.7"/>
+        <path d="M-78,-20 a60,30 0 0 1 50,-22" stroke="#ffb199" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.55"/>
+        ${cara(-46, -6, 6.5, a.higado)}
+        <text x="0" y="-52" text-anchor="middle" class="bm-rotulo">HÍGADO</text></g>
+      <!-- Células musculares -->
+      ${[-66, 0, 66].map(dx => `<g transform="translate(${500 + dx} 262)">
+        <ellipse rx="31" ry="25" fill="#5a63d8" opacity="0.35"/>
+        ${Arte.dosTonos('<ellipse rx="28" ry="22" fill="FILL"/>', '#8c96ff', '#6570e0', { x: 9 })}
+        <ellipse cx="9" cy="6" rx="8" ry="6.5" fill="#b197fc" opacity="0.75"/>
+        <path d="M-18,-10 a22,16 0 0 1 14,-8" stroke="#dfe3ff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+        ${cara(-8, 0, 3.6, a.celulas)}</g>`).join('')}
+      <text x="500" y="308" text-anchor="middle" class="bm-rotulo">CÉLULAS DEL MÚSCULO${glu.tipo === 2 ? ' · RESISTENTES' : ''}</text>
+      <!-- Riñón -->
+      <g transform="translate(700 256)">
+        <path d="M-10,8 C-22,18 -24,30 -26,42" stroke="#e8a0b0" stroke-width="5" fill="none" stroke-linecap="round"/>
+        ${Arte.dosTonos('<path d="M-2,-30 C24,-34 36,-8 30,14 C24,34 0,38 -14,26 C-6,16 -4,4 -12,-6 C-20,-18 -16,-28 -2,-30 Z" fill="FILL"/>', '#d0606a', '#a8434e', { x: 12 })}
+        <path d="M-10,-24 a24,20 0 0 1 22,0" stroke="#ffb3bd" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+        ${cara(6, -2, 3.8, a.rinon)}</g>
+      <text x="712" y="312" text-anchor="middle" class="bm-rotulo">RIÑÓN</text>`;
+  }
+
   function dibujarCuerpo(seg) {
+    const svg = raiz.querySelector('#bm-cuerpo');
     const s = glu.sim, G = s.G;
+    if (!svg.querySelector('#bm-c-fija')) {
+      svg.innerHTML = `<defs>
+          <radialGradient id="bm-c-fondo" cx="0.5" cy="0.45" r="0.8"><stop offset="0" stop-color="#262a74"/><stop offset="1" stop-color="#0c0e30"/></radialGradient>
+          <radialGradient id="bm-c-vineta" cx="0.5" cy="0.5" r="0.75"><stop offset="0.65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></radialGradient>
+          <filter id="bm-c-brillo" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs><g id="bm-c-fija"></g><g id="bm-c-din"></g><rect width="760" height="320" rx="12" fill="url(#bm-c-vineta)" pointer-events="none"/><g id="bm-c-ui"></g>`;
+    }
+    const animo = animosOrganos(s);
+    const clave = glu.tipo + JSON.stringify(animo);
+    if (glu.claveEscena !== clave) {
+      glu.claveEscena = clave;
+      svg.querySelector('#bm-c-fija').innerHTML = escenaFija(animo);
+    }
     const flujo = (n, dur, fn) => Array.from({ length: n }, (_, k) => fn(((seg / dur) + k / n) % 1, k)).join('');
-    const glucosa = (x, y, r = 5) => `<polygon points="${poligono(puntos(r, [-90, -30, 30, 90, 150, 210]).map(([a, b]) => [a + x, b + y]))}" fill="#ffd166"/>`;
-    const llave = (x, y) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle r="4.5" fill="none" stroke="#5cc8ff" stroke-width="2.4"/><path d="M4,0 h9 M9,0 v4 M12,0 v3" stroke="#5cc8ff" stroke-width="2.4" stroke-linecap="round"/></g>`;
-    const gota = (x, y) => `<path d="M${x.toFixed(1)},${(y - 6).toFixed(1)} c5,6 4,11 0,11 c-4,0 -5,-5 0,-11 Z" fill="#ff9f43"/>`;
-    const etiqueta = (x, y, texto, activo) => activo ? `<g><rect x="${x - texto.length * 3.3 - 8}" y="${y - 11}" width="${texto.length * 6.6 + 16}" height="17" rx="8.5" fill="#12143a" stroke="#ffd166" stroke-width="1.2"/><text x="${x}" y="${y + 1}" text-anchor="middle" class="bm-proceso">${texto}</text></g>` : '';
-    const estado = G > 180 ? ['HIPERGLUCEMIA', '#e66767'] : G < 70 ? ['HIPOGLUCEMIA', '#5cc8ff'] : G > 140 ? ['ELEVADA', '#ffa94d'] : ['NORMAL', '#2fd186'];
+    const hexa = (x, y, r = 5) => `<polygon points="${poligono(puntos(r, [-90, -30, 30, 90, 150, 210]).map(([a, b]) => [a + x, b + y]))}" fill="#ffd166"/>`;
+    const llave = (x, y) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle r="4.8" fill="none" stroke="#7fd3ff" stroke-width="2.6"/><path d="M4.5,0 h9 M9.5,0 v4.5 M12.5,0 v3.2" stroke="#7fd3ff" stroke-width="2.6" stroke-linecap="round"/></g>`;
+    const gota = (x, y) => `<path d="M${x.toFixed(1)},${(y - 7).toFixed(1)} c6,7 5,12 0,12 c-5,0 -6,-5 0,-12 Z" fill="#ffa94d"/>`;
+    const globulo = (x, y, r, ang, alfa) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang})" opacity="${alfa}"><ellipse rx="${r}" ry="${r * 0.62}" fill="#ff5c7a"/><ellipse rx="${r * 0.5}" ry="${r * 0.28}" fill="#c9184a"/><path d="M${-r * 0.7},${-r * 0.3} a${r},${r * 0.55} 0 0 1 ${r * 0.9},${-r * 0.25}" stroke="#ffb3c1" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>`;
     const ejercicio = s.t < s.ejHasta;
     const apertura = Math.min(1, s.captacion / 1.6);
-    const comiendo = s.comida && s.Ra > 0.05 && glu.corriendo;
-    let svg = `<defs><radialGradient id="bm-fondo-cuerpo" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stop-color="#23266b"/><stop offset="1" stop-color="#0e1033"/></radialGradient></defs>
-      <rect width="760" height="300" rx="12" fill="url(#bm-fondo-cuerpo)"/>`;
-    // Estómago e intestino.
-    svg += `<g transform="translate(0 6)">
-      ${Arte.dosTonos('<path d="M36,214 C20,180 50,150 84,166 C110,178 118,210 96,232 C80,248 48,244 36,214 Z" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 80 })}
-      ${comiendo && s.comida.e ? `<text x="72" y="210" text-anchor="middle" font-size="22">${s.comida.e}</text>` : ''}
-      <path d="M100,236 C130,262 160,236 190,256 S240,278 260,256" fill="none" stroke="#d6336c" stroke-width="22" stroke-linecap="round"/>
-      <path d="M100,236 C130,262 160,236 190,256 S240,278 260,256" fill="none" stroke="#ff8fab" stroke-width="14" stroke-linecap="round"/>
-      <text x="64" y="146" text-anchor="middle" class="bm-rotulo">ESTÓMAGO</text><text x="222" y="290" text-anchor="middle" class="bm-rotulo">INTESTINO</text></g>`;
-    // Vaso sanguíneo con glóbulos rojos.
-    svg += `<rect x="10" y="118" width="740" height="52" rx="26" fill="#8f1d45"/><rect x="10" y="124" width="740" height="40" rx="20" fill="#b3264f"/>
-      <rect x="30" y="128" width="700" height="4" rx="2" fill="#ff8fab" opacity="0.3"/>
-      <text x="744" y="112" text-anchor="end" class="bm-rotulo">SANGRE</text>`;
-    svg += flujo(9, 12, (p, k) => `<g transform="translate(${(15 + p * 730).toFixed(1)} ${134 + ((k * 23) % 22)}) rotate(${(k * 40) % 180})"><ellipse rx="8" ry="5" fill="#ff6b6b" opacity="0.85"/><ellipse rx="3.6" ry="2" fill="#c92a2a" opacity="0.85"/></g>`);
-    const nSangre = Math.max(3, Math.min(30, Math.round((G - 30) / 8)));
-    svg += flujo(nSangre, 9, (p, k) => glucosa(15 + p * 730, 132 + ((k * 37) % 26)));
-    // Páncreas: células β (insulina) y α (glucagón).
-    svg += `<g transform="translate(330 58)">
-      ${Arte.dosTonos('<path d="M-74,6 C-74,-20 -32,-26 0,-18 C30,-10 62,-26 80,-10 C94,4 72,24 42,20 C10,16 -22,28 -52,24 C-68,22 -74,14 -74,6 Z" fill="FILL"/>', '#ffd166', '#f0a830', { y: 6 })}
-      ${Arte.ojo(-26, 0, 7)}${Arte.ojo(-2, -2, 7)}<path d="M-20,12 q8,${glu.tipo === 1 ? -4 : 5} 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <circle cx="40" cy="4" r="6" fill="${glu.tipo === 1 ? '#6b6f9e' : '#5cc8ff'}"/><text x="40" y="7.5" text-anchor="middle" class="bm-letra mini" fill="#15163d">β</text>
-      <circle cx="58" cy="-4" r="6" fill="#ff9f43"/><text x="58" y="-0.5" text-anchor="middle" class="bm-letra mini" fill="#15163d">α</text>
-      <text x="0" y="-34" text-anchor="middle" class="bm-rotulo">PÁNCREAS</text>
-      ${glu.tipo === 1 ? '<text x="40" y="36" text-anchor="middle" class="bm-letra chica" fill="#ff8787">células β destruidas</text>' : ''}</g>`;
-    // Hígado con reserva de glucógeno.
-    const nGluc = Math.round(s.glucogeno / 100 * 19);
-    const racimo = Array.from({ length: nGluc }, (_, k) => { const a = k * 2.4, r = 3.6 * Math.sqrt(k); return `<circle cx="${(r * Math.cos(a)).toFixed(1)}" cy="${(r * Math.sin(a)).toFixed(1)}" r="2.8"/>`; }).join('');
-    svg += `<g transform="translate(598 58)">
-      ${Arte.dosTonos('<path d="M-84,-8 C-72,-40 20,-44 72,-24 C98,-12 86,20 52,30 C12,42 -40,40 -68,24 C-86,14 -88,4 -84,-8 Z" fill="FILL"/>', '#d9644a', '#b04a36', { y: 8 })}
-      ${Arte.ojo(-40, -6, 7)}${Arte.ojo(-16, -8, 7)}<path d="M-34,8 q8,5 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <g transform="translate(36 -4)" fill="#ffe066">${racimo}</g>
-      <text x="36" y="30" text-anchor="middle" class="bm-letra chica" fill="#fff">glucógeno ${Math.round(s.glucogeno)} %</text>
-      <text x="0" y="-44" text-anchor="middle" class="bm-rotulo">HÍGADO</text></g>`;
-    // Células con transportadores que se abren con la insulina.
-    svg += `<g transform="translate(500 244) scale(${ejercicio ? (1 + 0.04 * Math.sin(seg * 10)).toFixed(3) : 1})">
-      ${[-62, 0, 62].map(dx => `<g transform="translate(${dx} 0)">${Arte.dosTonos('<ellipse rx="27" ry="21" fill="FILL"/>', '#7c86ff', '#5a63d8', { x: 8 })}
-        <rect x="${-5 - apertura * 5}" y="-24" width="4" height="9" rx="1.5" fill="${glu.tipo === 2 ? '#8a8fb8' : '#b197fc'}"/><rect x="${1 + apertura * 5}" y="-24" width="4" height="9" rx="1.5" fill="${glu.tipo === 2 ? '#8a8fb8' : '#b197fc'}"/>
-        <circle r="7" fill="#b197fc" opacity="0.7"/></g>`).join('')}
-      <text x="0" y="40" text-anchor="middle" class="bm-rotulo">CÉLULAS${ejercicio ? ' · EJERCICIO 🏃' : ''}${glu.tipo === 2 ? ' · RESISTENTES' : ''}</text></g>`;
-    // Riñón.
-    svg += `<g transform="translate(690 236)">${Arte.dosTonos('<path d="M-14,-22 C8,-30 26,-14 22,6 C18,26 -6,30 -16,18 C-6,8 -6,-4 -14,-22 Z" fill="FILL"/>', '#c2555a', '#9c3d45', { x: 8 })}
-      <text x="4" y="46" text-anchor="middle" class="bm-rotulo">RIÑÓN</text></g>`;
-    // Flujos de partículas.
-    if (s.Ra > 0.08) svg += flujo(Math.min(6, Math.ceil(s.Ra * 3)), 1.6, (p, k) => glucosa(170 + (k % 3) * 22, 250 - p * 90, 4.5));
+    let d = '';
+    // Glóbulos rojos: unos más atrás (chicos y translúcidos) y otros adelante.
+    d += flujo(10, 14, (p, k) => { const x = -10 + p * 780; return globulo(x, vasoY(x) - 12 + ((k * 29) % 24), k % 3 ? 7 : 9, (k * 47) % 180, k % 3 ? 0.55 : 0.95); });
+    // Glucosa en la sangre: más partículas cuanto mayor la glucemia.
+    const n = Math.max(3, Math.min(34, Math.round((G - 30) / 7)));
+    let brillan = flujo(n, 10, (p, k) => { const x = -10 + p * 780; return hexa(x, vasoY(x) - 13 + ((k * 37) % 26), 4.6); });
+    if (s.Ra > 0.08) brillan += flujo(Math.min(7, Math.ceil(s.Ra * 3)), 1.8, (p, k) => { const x = 150 + (k % 4) * 36; return hexa(x, 268 - p * (268 - vasoY(x)), 4.4); });
+    if (s.captacion > 0.3) brillan += flujo(Math.min(7, Math.ceil(s.captacion * 2.6)), 1.4, (p, k) => { const x = 434 + (k % 3) * 66; return hexa(x, vasoY(x) + 16 + p * 62, 4); });
+    if (s.X * s.G > 0.3) brillan += flujo(3, 1.8, p => hexa(640 - p * 16, vasoY(640) - 18 - p * 52, 4));
+    if (s.liberacion > 0.2) brillan += flujo(Math.min(5, Math.ceil(s.liberacion * 2)), 1.6, p => hexa(586 + p * 8, 96 + p * (vasoY(590) - 110), 4.4));
+    if (s.renal > 0.02) brillan += flujo(3, 1.4, p => hexa(700, vasoY(700) + 18 + p * 52, 4));
+    // Insulina (desde las células β) y glucagón (desde las α).
     const nIns = Math.min(7, Math.round(s.I / 1.2));
-    if (nIns > 0) svg += flujo(nIns, 3, p => p < 0.4 ? llave(370 + p * 60, 70 + p / 0.4 * 60) : llave(394 + (p - 0.4) / 0.6 * 106, 136 + (p - 0.4) / 0.6 * 80));
-    if (s.Gc > 0.15) svg += flujo(Math.min(5, Math.ceil(s.Gc * 2)), 2.2, p => gota(390 + p * 140, 60 - Math.sin(p * Math.PI) * 30));
-    if (s.captacion > 0.3) svg += flujo(Math.min(6, Math.ceil(s.captacion * 2.5)), 1.4, (p, k) => glucosa(438 + (k % 3) * 62, 172 + p * 50, 4));
-    if (s.X * s.G > 0.3) svg += flujo(3, 1.8, p => glucosa(620, 164 - p * 70, 4));
-    if (s.liberacion > 0.2) svg += flujo(Math.min(5, Math.ceil(s.liberacion * 2)), 1.6, p => glucosa(580, 94 + p * 42, 4.5));
-    if (s.renal > 0.02) svg += flujo(3, 1.4, p => glucosa(690, 172 + p * 50, 4));
-    // Nombre de cada proceso mientras ocurre.
-    svg += etiqueta(236, 212, 'absorción', s.Ra > 0.1)
-      + etiqueta(430, 104, 'insulina', s.I > 1.5)
-      + etiqueta(500, 200, 'captación', s.captacion > 0.3)
-      + etiqueta(668, 150, s.liberacion > 0.2 ? 'glucogenólisis' : 'glucogénesis', s.liberacion > 0.2 || s.X * s.G > 0.3)
-      + etiqueta(470, 32, 'glucagón', s.Gc > 0.15)
-      + etiqueta(690, 196, 'glucosuria', s.renal > 0.02);
-    // Marcador de glucemia.
-    svg += `<g transform="translate(18 14)"><rect width="176" height="82" rx="12" fill="#12143a" stroke="${estado[1]}" stroke-width="2"/>
-      <text x="14" y="22" class="bm-rotulo">GLUCEMIA</text>
-      <text x="14" y="57" class="bm-glu-num" fill="${estado[1]}">${Math.round(G)}</text><text x="${Math.round(G) >= 100 ? 92 : 74}" y="57" class="bm-letra" fill="#c9ccf5">mg/dl</text>
-      <text x="14" y="74" class="bm-letra chica" fill="${estado[1]}">${estado[0]}${glu.corriendo ? ` · minuto ${Math.floor(s.t)}` : ''}</text></g>`;
-    raiz.querySelector('#bm-cuerpo').innerHTML = svg;
+    if (nIns > 0) brillan += flujo(nIns, 3.2, p => p < 0.35 ? llave(356 + p * 40, 76 + p / 0.35 * (vasoY(370) - 80)) : p < 0.75 ? llave(370 + (p - 0.35) / 0.4 * 130, vasoY(370 + (p - 0.35) / 0.4 * 130) + 4) : llave(500 + (p - 0.75) * 40, vasoY(500) + 20 + (p - 0.75) / 0.25 * 44));
+    if (s.Gc > 0.15) brillan += flujo(Math.min(5, Math.ceil(s.Gc * 2)), 2.4, p => gota(372 + p * 170, 58 - Math.sin(p * Math.PI) * 34));
+    d += `<g filter="url(#bm-c-brillo)">${brillan}</g>`;
+    // Islotes del páncreas: brillan cuando secretan.
+    const bIns = Math.min(1, s.I / 6), bGlc = Math.min(1, s.Gc / 1.5);
+    d += `<g filter="url(#bm-c-brillo)">
+      ${[[354, 70], [370, 60]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${5 + bIns * 3}" fill="${glu.tipo === 1 ? '#6b6f9e' : '#7fd3ff'}" opacity="${0.55 + bIns * 0.45}"/>`).join('')}
+      <circle cx="388" cy="66" r="${5 + bGlc * 3}" fill="#ffa94d" opacity="${0.55 + bGlc * 0.45}"/></g>
+      <text x="354" y="73" text-anchor="middle" class="bm-letra mini" fill="#15163d">β</text><text x="370" y="63" text-anchor="middle" class="bm-letra mini" fill="#15163d">β</text><text x="388" y="69" text-anchor="middle" class="bm-letra mini" fill="#15163d">α</text>`;
+    // Glucógeno del hígado: gránulos en forma de roseta.
+    const nGluc = Math.round(s.glucogeno / 100 * 22);
+    d += `<g transform="translate(648 60)" filter="url(#bm-c-brillo)">${Array.from({ length: nGluc }, (_, k) => { const a = k * 2.4, r = 3.8 * Math.sqrt(k); return `<circle cx="${(r * Math.cos(a)).toFixed(1)}" cy="${(r * Math.sin(a) * 0.8).toFixed(1)}" r="2.7" fill="#ffe066"/>`; }).join('')}</g>
+      <text x="648" y="96" text-anchor="middle" class="bm-letra chica" fill="#fff">glucógeno ${Math.round(s.glucogeno)} %</text>`;
+    // Transportadores de glucosa en las células (se abren con la insulina).
+    d += [-66, 0, 66].map(dx => { const x = 500 + dx, c = glu.tipo === 2 ? '#9aa0c8' : '#d0bfff'; return `<rect x="${x - 6 - apertura * 5}" y="236" width="5" height="10" rx="2" fill="${c}"/><rect x="${x + 1 + apertura * 5}" y="236" width="5" height="10" rx="2" fill="${c}"/>`; }).join('');
+    if (ejercicio) d += flujo(3, 0.9, (p, k) => `<path d="M${440 + k * 66},${248 - p * 16} q-4,6 0,9 q4,-3 0,-9 Z" fill="#9ec5ff" opacity="${1 - p}"/>`);
+    // Alimento en el estómago mientras se digiere.
+    if (s.comida && glu.corriendo && s.Ra > 0.05 && s.comida.e) d += `<text x="48" y="${278 + Math.sin(seg * 3) * 2}" font-size="16" text-anchor="middle">${s.comida.e}</text>`;
+    svg.querySelector('#bm-c-din').innerHTML = d;
+    // Carteles de proceso y marcador de glucemia (arriba de la viñeta).
+    const etiqueta = (x, y, texto, activo) => activo ? `<g><rect x="${x - texto.length * 3.3 - 9}" y="${y - 11}" width="${texto.length * 6.6 + 18}" height="18" rx="9" fill="#12143a" stroke="#ffd166" stroke-width="1.3"/><text x="${x}" y="${y + 1.5}" text-anchor="middle" class="bm-proceso">${texto}</text></g>` : '';
+    const estado = G > 180 ? ['HIPERGLUCEMIA', '#ff6b6b'] : G < 70 ? ['HIPOGLUCEMIA', '#5cc8ff'] : G > 140 ? ['ELEVADA', '#ffa94d'] : ['NORMAL', '#2fd186'];
+    const lleno = Math.max(0, Math.min(1, (G - 40) / 260));
+    svg.querySelector('#bm-c-ui').innerHTML = etiqueta(232, 226, 'absorción', s.Ra > 0.1)
+      + etiqueta(436, 104, 'insulina', s.I > 1.5)
+      + etiqueta(560, 212, 'captación', s.captacion > 0.3)
+      + etiqueta(540, 118, s.liberacion > 0.2 ? 'glucogenólisis' : 'glucogénesis', s.liberacion > 0.2 || s.X * s.G > 0.3)
+      + etiqueta(470, 24, 'glucagón', s.Gc > 0.15)
+      + etiqueta(704, 222, 'glucosuria', s.renal > 0.02)
+      + `<g transform="translate(16 14)"><rect width="182" height="86" rx="14" fill="#12143a" opacity="0.92"/><rect width="182" height="86" rx="14" fill="none" stroke="${estado[1]}" stroke-width="2"/>
+        <text x="14" y="22" class="bm-rotulo">GLUCEMIA</text>
+        <text x="14" y="58" class="bm-glu-num" fill="${estado[1]}">${Math.round(G)}</text><text x="${Math.round(G) >= 100 ? 92 : 74}" y="58" class="bm-letra" fill="#c9ccf5">mg/dl</text>
+        <rect x="14" y="68" width="154" height="6" rx="3" fill="#23266b"/><rect x="14" y="68" width="${(154 * lleno).toFixed(1)}" height="6" rx="3" fill="${estado[1]}"/>
+        <text x="168" y="22" text-anchor="end" class="bm-letra chica" fill="${estado[1]}">${estado[0]}</text>
+        ${glu.corriendo ? `<text x="168" y="84" text-anchor="end" class="bm-letra mini" fill="#9aa3ff">minuto ${Math.floor(s.t)}</text>` : ''}</g>`;
   }
 
   // =====================================================================

@@ -887,6 +887,8 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .bm-gg-reftxt { font-size: 9.5px; fill: #9aa3ff; }
 .bm-gg-etiq { font-size: 11px; font-weight: 700; fill: #e9ebff; paint-order: stroke; stroke: #0e1033; stroke-width: 3px; }
 .bm-gg-vacio { font-size: 12px; fill: #9aa3ff; }
+.bm-gg-zona { font-size: 8.5px; font-weight: 800; letter-spacing: 0.14em; fill: #c9ccf5; opacity: 0.5; }
+.bm-gg-area { font-size: 9.5px; font-weight: 700; fill: #e9ebff; opacity: 0.75; }
 .bm-gg-cruz { stroke: #e9ebff; stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.7; }
 .bm-gg-tip { fill: #1f2256; stroke: #3a3e85; }
 .bm-gg-tiptxt { font-size: 11px; fill: #e9ebff; }
