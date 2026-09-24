@@ -1268,23 +1268,25 @@ const Biomoleculas = (function () {
   // GLUCEMIA: insulina, glucagón, índice glucémico y diabetes
   // =====================================================================
 
-  // IG de referencia (tablas internacionales, valores aproximados). La fibra enlentece la absorción.
+  // IG de referencia: tablas internacionales (Atkinson y col., 2008 y 2021). La fibra enlentece la absorción.
   const COMIDAS = [
-    { id: 'glucosa', e: '🧪', n: 'Solución de glucosa', ig: 100, fibra: 0, x: 'Es glucosa pura: se absorbe sin necesidad de digerirla. Es la referencia del IG (100).' },
-    { id: 'blanco', e: '🍞', n: 'Pan blanco', ig: 75, fibra: 0, x: 'La harina refinada perdió el salvado: su almidón se digiere rápido.' },
-    { id: 'integral', e: '🥖', n: 'Pan integral', ig: 50, fibra: 1, x: 'La fibra del salvado enlentece la digestión del almidón.' },
-    { id: 'gaseosa', e: '🥤', n: 'Gaseosa', ig: 63, fibra: 0, x: 'Tiene mucho azúcar libre (sacarosa o jarabe de maíz) y nada de fibra.' },
-    { id: 'manzana', e: '🍎', n: 'Manzana entera', ig: 36, fibra: 1, x: 'La fibra (pectina y celulosa) y la fructosa hacen que la glucemia suba poco y despacio.' },
-    { id: 'jugo', e: '🧃', n: 'Jugo de manzana', ig: 41, fibra: 0, x: 'Al exprimirla se pierde casi toda la fibra: el azúcar pasa más rápido a la sangre que con la fruta entera.' },
-    { id: 'madura', e: '🍌', n: 'Banana madura', ig: 62, fibra: 0.4, x: 'Al madurar, el almidón se hidroliza a azúcares simples: es más dulce y sube más la glucemia.' },
-    { id: 'verde', e: '🟢', n: 'Banana verde', ig: 42, fibra: 0.8, x: 'Todavía tiene mucho almidón resistente, que se digiere lentamente.' },
+    { id: 'glucosa', e: '🧪', n: 'Solución de glucosa', corto: 'Glucosa', ig: 100, fibra: 0, x: 'Es glucosa pura: no necesita digerirse y pasa directo a la sangre. Por eso es la <b>referencia</b> del índice glucémico (IG = 100).' },
+    { id: 'blanco', e: '🍞', n: 'Pan blanco', corto: 'Pan blanco', ig: 75, fibra: 0, x: 'La harina refinada perdió el salvado y el germen: su almidón se digiere muy rápido y se comporta casi como glucosa.' },
+    { id: 'granos', e: '🥖', n: 'Pan de granos enteros', corto: 'Pan de granos', ig: 53, fibra: 0.6, x: 'Los granos enteros y la fibra forman una barrera física que enlentece la digestión del almidón. Ojo: el pan hecho con harina integral fina tiene un IG parecido al blanco (≈ 74).' },
+    { id: 'gaseosa', e: '🥤', n: 'Gaseosa', corto: 'Gaseosa', ig: 59, fibra: 0, x: 'Tiene mucho <b>azúcar libre</b> (sacarosa o jarabe de maíz) y nada de fibra. La mitad de la sacarosa es fructosa, que casi no sube la glucemia: por eso su IG no es tan alto como uno esperaría.' },
+    { id: 'manzana', e: '🍎', n: 'Manzana entera', corto: 'Manzana', ig: 36, fibra: 1, x: 'Su azúcar es <b>intrínseco</b> (está dentro de las células de la fruta), tiene fibra (pectina y celulosa) y mucha fructosa: la glucemia sube poco y despacio.' },
+    { id: 'jugo', e: '🧃', n: 'Jugo de manzana', corto: 'Jugo', ig: 41, fibra: 0, x: 'Al exprimir la fruta se pierde casi toda la fibra y el azúcar pasa a ser <b>libre</b>: sube más rápido que con la manzana entera.' },
+    { id: 'madura', e: '🍌', n: 'Banana madura', corto: 'Banana madura', ig: 51, fibra: 0.3, x: 'Al madurar, las enzimas de la fruta hidrolizan el almidón en azúcares simples: es más dulce y sube más la glucemia.' },
+    { id: 'verde', e: '🟢', n: 'Banana poco madura', corto: 'Banana verde', ig: 42, fibra: 0.8, x: 'Todavía conserva <b>almidón resistente</b>, que nuestras enzimas digieren lentamente.' },
   ];
   const PERSONAS = ['Sin diabetes', 'Diabetes tipo 1', 'Diabetes tipo 2'];
-  const COLORES_CURVA = ['#ffd166', '#5cc8ff', '#ff8fb1', '#2fd186'];
+  // Paleta categórica validada para fondo oscuro (3 series como máximo cuando las líneas se cruzan).
+  const COLORES_CURVA = ['#3987e5', '#d95926', '#199e70'];
   const MIN_POR_SEG = 8;
+  const clasificarIG = ig => ig >= 70 ? 'alto' : ig > 55 ? 'medio' : 'bajo';
 
   function nuevaSimulacion(comida) {
-    const s = { comida, t: 0, G: 90, I: 0, X: 0, Gc: 0, iny: 0, ejHasta: -1, glucogeno: 55, pts: [90], Ra: 0, captacion: 0, liberacion: 0 };
+    const s = { comida, t: 0, G: 90, I: 0, X: 0, Gc: 0, iny: 0, ejHasta: -1, glucogeno: 55, pts: [90], ins: [0], Ra: 0, captacion: 0, liberacion: 0, renal: 0, max: 90, eventos: new Set() };
     if (comida) {
       s.tp = 20 + (100 - comida.ig) * 0.4 + comida.fibra * 10;
       s.amp = (80 + 130 * comida.ig / 100) / (s.tp * Math.E);
@@ -1292,9 +1294,9 @@ const Biomoleculas = (function () {
     return s;
   }
 
-  // Modelo simplificado: absorción intestinal, secreción de insulina y glucagón, captación por las células.
-  function pasoGlucemia(s, dt) {
-    const tipo = glu.tipo;
+  // Modelo compartimental simplificado (inspirado en el "modelo mínimo" de Bergman): absorción intestinal,
+  // secreción de insulina y glucagón, captación de glucosa por las células, glucógeno del hígado y pérdida renal.
+  function pasoGlucemia(s, dt, tipo) {
     s.Ra = s.comida && s.t > 0 ? s.amp * (s.t / s.tp) * Math.exp(1 - s.t / s.tp) : 0;
     const secrecion = tipo === 1 ? 0 : 0.035 * Math.max(0, s.G - 92) * (tipo === 2 ? 0.8 : 1);
     s.I += (secrecion + s.iny * 0.08 - 0.08 * s.I) * dt;
@@ -1305,39 +1307,119 @@ const Biomoleculas = (function () {
     s.liberacion = s.glucogeno > 0 ? 1.5 * s.Gc : 0;
     const ejercicio = s.t < s.ejHasta ? 0.9 : 0;
     s.captacion = s.X * s.G + ejercicio;
-    const renal = s.G > 180 ? 0.004 * (s.G - 180) : 0;
-    s.G += (s.Ra - 0.006 * (s.G - 90) - s.X * s.G + s.liberacion + (tipo ? 0 : 0.002 * (90 - s.G)) - renal - ejercicio) * dt;
+    s.renal = s.G > 180 ? 0.004 * (s.G - 180) : 0;
+    s.G += (s.Ra - 0.006 * (s.G - 90) - s.X * s.G + s.liberacion + (tipo ? 0 : 0.002 * (90 - s.G)) - s.renal - ejercicio) * dt;
     s.glucogeno = Math.max(0, Math.min(100, s.glucogeno + (s.X * s.G * 0.3 - s.liberacion * 0.8) * dt * 0.08));
     s.t += dt;
+    s.max = Math.max(s.max, s.G);
+  }
+
+  // Área incremental bajo la curva en las primeras 2 horas: así se mide el IG en el laboratorio.
+  const areaBajoCurva = pts => { let a = 0; for (let i = 1; i <= 120; i++) a += Math.max(0, (pts[i] + pts[i - 1]) / 2 - pts[0]); return a; };
+  const referencias = {};
+  function areaGlucosa(tipo) {
+    if (referencias[tipo] === undefined) {
+      const s = nuevaSimulacion(COMIDAS[0]);
+      while (s.t < 121) { pasoGlucemia(s, 0.5, tipo); if (Number.isInteger(s.t)) s.pts.push(s.G); }
+      referencias[tipo] = areaBajoCurva(s.pts);
+    }
+    return referencias[tipo];
   }
 
   let glu = null, animGlu = null;
 
+  const ICONO = {
+    glucosa: '<svg viewBox="-8 -8 16 16"><polygon points="0,-6 5.2,-3 5.2,3 0,6 -5.2,3 -5.2,-3" fill="#ffd166"/></svg>',
+    insulina: '<svg viewBox="-8 -8 22 16"><circle r="4.5" fill="none" stroke="#5cc8ff" stroke-width="2.4"/><path d="M4,0 h9 M9,0 v4 M12,0 v3" stroke="#5cc8ff" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    glucagon: '<svg viewBox="-8 -8 16 16"><path d="M0,-6 C5,0 4,5 0,5 C-4,5 -5,0 0,-6 Z" fill="#ff9f43"/></svg>',
+    globulo: '<svg viewBox="-9 -8 18 16"><ellipse rx="7.5" ry="5" fill="#ff6b6b"/><ellipse rx="3.5" ry="2" fill="#c92a2a"/></svg>',
+    glucogeno: '<svg viewBox="-9 -9 18 18"><g fill="#ffe066">' + [[0, 0], [-5, -3], [5, -3], [0, -6], [-5, 3], [5, 3], [0, 6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6"/>`).join('') + '</g></svg>',
+  };
+
   function vistaGlucemia() {
-    glu = { tipo: 0, curvas: [], sim: nuevaSimulacion(null), corriendo: false, rapido: false, ultimo: 0, hover: null };
+    glu = { tipo: 0, curvas: [], sim: nuevaSimulacion(null), corriendo: false, rapido: false, ultimo: 0, hover: null, area: true, diario: [] };
     raiz.querySelector('#bm-vista').innerHTML = `
-      <div class="bm-grid">
+      <div class="bm-grid bm-glu">
         <div class="panel bm-mesa">
-          <svg id="bm-cuerpo" viewBox="0 0 760 260" role="img" aria-label="Regulación de la glucosa en el cuerpo"></svg>
-          <svg id="bm-glu-graf" viewBox="0 0 760 250" role="img" aria-label="Gráfico de glucemia en función del tiempo"></svg>
+          <svg id="bm-cuerpo" viewBox="0 0 760 300" role="img" aria-label="Regulación de la glucosa en el cuerpo"></svg>
+          <div class="bm-refs" aria-label="Referencias de la escena">
+            <span>${ICONO.glucosa}Glucosa</span><span>${ICONO.globulo}Glóbulo rojo</span><span>${ICONO.insulina}Insulina</span>
+            <span>${ICONO.glucagon}Glucagón</span><span>${ICONO.glucogeno}Glucógeno</span>
+          </div>
           <div class="bm-acciones">
             <button class="btn chico" id="bm-glu-insulina" hidden>💉 Aplicar insulina</button>
             <button class="btn chico" id="bm-glu-ej">🏃 Hacer ejercicio (30 min)</button>
             <button class="btn chico" id="bm-glu-vel">⏩ Más rápido</button>
-            <button class="btn chico" id="bm-glu-borrar">🗑 Borrar gráfico</button>
+          </div>
+          <div class="bm-graf-cab">
+            <h3>Glucemia después de comer</h3>
+            <div class="bm-glu-leyenda" id="bm-glu-leyenda"></div>
+          </div>
+          <svg id="bm-glu-graf" viewBox="0 0 760 270" role="img" aria-label="Gráfico de glucemia en función del tiempo"></svg>
+          <h3 class="bm-graf-sub">Insulina en sangre <small>(cantidad relativa)</small></h3>
+          <svg id="bm-ins-graf" viewBox="0 0 760 110" role="img" aria-label="Gráfico de insulina en función del tiempo"></svg>
+          <div class="bm-acciones">
+            <label class="bm-check claro"><input type="checkbox" id="bm-glu-area" checked> Sombrear el área bajo la curva (2 h)</label>
+            <button class="btn chico" id="bm-glu-borrar">🗑 Borrar curvas</button>
           </div>
         </div>
         <aside class="panel bm-info">
           <h2>📈 Glucemia</h2>
-          <p>La <b>glucemia</b> es la concentración de glucosa en la sangre. En ayunas lo normal es entre <b>70 y 100 mg/dl</b>. Elige una persona y un alimento, y observa cómo el cuerpo la regula.</p>
+          <p>La <b>glucemia</b> es la concentración de glucosa en la sangre. En ayunas lo normal es entre <b>70 y 99 mg/dl</b>. Elige una persona y un alimento, y observa cómo el cuerpo la regula.</p>
           <h3>1. La persona</h3>
           <div class="segmentado chico" id="bm-glu-persona">${PERSONAS.map((p, i) => `<button data-p="${i}">${p}</button>`).join('')}</div>
-          <h3>2. Qué come (50 g de carbohidratos)</h3>
+          <h3>2. Qué come <small class="bm-suave">(porción con 50 g de carbohidratos)</small></h3>
           <div class="bm-comidas" id="bm-comidas">${COMIDAS.map(c => `<button data-c="${c.id}"><span>${c.e}</span>${c.n}</button>`).join('')}</div>
-          <h3>📋 Resultados</h3>
-          <div class="tabla-scroll"><table class="bm-tabla" id="bm-glu-tabla"></table></div>
-          <p class="bm-aviso" id="bm-aviso"></p>
-          <p class="bm-ayuda">Modelo simplificado con fines didácticos: la respuesta real cambia de persona a persona.</p>
+          <div id="bm-glu-resumen"></div>
+          <h3>🔎 ¿Qué está pasando?</h3>
+          <ol class="bm-diario" id="bm-glu-diario"></ol>
+          <details class="bm-concepto"><summary>¿Qué es el índice glucémico y cómo se mide?</summary>
+            <p>El <b>IG</b> compara cuánto sube la glucemia un alimento con cuánto la sube la glucosa pura. Se da a 10 personas sanas una porción con <b>50 g de carbohidratos disponibles</b>, se mide la glucemia durante <b>2 horas</b> y se calcula el <b>área bajo la curva</b> (lo sombreado en el gráfico):</p>
+            <p class="bm-formula">IG = área del alimento ÷ área de la glucosa × 100</p>
+            <p>IG <b>bajo</b>: 55 o menos · <b>medio</b>: 56 a 69 · <b>alto</b>: 70 o más. Bajan el IG la fibra, las grasas, las proteínas, la acidez y la cocción breve (fideos al dente); lo suben el refinado, la maduración y la cocción prolongada.</p>
+          </details>
+          <details class="bm-concepto"><summary>Valores de referencia de la glucemia</summary>
+            <table class="bm-tabla-concepto"><thead><tr><th></th><th>Normal</th><th>Prediabetes</th><th>Diabetes</th></tr></thead><tbody>
+              <tr><td>En ayunas (8 h)</td><td>70–99</td><td>100–125</td><td>126 o más</td></tr>
+              <tr><td>2 h después de 75 g de glucosa</td><td>menos de 140</td><td>140–199</td><td>200 o más</td></tr></tbody></table>
+            <p>Valores en mg/dl. Por debajo de <b>70 mg/dl</b> hay <b>hipoglucemia</b> (temblores, sudor, mareo, confusión). Por encima de ~<b>180 mg/dl</b> los riñones ya no reabsorben toda la glucosa y aparece en la orina (<b>glucosuria</b>).</p>
+          </details>
+          <details class="bm-concepto"><summary>Insulina y glucagón</summary>
+            <table class="bm-tabla-concepto"><thead><tr><th></th><th>Insulina</th><th>Glucagón</th></tr></thead><tbody>
+              <tr><td>Dónde se fabrica</td><td>Células β de los islotes del páncreas</td><td>Células α de los islotes del páncreas</td></tr>
+              <tr><td>Cuándo se libera</td><td>Cuando la glucemia sube (después de comer)</td><td>Cuando la glucemia baja (ayuno, ejercicio)</td></tr>
+              <tr><td>En las células</td><td>Abre la entrada de glucosa (como una llave)</td><td>—</td></tr>
+              <tr><td>En el hígado</td><td>Guarda glucosa como glucógeno</td><td>Rompe glucógeno y libera glucosa</td></tr>
+              <tr><td>Resultado</td><td>Baja la glucemia</td><td>Sube la glucemia</td></tr></tbody></table>
+            <p>Son hormonas <b>proteicas</b> con efectos opuestos (<b>antagónicas</b>): juntas mantienen la glucemia estable. Esto es un ejemplo de <b>homeostasis</b>.</p>
+          </details>
+          <details class="bm-concepto"><summary>Tres palabras parecidas</summary>
+            <ul>
+              <li><b>Glucogénesis</b>: glucosa → glucógeno (se guarda la glucosa; la estimula la insulina).</li>
+              <li><b>Glucogenólisis</b>: glucógeno → glucosa (se usa la reserva; la estimula el glucagón).</li>
+              <li><b>Gluconeogénesis</b>: fabricación de glucosa <i>nueva</i> a partir de aminoácidos, lactato o glicerol, en ayunos largos.</li>
+            </ul>
+            <p class="bm-suave">⚠️ Algunos textos llaman gluconeogénesis al almacenamiento de glucosa como glucógeno: el término correcto es <b>glucogénesis</b>.</p>
+          </details>
+          <details class="bm-concepto"><summary>Tipos de diabetes</summary>
+            <table class="bm-tabla-concepto"><thead><tr><th></th><th>Tipo 1</th><th>Tipo 2</th><th>Gestacional</th></tr></thead><tbody>
+              <tr><td>Qué pasa</td><td>El sistema inmune destruye las células β: no hay insulina</td><td>Resistencia a la insulina y, con el tiempo, menos producción</td><td>Resistencia a la insulina por las hormonas del embarazo</td></tr>
+              <tr><td>Aparece</td><td>Generalmente en niños y jóvenes</td><td>Generalmente en adultos (cada vez más en jóvenes)</td><td>Durante el embarazo</td></tr>
+              <tr><td>Factores</td><td>Autoinmune; no se puede prevenir</td><td>Sedentarismo, sobrepeso, alimentación, herencia</td><td>Sobrepeso, antecedentes familiares</td></tr>
+              <tr><td>Tratamiento</td><td>Insulina de por vida</td><td>Alimentación, actividad física y medicamentos (a veces insulina)</td><td>Alimentación y control; suele desaparecer tras el parto</td></tr>
+              <tr><td>Frecuencia</td><td>≈ 5–10 % de los casos</td><td>≈ 90 % de los casos</td><td>Afecta a una parte de los embarazos</td></tr></tbody></table>
+          </details>
+          <details class="bm-concepto"><summary>📚 Fuentes</summary>
+            <ul class="bm-fuentes">
+              <li>Atkinson FS, Brand-Miller JC, Foster-Powell K, Buyken AE, Goletzke J. <i>International tables of glycemic index and glycemic load values 2021: a systematic review</i>. American Journal of Clinical Nutrition, 2021; 114(5): 1625-1632.</li>
+              <li>Atkinson FS, Foster-Powell K, Brand-Miller JC. <i>International tables of glycemic index and glycemic load values: 2008</i>. Diabetes Care, 2008; 31(12): 2281-2283.</li>
+              <li>American Diabetes Association. <i>Diagnosis and Classification of Diabetes: Standards of Care in Diabetes—2025</i>. Diabetes Care, 2025; 48 (Suppl. 1).</li>
+              <li>Organización Mundial de la Salud. <i>Diabetes</i>. Nota descriptiva.</li>
+              <li>Ministerio de Salud de la Nación. <i>Guías Alimentarias para la Población Argentina</i>, 2016.</li>
+              <li>Bergman RN, Ider YZ, Bowden CR, Cobelli C. <i>Quantitative estimation of insulin sensitivity</i>. American Journal of Physiology, 1979; 236(6): E667-E677 (modelo en el que se inspira el simulador).</li>
+            </ul>
+            <p class="bm-suave">El simulador usa un modelo simplificado con fines didácticos: las curvas reales cambian de persona a persona y según la porción, la cocción y lo que se come junto.</p>
+          </details>
         </aside>
       </div>`;
     const q = s => raiz.querySelector(s);
@@ -1345,37 +1427,40 @@ const Biomoleculas = (function () {
       if (glu.corriendo) return;
       glu.tipo = +b.dataset.p;
       pintarControlesGlu();
-      avisar(glu.tipo === 0
-        ? 'Persona <b>sin diabetes</b>: el páncreas libera insulina cuando sube la glucemia y glucagón cuando baja.'
+      anotar('👤', glu.tipo === 0
+        ? '<b>Persona sin diabetes</b>: el páncreas libera insulina cuando sube la glucemia y glucagón cuando baja.'
         : glu.tipo === 1
-          ? '<b>Diabetes tipo 1</b>: el sistema inmune destruyó las células del páncreas que fabrican insulina. Sin insulina la glucosa no puede entrar a las células. Se trata con <b>inyecciones de insulina</b>.'
-          : '<b>Diabetes tipo 2</b>: el páncreas fabrica insulina, pero las células casi no le responden (<b>resistencia a la insulina</b>). Se asocia al sedentarismo y a la alimentación; se trata con dieta, ejercicio y medicamentos.');
+          ? '<b>Diabetes tipo 1</b>: el sistema inmune destruyó las células β del páncreas y no hay insulina. Sin ella la glucosa no puede entrar a las células. Se trata con <b>insulina inyectable</b>.'
+          : '<b>Diabetes tipo 2</b>: el páncreas fabrica insulina, pero las células casi no le responden (<b>resistencia a la insulina</b>).', true);
     }));
     raiz.querySelectorAll('#bm-comidas button').forEach(b => b.addEventListener('click', () => comer(COMIDAS.find(c => c.id === b.dataset.c))));
     q('#bm-glu-insulina').addEventListener('click', () => {
       glu.sim.iny += 16;
-      avisar('💉 Se inyectó <b>insulina</b>: actúa como una llave que abre las células para que entre la glucosa.');
+      glu.sim.inyectada = true;
+      anotar('💉', 'Se inyectó <b>insulina</b>: en unos minutos las células empiezan a captar glucosa.');
     });
     q('#bm-glu-ej').addEventListener('click', () => {
-      if (!glu.corriendo) { glu.sim = nuevaSimulacion(null); glu.sim.soloEjercicio = true; glu.corriendo = true; pintarControlesGlu(); }
+      if (!glu.corriendo) { glu.sim = nuevaSimulacion(null); glu.sim.soloEjercicio = true; glu.corriendo = true; glu.diario = []; pintarControlesGlu(); }
       glu.sim.ejHasta = glu.sim.t + 30;
-      avisar('🏃 Durante el ejercicio los músculos consumen mucha glucosa, incluso con poca insulina. Si la glucemia baja, el páncreas libera <b>glucagón</b> y el hígado rompe glucógeno (<b>glucogenólisis</b>).');
+      anotar('🏃', 'Empieza el <b>ejercicio</b>: los músculos que se contraen captan glucosa aunque haya poca insulina.');
     });
     q('#bm-glu-vel').addEventListener('click', () => { glu.rapido = !glu.rapido; q('#bm-glu-vel').textContent = glu.rapido ? '▶ Velocidad normal' : '⏩ Más rápido'; });
-    q('#bm-glu-borrar').addEventListener('click', () => { glu.curvas = []; pintarTablaGlu(); dibujarGraficoGlu(); });
-    const graf = q('#bm-glu-graf');
-    const mover = ev => {
-      const r = graf.getBoundingClientRect();
-      const x = (ev.clientX - r.left) / r.width * 760;
-      glu.hover = x >= 50 && x <= 740 ? Math.round((x - 50) / 690 * 180) : null;
-      dibujarGraficoGlu();
-    };
-    graf.addEventListener('pointermove', mover);
-    graf.addEventListener('pointerdown', mover);
-    graf.addEventListener('pointerleave', () => { glu.hover = null; dibujarGraficoGlu(); });
+    q('#bm-glu-borrar').addEventListener('click', () => { glu.curvas = []; q('#bm-glu-resumen').innerHTML = ''; dibujarGraficosGlu(); });
+    q('#bm-glu-area').addEventListener('change', e => { glu.area = e.target.checked; dibujarGraficosGlu(); });
+    ['#bm-glu-graf', '#bm-ins-graf'].forEach(sel => {
+      const graf = q(sel);
+      const mover = ev => {
+        const r = graf.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width * (glu.W || 760);
+        glu.hover = x >= GX0 && x <= GX1 ? Math.round((x - GX0) / (GX1 - GX0) * 180) : null;
+        dibujarGraficosGlu();
+      };
+      graf.addEventListener('pointermove', mover);
+      graf.addEventListener('pointerdown', mover);
+      graf.addEventListener('pointerleave', () => { glu.hover = null; dibujarGraficosGlu(); });
+    });
     pintarControlesGlu();
-    pintarTablaGlu();
-    avisar('👆 Elige un alimento. Luego compara varios: por ejemplo <b>glucosa, pan blanco y pan integral</b>, como en el gráfico del trabajo práctico.');
+    anotar('👆', 'Elige un alimento. Después compara varios: por ejemplo <b>glucosa, pan blanco y pan de granos enteros</b>, como en el gráfico del trabajo práctico.', true);
     glu.ultimo = performance.now();
     animGlu = requestAnimationFrame(bucleGlucemia);
   }
@@ -1386,12 +1471,23 @@ const Biomoleculas = (function () {
     raiz.querySelector('#bm-glu-insulina').hidden = !(glu.tipo === 1 && glu.corriendo);
   }
 
+  // Diario de la simulación: cada evento queda anotado con el minuto en que ocurrió.
+  function anotar(icono, html, reiniciar) {
+    if (reiniciar) glu.diario = [];
+    const min = glu.corriendo ? Math.floor(glu.sim.t) : null;
+    glu.diario.push({ icono, html, min });
+    raiz.querySelector('#bm-glu-diario').innerHTML = glu.diario.map((d, i) => `<li class="${i === glu.diario.length - 1 ? 'nuevo' : ''}">
+      <span class="bm-diario-min">${d.min === null ? '' : `min ${d.min}`}</span><span>${d.icono}</span><p>${d.html}</p></li>`).join('');
+  }
+
   function comer(c) {
     if (glu.corriendo) return;
     glu.sim = nuevaSimulacion(c);
     glu.corriendo = true;
     pintarControlesGlu();
-    avisar(`${c.e} Comió <b>${c.n.toLowerCase()}</b>. En la boca y el intestino, las enzimas (amilasas, maltasa, sacarasa, lactasa) hidrolizan los carbohidratos hasta <b>monosacáridos</b>, que pasan a la sangre.`);
+    raiz.querySelector('#bm-glu-resumen').innerHTML = '';
+    glu.diario = [];
+    anotar(c.e, `Come <b>${c.n.toLowerCase()}</b>. En la boca y el intestino, las enzimas (amilasa, maltasa, sacarasa, lactasa) hidrolizan los carbohidratos hasta <b>monosacáridos</b>.`);
   }
 
   function bucleGlucemia(t) {
@@ -1403,145 +1499,248 @@ const Biomoleculas = (function () {
       let min = dtReal * MIN_POR_SEG * (glu.rapido ? 3 : 1);
       while (min > 0 && s.t < 180) {
         const dt = Math.min(0.5, min);
-        pasoGlucemia(s, dt);
+        pasoGlucemia(s, dt, glu.tipo);
         min -= dt;
-        const m = Math.floor(s.t);
-        while (s.pts.length <= m && s.pts.length <= 180) s.pts.push(s.G);
+        while (s.pts.length <= Math.floor(s.t) && s.pts.length <= 180) { s.pts.push(s.G); s.ins.push(s.I); }
+        eventosGlucemia(s);
       }
-      comentarGlucemia(s);
       if (s.t >= 180) terminarSimulacion();
     }
     dibujarCuerpo(t / 1000);
-    dibujarGraficoGlu();
+    dibujarGraficosGlu();
     animGlu = requestAnimationFrame(bucleGlucemia);
   }
 
-  function comentarGlucemia(s) {
-    const fase = s.G > 180 ? 'hiper' : s.G < 70 ? 'hipo' : s.liberacion > 0.3 ? 'glucagon' : s.X * s.G > 0.6 ? 'insulina' : null;
-    if (!fase || fase === s.fase) return;
-    s.fase = fase;
-    avisar({
-      hiper: `⚠️ <b>Hiperglucemia</b> (más de 180 mg/dl). ${glu.tipo === 1 ? 'Sin insulina, la glucosa se acumula en la sangre. Prueba <b>💉 aplicar insulina</b>.' : glu.tipo === 2 ? 'Hay insulina, pero las células casi no le responden.' : ''} Por encima de ~180 mg/dl los riñones empiezan a eliminar glucosa por la orina.`,
-      hipo: '⚠️ <b>Hipoglucemia</b> (menos de 70 mg/dl): puede causar mareos, temblores y confusión. El <b>glucagón</b> hace que el hígado libere glucosa.',
-      glucagon: '🟠 La glucemia bajó: el páncreas libera <b>glucagón</b> y el hígado degrada glucógeno (glucogenólisis) para devolver glucosa a la sangre.',
-      insulina: '🔑 El páncreas liberó <b>insulina</b>: las células captan glucosa y el hígado la guarda como <b>glucógeno</b> (glucogénesis). La glucemia empieza a bajar.',
-    }[fase]);
+  // Cada evento se anota una sola vez por simulación.
+  function eventosGlucemia(s) {
+    const una = (clave, cond, icono, html) => { if (cond && !s.eventos.has(clave)) { s.eventos.add(clave); anotar(icono, html); } };
+    const t1 = glu.tipo === 1, t2 = glu.tipo === 2;
+    una('absorcion', s.Ra > 0.4, '⬢', 'Los monosacáridos atraviesan la pared del intestino y pasan a la sangre (<b>absorción</b>). La glucemia empieza a subir.');
+    una('insulina', s.I > 2, '🔑', t2 ? 'El páncreas libera <b>insulina</b>, pero las células casi no responden: tienen <b>resistencia a la insulina</b>.' : 'Las células β del páncreas detectan la subida y liberan <b>insulina</b>.');
+    una('sin-insulina', t1 && s.G > 130, '🚫', 'La glucemia sube pero <b>no hay insulina</b>: la glucosa se acumula en la sangre. Prueba con 💉 <b>Aplicar insulina</b>.');
+    una('captacion', s.X * s.G > 0.5, '🚪', 'Con la insulina, las células abren sus transportadores (GLUT4) y <b>captan glucosa</b>. El hígado la guarda como <b>glucógeno</b> (glucogénesis).');
+    una('pico', s.comida && s.t > 5 && s.G < s.max - 3, '⛰️', `Se alcanzó el <b>pico</b>: ${Math.round(s.max)} mg/dl. Desde aquí la glucosa sale de la sangre más rápido de lo que entra.`);
+    una('hiper', s.G > 180, '⚠️', '<b>Hiperglucemia</b>: más de 180 mg/dl.');
+    una('renal', s.renal > 0.05, '🫘', 'Los riñones no alcanzan a reabsorber toda la glucosa y parte se elimina por la orina (<b>glucosuria</b>).');
+    una('glucagon', s.liberacion > 0.3, '🟠', 'La glucemia bajó del valor normal: las células α liberan <b>glucagón</b> y el hígado rompe glucógeno (<b>glucogenólisis</b>) para devolver glucosa a la sangre.');
+    una('hipo', s.G < 70, '⚠️', '<b>Hipoglucemia</b>: menos de 70 mg/dl.');
+    una('vuelta', s.comida && s.eventos.has('pico') && s.G < 110, '✅', 'La glucemia volvió cerca del valor de ayunas: la <b>homeostasis</b> funcionó.');
   }
 
   function terminarSimulacion() {
     const s = glu.sim;
     glu.corriendo = false;
-    if (!s.comida && s.soloEjercicio) s.comida = { e: '🏃', n: 'Ejercicio en ayunas', ig: '—', x: 'Sin comer, el ejercicio bajó la glucemia y el <b>glucagón</b> hizo que el hígado usara su glucógeno para recuperarla.' };
+    if (!s.comida && s.soloEjercicio) s.comida = { e: '🏃', n: 'Ejercicio en ayunas', corto: 'Ejercicio', ig: null, x: 'Sin comer, el ejercicio bajó la glucemia y el <b>glucagón</b> hizo que el hígado usara su glucógeno para recuperarla.' };
     if (s.comida) {
-      const pts = s.pts.slice(0, 181);
-      let pico = 0, tPico = 0;
-      if (s.soloEjercicio) { pico = Infinity; pts.forEach((g, i) => { if (g < pico) { pico = g; tPico = i; } }); }
-      else pts.forEach((g, i) => { if (g > pico) { pico = g; tPico = i; } });
-      const vuelta = pts.findIndex((g, i) => i > tPico && g < 110);
-      glu.curvas.push({ nombre: s.comida.n + (glu.tipo ? ` (${PERSONAS[glu.tipo].toLowerCase()})` : ''), comida: s.comida, pts, pico, tPico, vuelta, minimo: !!s.soloEjercicio });
-      if (glu.curvas.length > 4) glu.curvas.shift();
-      glu.curvas.forEach((c, i) => { c.color = COLORES_CURVA[i]; });
-      avisar(`✅ Pasaron 3 horas. ${s.soloEjercicio ? 'Mínimo' : 'Pico'} de <b>${Math.round(pico)} mg/dl</b> a los <b>${tPico} min</b>. ${s.comida.x} Pasa el dedo o el mouse por el gráfico para leer los valores.`);
+      const pts = s.pts.slice(0, 181), ins = s.ins.slice(0, 181);
+      const extremo = s.soloEjercicio ? Math.min(...pts) : Math.max(...pts);
+      const tExtremo = pts.indexOf(extremo);
+      const area = areaBajoCurva(pts);
+      const igEst = s.soloEjercicio || glu.tipo !== 0 ? null : Math.round(area / areaGlucosa(0) * 100);
+      // El color sigue a la curva: una curva nueva usa el color que quedó libre.
+      if (glu.curvas.length >= COLORES_CURVA.length) glu.curvas.shift();
+      const libre = COLORES_CURVA.find(c => !glu.curvas.some(k => k.color === c));
+      const curva = { nombre: s.comida.n + (glu.tipo ? ` · ${PERSONAS[glu.tipo].toLowerCase()}` : ''), corto: s.comida.corto, comida: s.comida, tipo: glu.tipo, pts, ins, extremo, tExtremo, a2h: pts[120], area, igEst, minimo: !!s.soloEjercicio, inyectada: !!s.inyectada, color: libre };
+      glu.curvas.push(curva);
+      pintarResumen(curva);
+      anotar('📊', `Pasaron 3 horas. Mira el resumen y pasa el dedo o el mouse por el gráfico para leer los valores.`);
     }
     glu.sim = nuevaSimulacion(null);
     glu.sim.G = s.G;
     glu.sim.glucogeno = s.glucogeno;
     pintarControlesGlu();
-    pintarTablaGlu();
   }
 
-  function pintarTablaGlu() {
-    raiz.querySelector('#bm-glu-tabla').innerHTML = glu.curvas.length
-      ? `<thead><tr><th>Alimento</th><th>Pico</th><th>Minuto</th><th>IG</th></tr></thead>
-        <tbody>${glu.curvas.map(c => `<tr><td><i class="bm-punto-color" style="background:${c.color}"></i>${c.comida.e} ${c.nombre}</td><td>${c.minimo ? 'mín. ' : ''}${Math.round(c.pico)}</td><td>${c.tPico}</td><td>${c.comida.ig}</td></tr>`).join('')}</tbody>`
-      : '<tbody><tr><td class="bm-sin">Todavía no hay mediciones.</td></tr></tbody>';
+  function pintarResumen(c) {
+    const ref = glu.curvas.find(k => k !== c && k.comida.id === 'glucosa' && k.tipo === c.tipo);
+    const comparacion = ref && c.comida.id !== 'glucosa'
+      ? `<p>Comparado con la glucosa, el pico fue <b>${Math.round(ref.extremo - c.extremo)} mg/dl más bajo</b> y llegó <b>${c.tExtremo - ref.tExtremo} min ${c.tExtremo >= ref.tExtremo ? 'más tarde' : 'antes'}</b>.</p>` : '';
+    const dx2h = c.a2h < 140 ? 'por debajo de 140 mg/dl' : c.a2h < 200 ? 'entre 140 y 199 mg/dl' : '200 mg/dl o más';
+    raiz.querySelector('#bm-glu-resumen').innerHTML = `
+      <div class="bm-resultado bm-glu-res" style="--c:${c.color}">
+        <span class="bm-res-lab">Resultado · ${c.comida.e} ${c.nombre}</span>
+        <dl class="bm-glu-datos">
+          <div><dt>${c.minimo ? 'Mínimo' : 'Pico'}</dt><dd>${Math.round(c.extremo)} <small>mg/dl</small></dd></div>
+          <div><dt>Minuto</dt><dd>${c.tExtremo}</dd></div>
+          <div><dt>A las 2 h</dt><dd>${Math.round(c.a2h)} <small>mg/dl</small></dd></div>
+          ${c.igEst !== null ? `<div><dt>IG estimado</dt><dd>${c.igEst}</dd></div>` : ''}
+        </dl>
+        <p>${c.comida.x}</p>
+        ${c.igEst !== null && c.tipo === 0 ? `<p>El área bajo su curva es el <b>${c.igEst} %</b> de la de la glucosa → IG estimado <b>${c.igEst}</b>. En las tablas: <b>${c.comida.ig}</b> (IG ${clasificarIG(c.comida.ig)}).</p>` : ''}
+        ${c.tipo !== 0 && !c.minimo ? `<p>A las 2 horas la glucemia quedó <b>${dx2h}</b>. ${c.tipo === 1 ? (c.inyectada ? 'La <b>insulina inyectada</b> reemplazó a la que el páncreas no fabrica y permitió bajarla.' : 'Sin insulina el cuerpo no puede bajarla: por eso las personas con diabetes tipo 1 se aplican insulina.') : 'Con resistencia a la insulina la bajada es muy lenta.'} El IG solo se mide en personas sin diabetes.</p>` : ''}
+        ${comparacion}
+      </div>`;
   }
 
-  function dibujarGraficoGlu() {
-    const X = m => 50 + m / 180 * 690, Y = g => 222 - (g - 40) / 240 * 205;
-    const lineas = pts => pts.map((g, i) => `${X(i).toFixed(1)},${Y(Math.max(40, Math.min(280, g))).toFixed(1)}`).join(' ');
-    let svg = `<rect width="760" height="250" rx="12" fill="#0e1033"/>
-      <rect x="50" y="${Y(280)}" width="690" height="${Y(180) - Y(280)}" fill="#ff6b6b" opacity="0.08"/>
-      <rect x="50" y="${Y(140)}" width="690" height="${Y(70) - Y(140)}" fill="#2fd186" opacity="0.08"/>
-      <rect x="50" y="${Y(70)}" width="690" height="${Y(40) - Y(70)}" fill="#5cc8ff" opacity="0.1"/>
-      <text x="736" y="${Y(270)}" text-anchor="end" class="bm-g-zona">HIPERGLUCEMIA</text>
-      <text x="736" y="${Y(76)}" text-anchor="end" class="bm-g-zona">NORMAL</text>
-      <text x="736" y="${Y(46)}" text-anchor="end" class="bm-g-zona">HIPOGLUCEMIA</text>`;
-    for (let g = 40; g <= 280; g += 40) svg += `<line x1="50" x2="740" y1="${Y(g)}" y2="${Y(g)}" stroke="#2d3070"/><text x="44" y="${Y(g) + 4}" text-anchor="end" class="bm-g-txt oscuro">${g}</text>`;
-    for (let m = 0; m <= 180; m += 30) svg += `<text x="${X(m)}" y="240" text-anchor="middle" class="bm-g-txt oscuro">${m}</text>`;
-    svg += `<text x="395" y="249" text-anchor="middle" class="bm-g-txt oscuro">minutos después de comer</text>
-      <text x="12" y="120" text-anchor="middle" transform="rotate(-90 12 120)" class="bm-g-txt oscuro">glucemia (mg/dl)</text>`;
-    glu.curvas.forEach(c => { svg += `<polyline points="${lineas(c.pts)}" fill="none" stroke="${c.color}" stroke-width="3" stroke-linejoin="round"/>`; });
-    if (glu.corriendo && (glu.sim.comida || glu.sim.soloEjercicio)) svg += `<polyline points="${lineas(glu.sim.pts)}" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>
-      <circle cx="${X(glu.sim.pts.length - 1)}" cy="${Y(glu.sim.G)}" r="5" fill="#fff"/>`;
-    if (glu.hover !== null && glu.curvas.length) {
-      const m = glu.hover, filas = glu.curvas.map(c => [c.color, `${c.nombre}: ${Math.round(c.pts[m])} mg/dl`]);
-      const bx = X(m) > 460 ? X(m) - 284 : X(m) + 10;
-      svg += `<line x1="${X(m)}" x2="${X(m)}" y1="${Y(280)}" y2="${Y(40)}" stroke="#fff" stroke-dasharray="3 3" opacity="0.7"/>
-        ${glu.curvas.map(c => `<circle cx="${X(m)}" cy="${Y(c.pts[m])}" r="4.5" fill="${c.color}" stroke="#0e1033" stroke-width="1.5"/>`).join('')}
-        <rect x="${bx}" y="14" width="274" height="${22 + filas.length * 16}" rx="8" fill="#1f2256" stroke="#3a3e85"/>
-        <text x="${bx + 10}" y="30" class="bm-g-tip"><tspan font-weight="800">Minuto ${m}</tspan></text>
-        ${filas.map(([col, t], i) => `<text x="${bx + 10}" y="${47 + i * 16}" class="bm-g-tip" fill="${col}">${t}</text>`).join('')}`;
+  // ---------- Gráficos (glucemia e insulina comparten el eje del tiempo) ----------
+  const GX0 = 56;
+  let GX1 = 740;
+  const gx = m => GX0 + m / 180 * (GX1 - GX0);
+
+  function dibujarGraficosGlu() {
+    const grafEl = raiz.querySelector('#bm-glu-graf');
+    if (!grafEl) return;
+    // En pantallas angostas se usa un lienzo más angosto para que los textos no queden diminutos.
+    const W = grafEl.clientWidth && grafEl.clientWidth < 560 ? 440 : 760;
+    if (glu.W !== W) {
+      glu.W = W;
+      grafEl.setAttribute('viewBox', `0 0 ${W} 270`);
+      raiz.querySelector('#bm-ins-graf').setAttribute('viewBox', `0 0 ${W} 110`);
     }
+    GX1 = W - 20;
+    const Y = g => 236 - (Math.max(40, Math.min(300, g)) - 40) / 260 * 222;
+    const linea = (pts, y) => pts.map((v, i) => `${gx(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const C = glu.curvas, s = glu.sim, corriendo = glu.corriendo && (s.comida || s.soloEjercicio);
+    let svg = `<rect width="${W}" height="270" rx="12" fill="#0e1033"/>
+      <rect x="${GX0}" y="${Y(300)}" width="${GX1 - GX0}" height="${Y(180) - Y(300)}" fill="#e66767" opacity="0.07"/>
+      <rect x="${GX0}" y="${Y(70)}" width="${GX1 - GX0}" height="${Y(40) - Y(70)}" fill="#3987e5" opacity="0.1"/>`;
+    for (let g = 40; g <= 300; g += 20) if (g % 40 === 0) svg += `<line x1="${GX0}" x2="${GX1}" y1="${Y(g)}" y2="${Y(g)}" class="bm-gg-grilla"/><text x="${GX0 - 8}" y="${Y(g) + 4}" text-anchor="end" class="bm-gg-eje">${g}</text>`;
+    for (let m = 0; m <= 180; m += W < 600 ? 60 : 30) svg += `<line x1="${gx(m)}" x2="${gx(m)}" y1="${Y(300)}" y2="${Y(40)}" class="bm-gg-grilla v"/><text x="${gx(m)}" y="254" text-anchor="middle" class="bm-gg-eje">${m}</text>`;
+    // Líneas de referencia.
+    [[70, 'hipoglucemia'], [100, 'límite en ayunas'], [140, 'límite a las 2 h'], [180, 'umbral renal']].forEach(([g, t]) => {
+      svg += `<line x1="${GX0}" x2="${GX1}" y1="${Y(g)}" y2="${Y(g)}" class="bm-gg-ref"/><text x="${GX1 - 4}" y="${Y(g) - 4}" text-anchor="end" class="bm-gg-reftxt">${t} (${g})</text>`;
+    });
+    svg += `<line x1="${gx(120)}" x2="${gx(120)}" y1="${Y(300)}" y2="${Y(40)}" class="bm-gg-ref"/><text x="${gx(120) + 4}" y="${Y(296)}" class="bm-gg-reftxt">2 h</text>
+      <text x="${(GX0 + GX1) / 2}" y="268" text-anchor="middle" class="bm-gg-titulo">Tiempo después de comer (minutos)</text>
+      <text x="14" y="${Y(170)}" text-anchor="middle" transform="rotate(-90 14 ${Y(170)})" class="bm-gg-titulo">Glucemia (mg/dl)</text>`;
+    // Área bajo la curva (primeras 2 h) de la última curva.
+    const ultima = C[C.length - 1];
+    if (glu.area && ultima && !ultima.minimo) {
+      const base = ultima.pts[0];
+      const tope = ultima.pts.slice(0, 121).map((g, i) => `${gx(i).toFixed(1)},${Y(Math.max(g, base)).toFixed(1)}`).join(' ');
+      svg += `<polygon points="${gx(0)},${Y(base)} ${tope} ${gx(120)},${Y(base)}" fill="${ultima.color}" opacity="0.22"/>`;
+    }
+    C.forEach(c => { svg += `<polyline points="${linea(c.pts, Y)}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`; });
+    if (corriendo) svg += `<polyline points="${linea(s.pts, Y)}" fill="none" stroke="#e9ebff" stroke-width="2.5" stroke-dasharray="6 4"/><circle cx="${gx(s.pts.length - 1)}" cy="${Y(s.G)}" r="5" fill="#e9ebff" stroke="#0e1033" stroke-width="2"/>`;
+    // Etiquetas directas en el pico (o mínimo) de cada curva, sin superponerse.
+    const etiquetas = C.map(c => ({ c, x: gx(c.tExtremo), y: Y(c.extremo) })).sort((a, b) => a.y - b.y);
+    etiquetas.forEach((e, i) => {
+      let ly = e.c.minimo ? e.y + 18 : e.y - 10;
+      for (let k = 0; k < i; k++) if (Math.abs(etiquetas[k].ly - ly) < 14 && Math.abs(etiquetas[k].x - e.x) < 130) ly = etiquetas[k].ly + 14;
+      e.ly = ly;
+      svg += `<circle cx="${e.x}" cy="${e.y}" r="5" fill="${e.c.color}" stroke="#0e1033" stroke-width="2"/>
+        <text x="${e.x + 8}" y="${ly}" class="bm-gg-etiq">${e.c.corto} · ${Math.round(e.c.extremo)}</text>`;
+    });
+    if (!C.length && !corriendo) svg += `<text x="${(GX0 + GX1) / 2}" y="${Y(200)}" text-anchor="middle" class="bm-gg-vacio">Elige un alimento para ver su curva de glucemia</text>`;
+    svg += cruceta(Y, C.map(c => [c, c.pts]), 'mg/dl', v => Math.round(v), Y(300), Y(40), 236);
     raiz.querySelector('#bm-glu-graf').innerHTML = svg;
+
+    // Gráfico de insulina (pequeño múltiplo con el mismo eje de tiempo).
+    const maxI = Math.max(8, ...C.flatMap(c => c.ins), ...(corriendo ? s.ins : [0]));
+    const YI = v => 90 - v / maxI * 76;
+    let si = `<rect width="${W}" height="110" rx="12" fill="#0e1033"/>
+      <line x1="${GX0}" x2="${GX1}" y1="${YI(0)}" y2="${YI(0)}" class="bm-gg-ejeline"/>
+      <text x="${GX0 - 8}" y="${YI(0) + 4}" text-anchor="end" class="bm-gg-eje">0</text><text x="${GX0 - 8}" y="${YI(maxI) + 8}" text-anchor="end" class="bm-gg-eje">máx.</text>`;
+    for (let m = 0; m <= 180; m += W < 600 ? 60 : 30) si += `<line x1="${gx(m)}" x2="${gx(m)}" y1="${YI(maxI)}" y2="${YI(0)}" class="bm-gg-grilla v"/><text x="${gx(m)}" y="106" text-anchor="middle" class="bm-gg-eje">${m}</text>`;
+    C.forEach(c => { si += `<polyline points="${linea(c.ins, YI)}" fill="none" stroke="${c.color}" stroke-width="2.5" stroke-linejoin="round"/>`; });
+    if (corriendo) si += `<polyline points="${linea(s.ins, YI)}" fill="none" stroke="#e9ebff" stroke-width="2.5" stroke-dasharray="6 4"/>`;
+    const sinIns = C.find(c => c.tipo === 1) || (corriendo && glu.tipo === 1);
+    if (sinIns) si += `<text x="${gx(90)}" y="${YI(0) - 8}" text-anchor="middle" class="bm-gg-reftxt">diabetes tipo 1: la insulina queda en cero</text>`;
+    si += cruceta(YI, C.map(c => [c, c.ins]), '', v => v < 0.5 ? 'casi nada' : v < maxI * 0.3 ? 'baja' : v < maxI * 0.65 ? 'media' : 'alta', YI(maxI), YI(0), 90, true);
+    raiz.querySelector('#bm-ins-graf').innerHTML = si;
+    pintarLeyendaGlu();
   }
 
-  // Escena del cuerpo: intestino → sangre → células, con páncreas e hígado regulando.
+  // Línea vertical y recuadro con los valores de cada curva en el minuto señalado.
+  function cruceta(Y, series, unidad, fmt, yTop, yBase, _yb, chico) {
+    const m = glu.hover;
+    if (m === null || !series.length) return '';
+    const x = gx(m);
+    const filas = series.map(([c, pts]) => [c.color, `${c.corto}: ${fmt(pts[Math.min(m, pts.length - 1)])}${unidad ? ' ' + unidad : ''}`]);
+    const ancho = 210, alto = (chico ? 8 : 24) + filas.length * 16;
+    const bx = x > (glu.W || 760) - ancho - 30 ? x - ancho - 10 : x + 10, by = chico ? 6 : 14;
+    return `<line x1="${x}" x2="${x}" y1="${yTop}" y2="${yBase}" class="bm-gg-cruz"/>
+      ${series.map(([c, pts]) => `<circle cx="${x}" cy="${Y(pts[Math.min(m, pts.length - 1)])}" r="4.5" fill="${c.color}" stroke="#0e1033" stroke-width="2"/>`).join('')}
+      <rect x="${bx}" y="${by}" width="${ancho}" height="${alto}" rx="8" class="bm-gg-tip"/>
+      ${chico ? '' : `<text x="${bx + 10}" y="${by + 17}" class="bm-gg-tiptxt fuerte">Minuto ${m}</text>`}
+      ${filas.map(([col, t], i) => `<rect x="${bx + 10}" y="${by + (chico ? 10 : 26) + i * 16}" width="12" height="3" rx="1.5" fill="${col}"/><text x="${bx + 28}" y="${by + (chico ? 15 : 31) + i * 16}" class="bm-gg-tiptxt">${t}</text>`).join('')}`;
+  }
+
+  function pintarLeyendaGlu() {
+    const cont = raiz.querySelector('#bm-glu-leyenda');
+    const html = glu.curvas.map((c, i) => `<span><i style="background:${c.color}"></i>${c.comida.e} ${c.nombre}<button data-i="${i}" aria-label="Quitar ${c.nombre}">×</button></span>`).join('')
+      + (glu.corriendo && (glu.sim.comida || glu.sim.soloEjercicio) ? `<span><i class="enCurso"></i>En curso</span>` : '');
+    if (cont.dataset.html === html) return;
+    cont.dataset.html = html;
+    cont.innerHTML = html || '<span class="bm-suave">Hasta 3 curvas para comparar</span>';
+    cont.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { glu.curvas.splice(+b.dataset.i, 1); dibujarGraficosGlu(); }));
+  }
+
+  // ---------- Escena del cuerpo ----------
   function dibujarCuerpo(seg) {
-    const s = glu.sim;
+    const s = glu.sim, G = s.G;
     const flujo = (n, dur, fn) => Array.from({ length: n }, (_, k) => fn(((seg / dur) + k / n) % 1, k)).join('');
     const glucosa = (x, y, r = 5) => `<polygon points="${poligono(puntos(r, [-90, -30, 30, 90, 150, 210]).map(([a, b]) => [a + x, b + y]))}" fill="#ffd166"/>`;
     const llave = (x, y) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle r="4.5" fill="none" stroke="#5cc8ff" stroke-width="2.4"/><path d="M4,0 h9 M9,0 v4 M12,0 v3" stroke="#5cc8ff" stroke-width="2.4" stroke-linecap="round"/></g>`;
-    const gota = (x, y) => `<path d="M${x},${y - 6} C${x + 5},${y} ${x + 4},${y + 5} ${x},${y + 5} C${x - 4},${y + 5} ${x - 5},${y} ${x},${y - 6} Z" fill="#ff9f43"/>`;
-    const G = s.G;
-    const estado = G > 180 ? ['HIPERGLUCEMIA', '#ff6b6b'] : G < 70 ? ['HIPOGLUCEMIA', '#5cc8ff'] : G > 140 ? ['ELEVADA', '#ffa94d'] : ['NORMAL', '#2fd186'];
-    const nSangre = Math.max(3, Math.min(30, Math.round((G - 30) / 8)));
-    const insulina = s.I;
+    const gota = (x, y) => `<path d="M${x.toFixed(1)},${(y - 6).toFixed(1)} c5,6 4,11 0,11 c-4,0 -5,-5 0,-11 Z" fill="#ff9f43"/>`;
+    const etiqueta = (x, y, texto, activo) => activo ? `<g><rect x="${x - texto.length * 3.3 - 8}" y="${y - 11}" width="${texto.length * 6.6 + 16}" height="17" rx="8.5" fill="#12143a" stroke="#ffd166" stroke-width="1.2"/><text x="${x}" y="${y + 1}" text-anchor="middle" class="bm-proceso">${texto}</text></g>` : '';
+    const estado = G > 180 ? ['HIPERGLUCEMIA', '#e66767'] : G < 70 ? ['HIPOGLUCEMIA', '#5cc8ff'] : G > 140 ? ['ELEVADA', '#ffa94d'] : ['NORMAL', '#2fd186'];
     const ejercicio = s.t < s.ejHasta;
+    const apertura = Math.min(1, s.captacion / 1.6);
+    const comiendo = s.comida && s.Ra > 0.05 && glu.corriendo;
     let svg = `<defs><radialGradient id="bm-fondo-cuerpo" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stop-color="#23266b"/><stop offset="1" stop-color="#0e1033"/></radialGradient></defs>
-      <rect width="760" height="260" rx="12" fill="url(#bm-fondo-cuerpo)"/>
-      <g transform="translate(0 -10)"><path d="M40,222 C60,190 100,250 130,222 S190,196 210,226 S160,256 120,250" fill="none" stroke="#d6336c" stroke-width="26" stroke-linecap="round"/>
-      <path d="M40,222 C60,190 100,250 130,222 S190,196 210,226 S160,256 120,250" fill="none" stroke="#ff8fab" stroke-width="18" stroke-linecap="round"/></g>
-      <text x="236" y="236" class="bm-rotulo">INTESTINO</text>
-      <rect x="10" y="126" width="740" height="44" rx="22" fill="#9c1f4a"/><rect x="10" y="132" width="740" height="32" rx="16" fill="#c2255c"/>
-      <rect x="30" y="136" width="700" height="4" rx="2" fill="#ff8fab" opacity="0.35"/>
-      <text x="740" y="120" text-anchor="end" class="bm-rotulo">SANGRE</text>`;
-    // Páncreas con cara.
-    svg += `<g transform="translate(330 62)">
-      ${Arte.dosTonos('<path d="M-70,6 C-70,-20 -30,-26 0,-18 C30,-10 60,-26 78,-10 C92,4 70,24 40,20 C10,16 -20,28 -50,24 C-66,22 -70,14 -70,6 Z" fill="FILL"/>', '#ffd166', '#f0a830', { y: 6 })}
-      ${Arte.ojo(-24, 0, 7)}${Arte.ojo(0, -2, 7)}<path d="M-18,12 q8,${glu.tipo === 1 ? -4 : 5} 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <text x="0" y="-32" text-anchor="middle" class="bm-rotulo">PÁNCREAS</text>
-      ${glu.tipo === 1 ? '<text x="0" y="44" text-anchor="middle" class="bm-letra chica" fill="#ff8787">no fabrica insulina</text>' : ''}</g>`;
-    // Hígado con cara y reserva de glucógeno.
-    svg += `<g transform="translate(590 60)">
-      ${Arte.dosTonos('<path d="M-80,-10 C-70,-40 20,-44 70,-24 C96,-12 84,20 50,30 C10,42 -40,40 -66,24 C-84,14 -86,2 -80,-10 Z" fill="FILL"/>', '#d9644a', '#b04a36', { y: 8 })}
-      ${Arte.ojo(-30, -6, 7)}${Arte.ojo(-6, -8, 7)}<path d="M-24,8 q8,5 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <text x="0" y="-44" text-anchor="middle" class="bm-rotulo">HÍGADO</text>
-      <rect x="18" y="-12" width="50" height="10" rx="5" fill="#15163d" opacity="0.5"/>
-      <rect x="18" y="-12" width="${(s.glucogeno / 2).toFixed(1)}" height="10" rx="5" fill="#ffd166"/>
-      <text x="43" y="14" text-anchor="middle" class="bm-letra chica" fill="#fff">glucógeno ${Math.round(s.glucogeno)} %</text></g>`;
-    // Células musculares con "cerraduras" (receptores de insulina).
-    svg += `<g transform="translate(540 222) scale(${ejercicio ? (1 + 0.04 * Math.sin(seg * 10)).toFixed(3) : 1})">
-      ${[-60, 0, 60].map(dx => `<g transform="translate(${dx} 0)">${Arte.dosTonos('<ellipse rx="26" ry="20" fill="FILL"/>', '#7c86ff', '#5a63d8', { x: 8 })}<rect x="-5" y="-22" width="10" height="7" rx="2" fill="#15163d" opacity="0.6"/><circle r="6" fill="#b197fc"/></g>`).join('')}
-      <text x="96" y="6" class="bm-rotulo">CÉLULAS${ejercicio ? ' 🏃' : ''}</text></g>`;
-    // Glucosa en la sangre (más partículas cuanto mayor la glucemia).
-    svg += flujo(nSangre, 9, (p, k) => glucosa(15 + p * 730, 140 + ((k * 37) % 20)));
-    // Absorción desde el intestino.
-    if (s.Ra > 0.08) svg += flujo(Math.min(5, Math.ceil(s.Ra * 3)), 1.6, p => glucosa(150 - p * 10, 210 - p * 60, 4.5));
-    // Insulina desde el páncreas hacia la sangre y las células.
-    const nIns = Math.min(7, Math.round(insulina / 1.2));
-    if (nIns > 0) svg += flujo(nIns, 3, p => p < 0.4 ? llave(330 + p * 100, 88 + p / 0.4 * 50) : llave(370 + (p - 0.4) / 0.6 * 170, 146 + (p - 0.4) / 0.6 * 52));
-    // Glucagón hacia el hígado.
-    if (s.Gc > 0.15) svg += flujo(Math.min(5, Math.ceil(s.Gc * 2)), 2.2, p => gota(380 + p * 150, 70 - Math.sin(p * Math.PI) * 30));
-    // Glucosa que entra a las células.
-    if (s.captacion > 0.3) svg += flujo(Math.min(6, Math.ceil(s.captacion * 2.5)), 1.4, (p, k) => glucosa(480 + (k % 3) * 60, 166 + p * 44, 4));
-    // Glucosa liberada por el hígado.
-    if (s.liberacion > 0.2) svg += flujo(Math.min(5, Math.ceil(s.liberacion * 2)), 1.6, p => glucosa(600, 92 + p * 44, 4.5));
+      <rect width="760" height="300" rx="12" fill="url(#bm-fondo-cuerpo)"/>`;
+    // Estómago e intestino.
+    svg += `<g transform="translate(0 6)">
+      ${Arte.dosTonos('<path d="M36,214 C20,180 50,150 84,166 C110,178 118,210 96,232 C80,248 48,244 36,214 Z" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 80 })}
+      ${comiendo && s.comida.e ? `<text x="72" y="210" text-anchor="middle" font-size="22">${s.comida.e}</text>` : ''}
+      <path d="M100,236 C130,262 160,236 190,256 S240,278 260,256" fill="none" stroke="#d6336c" stroke-width="22" stroke-linecap="round"/>
+      <path d="M100,236 C130,262 160,236 190,256 S240,278 260,256" fill="none" stroke="#ff8fab" stroke-width="14" stroke-linecap="round"/>
+      <text x="64" y="146" text-anchor="middle" class="bm-rotulo">ESTÓMAGO</text><text x="222" y="290" text-anchor="middle" class="bm-rotulo">INTESTINO</text></g>`;
+    // Vaso sanguíneo con glóbulos rojos.
+    svg += `<rect x="10" y="118" width="740" height="52" rx="26" fill="#8f1d45"/><rect x="10" y="124" width="740" height="40" rx="20" fill="#b3264f"/>
+      <rect x="30" y="128" width="700" height="4" rx="2" fill="#ff8fab" opacity="0.3"/>
+      <text x="744" y="112" text-anchor="end" class="bm-rotulo">SANGRE</text>`;
+    svg += flujo(9, 12, (p, k) => `<g transform="translate(${(15 + p * 730).toFixed(1)} ${134 + ((k * 23) % 22)}) rotate(${(k * 40) % 180})"><ellipse rx="8" ry="5" fill="#ff6b6b" opacity="0.85"/><ellipse rx="3.6" ry="2" fill="#c92a2a" opacity="0.85"/></g>`);
+    const nSangre = Math.max(3, Math.min(30, Math.round((G - 30) / 8)));
+    svg += flujo(nSangre, 9, (p, k) => glucosa(15 + p * 730, 132 + ((k * 37) % 26)));
+    // Páncreas: células β (insulina) y α (glucagón).
+    svg += `<g transform="translate(330 58)">
+      ${Arte.dosTonos('<path d="M-74,6 C-74,-20 -32,-26 0,-18 C30,-10 62,-26 80,-10 C94,4 72,24 42,20 C10,16 -22,28 -52,24 C-68,22 -74,14 -74,6 Z" fill="FILL"/>', '#ffd166', '#f0a830', { y: 6 })}
+      ${Arte.ojo(-26, 0, 7)}${Arte.ojo(-2, -2, 7)}<path d="M-20,12 q8,${glu.tipo === 1 ? -4 : 5} 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="4" r="6" fill="${glu.tipo === 1 ? '#6b6f9e' : '#5cc8ff'}"/><text x="40" y="7.5" text-anchor="middle" class="bm-letra mini" fill="#15163d">β</text>
+      <circle cx="58" cy="-4" r="6" fill="#ff9f43"/><text x="58" y="-0.5" text-anchor="middle" class="bm-letra mini" fill="#15163d">α</text>
+      <text x="0" y="-34" text-anchor="middle" class="bm-rotulo">PÁNCREAS</text>
+      ${glu.tipo === 1 ? '<text x="40" y="36" text-anchor="middle" class="bm-letra chica" fill="#ff8787">células β destruidas</text>' : ''}</g>`;
+    // Hígado con reserva de glucógeno.
+    const nGluc = Math.round(s.glucogeno / 100 * 19);
+    const racimo = Array.from({ length: nGluc }, (_, k) => { const a = k * 2.4, r = 3.6 * Math.sqrt(k); return `<circle cx="${(r * Math.cos(a)).toFixed(1)}" cy="${(r * Math.sin(a)).toFixed(1)}" r="2.8"/>`; }).join('');
+    svg += `<g transform="translate(598 58)">
+      ${Arte.dosTonos('<path d="M-84,-8 C-72,-40 20,-44 72,-24 C98,-12 86,20 52,30 C12,42 -40,40 -68,24 C-86,14 -88,4 -84,-8 Z" fill="FILL"/>', '#d9644a', '#b04a36', { y: 8 })}
+      ${Arte.ojo(-40, -6, 7)}${Arte.ojo(-16, -8, 7)}<path d="M-34,8 q8,5 16,0" stroke="#15163d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <g transform="translate(36 -4)" fill="#ffe066">${racimo}</g>
+      <text x="36" y="30" text-anchor="middle" class="bm-letra chica" fill="#fff">glucógeno ${Math.round(s.glucogeno)} %</text>
+      <text x="0" y="-44" text-anchor="middle" class="bm-rotulo">HÍGADO</text></g>`;
+    // Células con transportadores que se abren con la insulina.
+    svg += `<g transform="translate(500 244) scale(${ejercicio ? (1 + 0.04 * Math.sin(seg * 10)).toFixed(3) : 1})">
+      ${[-62, 0, 62].map(dx => `<g transform="translate(${dx} 0)">${Arte.dosTonos('<ellipse rx="27" ry="21" fill="FILL"/>', '#7c86ff', '#5a63d8', { x: 8 })}
+        <rect x="${-5 - apertura * 5}" y="-24" width="4" height="9" rx="1.5" fill="${glu.tipo === 2 ? '#8a8fb8' : '#b197fc'}"/><rect x="${1 + apertura * 5}" y="-24" width="4" height="9" rx="1.5" fill="${glu.tipo === 2 ? '#8a8fb8' : '#b197fc'}"/>
+        <circle r="7" fill="#b197fc" opacity="0.7"/></g>`).join('')}
+      <text x="0" y="40" text-anchor="middle" class="bm-rotulo">CÉLULAS${ejercicio ? ' · EJERCICIO 🏃' : ''}${glu.tipo === 2 ? ' · RESISTENTES' : ''}</text></g>`;
+    // Riñón.
+    svg += `<g transform="translate(690 236)">${Arte.dosTonos('<path d="M-14,-22 C8,-30 26,-14 22,6 C18,26 -6,30 -16,18 C-6,8 -6,-4 -14,-22 Z" fill="FILL"/>', '#c2555a', '#9c3d45', { x: 8 })}
+      <text x="4" y="46" text-anchor="middle" class="bm-rotulo">RIÑÓN</text></g>`;
+    // Flujos de partículas.
+    if (s.Ra > 0.08) svg += flujo(Math.min(6, Math.ceil(s.Ra * 3)), 1.6, (p, k) => glucosa(170 + (k % 3) * 22, 250 - p * 90, 4.5));
+    const nIns = Math.min(7, Math.round(s.I / 1.2));
+    if (nIns > 0) svg += flujo(nIns, 3, p => p < 0.4 ? llave(370 + p * 60, 70 + p / 0.4 * 60) : llave(394 + (p - 0.4) / 0.6 * 106, 136 + (p - 0.4) / 0.6 * 80));
+    if (s.Gc > 0.15) svg += flujo(Math.min(5, Math.ceil(s.Gc * 2)), 2.2, p => gota(390 + p * 140, 60 - Math.sin(p * Math.PI) * 30));
+    if (s.captacion > 0.3) svg += flujo(Math.min(6, Math.ceil(s.captacion * 2.5)), 1.4, (p, k) => glucosa(438 + (k % 3) * 62, 172 + p * 50, 4));
+    if (s.X * s.G > 0.3) svg += flujo(3, 1.8, p => glucosa(620, 164 - p * 70, 4));
+    if (s.liberacion > 0.2) svg += flujo(Math.min(5, Math.ceil(s.liberacion * 2)), 1.6, p => glucosa(580, 94 + p * 42, 4.5));
+    if (s.renal > 0.02) svg += flujo(3, 1.4, p => glucosa(690, 172 + p * 50, 4));
+    // Nombre de cada proceso mientras ocurre.
+    svg += etiqueta(236, 212, 'absorción', s.Ra > 0.1)
+      + etiqueta(430, 104, 'insulina', s.I > 1.5)
+      + etiqueta(500, 200, 'captación', s.captacion > 0.3)
+      + etiqueta(668, 150, s.liberacion > 0.2 ? 'glucogenólisis' : 'glucogénesis', s.liberacion > 0.2 || s.X * s.G > 0.3)
+      + etiqueta(470, 32, 'glucagón', s.Gc > 0.15)
+      + etiqueta(690, 196, 'glucosuria', s.renal > 0.02);
     // Marcador de glucemia.
-    svg += `<g transform="translate(18 16)"><rect width="176" height="84" rx="12" fill="#12143a" stroke="${estado[1]}" stroke-width="2"/>
+    svg += `<g transform="translate(18 14)"><rect width="176" height="82" rx="12" fill="#12143a" stroke="${estado[1]}" stroke-width="2"/>
       <text x="14" y="22" class="bm-rotulo">GLUCEMIA</text>
-      <text x="14" y="58" class="bm-glu-num" fill="${estado[1]}">${Math.round(G)}</text><text x="${Math.round(G) >= 100 ? 92 : 76}" y="58" class="bm-letra" fill="#c9ccf5">mg/dl</text>
-      <text x="14" y="76" class="bm-letra chica" fill="${estado[1]}">${estado[0]}${glu.corriendo ? ` · minuto ${Math.floor(s.t)}` : ''}</text></g>`;
+      <text x="14" y="57" class="bm-glu-num" fill="${estado[1]}">${Math.round(G)}</text><text x="${Math.round(G) >= 100 ? 92 : 74}" y="57" class="bm-letra" fill="#c9ccf5">mg/dl</text>
+      <text x="14" y="74" class="bm-letra chica" fill="${estado[1]}">${estado[0]}${glu.corriendo ? ` · minuto ${Math.floor(s.t)}` : ''}</text></g>`;
     raiz.querySelector('#bm-cuerpo').innerHTML = svg;
   }
 
