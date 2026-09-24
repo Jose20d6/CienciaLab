@@ -1268,7 +1268,7 @@ const Biomoleculas = (function () {
   // GLUCEMIA: insulina, glucagón, índice glucémico y diabetes
   // =====================================================================
 
-  // IG de referencia: tablas internacionales (Atkinson y col., 2008 y 2021). La fibra enlentece la absorción.
+  // IG de referencia: valores aproximados de tablas internacionales. La fibra enlentece la absorción.
   const COMIDAS = [
     { id: 'glucosa', e: '🧪', n: 'Solución de glucosa', corto: 'Glucosa', ig: 100, fibra: 0, x: 'Es glucosa pura: no necesita digerirse y pasa directo a la sangre. Por eso es la <b>referencia</b> del índice glucémico (IG = 100).' },
     { id: 'blanco', e: '🍞', n: 'Pan blanco', corto: 'Pan blanco', ig: 75, fibra: 0, x: 'La harina refinada perdió el salvado y el germen: su almidón se digiere muy rápido y se comporta casi como glucosa.' },
@@ -1409,17 +1409,7 @@ const Biomoleculas = (function () {
               <tr><td>Tratamiento</td><td>Insulina de por vida</td><td>Alimentación, actividad física y medicamentos (a veces insulina)</td><td>Alimentación y control; suele desaparecer tras el parto</td></tr>
               <tr><td>Frecuencia</td><td>≈ 5–10 % de los casos</td><td>≈ 90 % de los casos</td><td>Afecta a una parte de los embarazos</td></tr></tbody></table>
           </details>
-          <details class="bm-concepto"><summary>📚 Fuentes</summary>
-            <ul class="bm-fuentes">
-              <li>Atkinson FS, Brand-Miller JC, Foster-Powell K, Buyken AE, Goletzke J. <i>International tables of glycemic index and glycemic load values 2021: a systematic review</i>. American Journal of Clinical Nutrition, 2021; 114(5): 1625-1632.</li>
-              <li>Atkinson FS, Foster-Powell K, Brand-Miller JC. <i>International tables of glycemic index and glycemic load values: 2008</i>. Diabetes Care, 2008; 31(12): 2281-2283.</li>
-              <li>American Diabetes Association. <i>Diagnosis and Classification of Diabetes: Standards of Care in Diabetes—2025</i>. Diabetes Care, 2025; 48 (Suppl. 1).</li>
-              <li>Organización Mundial de la Salud. <i>Diabetes</i>. Nota descriptiva.</li>
-              <li>Ministerio de Salud de la Nación. <i>Guías Alimentarias para la Población Argentina</i>, 2016.</li>
-              <li>Bergman RN, Ider YZ, Bowden CR, Cobelli C. <i>Quantitative estimation of insulin sensitivity</i>. American Journal of Physiology, 1979; 236(6): E667-E677 (modelo en el que se inspira el simulador).</li>
-            </ul>
-            <p class="bm-suave">El simulador usa un modelo simplificado con fines didácticos: las curvas reales cambian de persona a persona y según la porción, la cocción y lo que se come junto.</p>
-          </details>
+          <p class="bm-ayuda">El simulador usa un modelo simplificado con fines didácticos: las curvas reales cambian de persona a persona y según la porción, la cocción y lo que se come junto.</p>
         </aside>
       </div>`;
     const q = s => raiz.querySelector(s);
@@ -2043,7 +2033,7 @@ const Biomoleculas = (function () {
 
   function vistaFunciones(cont) {
     const ejemplos = FUNCIONES.map(f => {
-      const par = rondasFunciones === 0 ? f.ej.find(e => e[0] === EJEMPLOS_TP[f.id]) : Util.elegir(f.ej);
+      const par = rondasFunciones === 0 ? f.ej.find(e => e[0] === EJEMPLOS_TP[f.id]) : Util.tomar('bm-fun-' + f.id, f.ej, 1, e => e[0])[0];
       return { f: f.id, n: par[0], x: par[1] };
     });
     rondasFunciones++;
@@ -2117,7 +2107,7 @@ const Biomoleculas = (function () {
 
   function vistaClasificar() {
     const lista = conjunto === 'alimentos' ? ALIMENTOS : MOLECULAS;
-    juego = { lista: Util.mezclar(lista).slice(0, 10), i: 0, puntos: 0, errores: [] };
+    juego = { lista: Util.tomar('bm-' + conjunto, lista, 10, x => x.n), i: 0, puntos: 0, errores: [] };
     raiz.querySelector('#bm-vista').innerHTML = `
       <div class="segmentado" id="bm-conjunto">
         <button data-c="moleculas">🔬 Moléculas y funciones</button>

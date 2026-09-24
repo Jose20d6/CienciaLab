@@ -18,6 +18,23 @@ const Util = {
     return lista[Math.floor(Math.random() * lista.length)];
   },
 
+  // Toma n elementos distintos de la lista, prefiriendo los que no salieron en rondas anteriores.
+  // Recién cuando se agotan todos vuelve a empezar, así las preguntas no se repiten entre rondas.
+  tomar(clave, lista, n, id = x => (x && (x.id || x.n || x.t)) || String(x)) {
+    n = Math.min(n, lista.length);
+    const vistos = new Set(Util.leer('vistos:' + clave, []));
+    let nuevos = Util.mezclar(lista.filter(x => !vistos.has(id(x))));
+    if (nuevos.length < n) {
+      const elegidos = new Set(nuevos.map(id));
+      const resto = Util.mezclar(lista.filter(x => !elegidos.has(id(x))));
+      nuevos = nuevos.concat(resto).slice(0, n);
+      vistos.clear();
+    } else nuevos = nuevos.slice(0, n);
+    nuevos.forEach(x => vistos.add(id(x)));
+    Util.guardar('vistos:' + clave, [...vistos]);
+    return nuevos;
+  },
+
   // localStorage puede no estar disponible (modo privado, archivos locales, etc.).
   leer(clave, porDefecto) {
     try {

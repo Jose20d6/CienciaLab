@@ -108,7 +108,7 @@ const Transformaciones = (function () {
   }
 
   function nuevaRonda() {
-    casos = Util.mezclar(CASOS).slice(0, RONDA);
+    casos = Util.tomar('transformaciones', CASOS, RONDA, c => c.t);
     indice = 0;
     puntos = 0;
     errores = [];

@@ -203,7 +203,10 @@ const Celula = (function () {
           <button data-t="vegetal">🌿 Célula vegetal</button>
           <button data-t="comparar">⚖️ Comparar</button>
         </div>
-        <button class="btn primario" id="cel-quiz">🎯 ¿Dónde está?</button>
+        <div class="cel-botones">
+          <button class="btn primario" id="cel-quiz">🎯 ¿Dónde está?</button>
+          <button class="btn primario" id="cel-rutas-btn">🧭 Rutas en la célula</button>
+        </div>
       </div>
       <div id="cel-barra-quiz" class="barra-desafio" hidden></div>
 
@@ -255,17 +258,20 @@ const Celula = (function () {
     raiz.querySelector('#cel-acercar').addEventListener('click', () => zoomFactor(0.7));
     raiz.querySelector('#cel-alejar').addEventListener('click', () => zoomFactor(1 / 0.7));
     raiz.querySelector('#cel-completa').addEventListener('click', () => { seleccion = null; marcar(); zoomA({ ...VB }); pintarInfo(); });
-    raiz.querySelector('#cel-quiz').addEventListener('click', () => (quiz ? terminarQuiz() : empezarQuiz()));
+    raiz.querySelector('#cel-quiz').addEventListener('click', () => { if (ruta) terminarRuta(); quiz ? terminarQuiz() : empezarQuiz(); });
+    raiz.querySelector('#cel-rutas-btn').addEventListener('click', () => (ruta ? terminarRuta() : empezarRuta((RUTAS.find(x => x.tipo === tipo && !rutasHechas.has(x.id)) || RUTAS.find(x => x.tipo === tipo) || RUTAS[0]).id)));
     cambiarTipo('animal');
   }
 
-  function cambiarTipo(t) {
+  function cambiarTipo(t, desdeRuta) {
     if (quiz && t === 'comparar') terminarQuiz();
+    if (ruta && !desdeRuta) terminarRuta();
     tipo = t;
     raiz.querySelectorAll('#cel-tipos button').forEach(b => b.classList.toggle('activo', b.dataset.t === t));
     raiz.querySelector('#cel-vista-una').hidden = t === 'comparar';
     raiz.querySelector('#cel-vista-comparar').hidden = t !== 'comparar';
     raiz.querySelector('#cel-quiz').hidden = t === 'comparar';
+    raiz.querySelector('#cel-rutas-btn').hidden = t === 'comparar';
     if (t === 'comparar') return;
     raiz.querySelector('#cel-svg').innerHTML = t === 'animal' ? celulaAnimal() : celulaVegetal();
     raiz.querySelector('#cel-svg').setAttribute('aria-label', t === 'animal' ? 'Dibujo de una célula animal' : 'Dibujo de una célula vegetal');
@@ -290,6 +296,7 @@ const Celula = (function () {
   }
 
   function tocar(clave, g) {
+    if (ruta) return responderRuta(clave);
     if (quiz) return responderQuiz(clave, g);
     seleccion = clave;
     marcar();
@@ -365,11 +372,177 @@ const Celula = (function () {
     zoomA({ x: vb.x + (vb.w - w) / 2, y: vb.y + (vb.h - h) / 2, w, h });
   }
 
+  // ---------- Actividad: rutas en la célula ----------
+  // El estudiante sigue el recorrido de una sustancia tocando los orgánulos en orden.
+  const RUTAS = [
+    { id: 'insulina', tipo: 'animal', icono: '🔑', color: '#5cc8ff', titulo: 'Fabricar y exportar insulina',
+      intro: 'Las células β del páncreas fabrican <b>insulina</b>, una proteína que sale de la célula hacia la sangre. Sigue su recorrido desde la información genética hasta afuera.',
+      inicio: null, pasos: [
+        { org: ['nucleo'], pista: '¿Dónde está la información para fabricarla?', texto: 'En el <b>núcleo</b>, el gen de la insulina se copia en un <b>ARN mensajero</b> (transcripción), que sale por los poros nucleares.' },
+        { org: ['rer', 'ribosoma'], pista: '¿Dónde se fabrican las proteínas que la célula va a exportar?', texto: 'Los <b>ribosomas</b> pegados al <b>retículo endoplasmático rugoso</b> leen el ARNm y unen aminoácidos (traducción). La cadena entra al retículo y se pliega.' },
+        { org: ['golgi'], pista: '¿Qué orgánulo la modifica y la empaqueta?', texto: 'Una vesícula lleva la proteína al <b>aparato de Golgi</b>, que la termina de modificar y la empaqueta en vesículas de secreción.' },
+        { org: ['membrana'], pista: '¿Por dónde sale de la célula?', texto: 'La vesícula se fusiona con la <b>membrana plasmática</b> y libera la insulina afuera (<b>exocitosis</b>). ¡Ya puede viajar por la sangre!' },
+      ] },
+    { id: 'glucosa', tipo: 'animal', icono: '⬢', color: '#ffd166', titulo: 'Obtener energía de la glucosa',
+      intro: 'Una molécula de <b>glucosa</b> llega desde la sangre. ¿Cómo la usa la célula para obtener energía?',
+      inicio: [636, 250], pasos: [
+        { org: ['membrana'], pista: '¿Por dónde entra a la célula?', texto: 'La glucosa entra por <b>proteínas transportadoras</b> de la <b>membrana</b>. En el músculo, la insulina hace que haya más transportadores.' },
+        { org: ['citoplasma'], pista: '¿Dónde empieza a romperse?', texto: 'En el <b>citoplasma</b>, la glucosa se parte en dos moléculas más chicas (<b>glucólisis</b>) y se obtiene un poco de ATP.' },
+        { org: ['mitocondria'], pista: '¿Dónde se obtiene la mayor parte de la energía?', texto: 'En la <b>mitocondria</b> ocurre la <b>respiración celular</b>: con oxígeno se obtiene mucho ATP y se liberan CO₂ y agua.' },
+      ] },
+    { id: 'bacteria', tipo: 'animal', icono: '🦠', color: '#2fd186', titulo: 'Digerir una bacteria',
+      intro: 'Un glóbulo blanco atrapa una <b>bacteria</b>. Sigue qué le pasa adentro de la célula.',
+      inicio: [636, 250], pasos: [
+        { org: ['membrana'], pista: '¿Qué parte de la célula la envuelve?', texto: 'La <b>membrana</b> rodea a la bacteria y la encierra en una vesícula (<b>endocitosis</b>; en este caso se llama fagocitosis).' },
+        { org: ['lisosoma'], pista: '¿Qué orgánulo tiene enzimas digestivas?', texto: 'Un <b>lisosoma</b> se fusiona con la vesícula y sus <b>enzimas</b> hidrolizan las biomoléculas de la bacteria.' },
+        { org: ['citoplasma'], pista: '¿Adónde van las moléculas que sirven?', texto: 'Los aminoácidos, azúcares y otras moléculas útiles salen al <b>citoplasma</b> para ser reutilizados. ¡Reciclaje celular!' },
+      ] },
+    { id: 'sol', tipo: 'vegetal', icono: '☀️', color: '#8ce99a', titulo: 'Del Sol a la energía',
+      intro: 'La luz del Sol llega a una célula de una hoja. Sigue a la energía hasta que la célula la puede usar.',
+      inicio: [24, 24], pasos: [
+        { org: ['cloroplasto'], pista: '¿Dónde se captura la luz?', texto: 'En el <b>cloroplasto</b>, la clorofila capta la luz y se fabrica <b>glucosa</b> con CO₂ y agua (<b>fotosíntesis</b>). Se libera O₂.' },
+        { org: ['citoplasma'], pista: '¿Por dónde viaja la glucosa?', texto: 'La glucosa pasa al <b>citoplasma</b>, donde empieza a degradarse. Si sobra, la planta la guarda como <b>almidón</b>.' },
+        { org: ['mitocondria'], pista: '¿Dónde se obtiene energía de la glucosa?', texto: '¡Las plantas también respiran! En la <b>mitocondria</b> la glucosa se usa para obtener ATP, igual que en los animales.' },
+      ] },
+    { id: 'agua', tipo: 'vegetal', icono: '💧', color: '#74c0fc', titulo: 'El viaje del agua',
+      intro: 'La raíz absorbió <b>agua</b> y llega a esta célula. ¿Qué capas atraviesa y dónde se guarda?',
+      inicio: [632, 300], pasos: [
+        { org: ['pared'], pista: '¿Qué es lo primero que atraviesa?', texto: 'Primero atraviesa la <b>pared celular</b> de celulosa, que es rígida pero deja pasar el agua.' },
+        { org: ['membrana'], pista: '¿Qué capa controla lo que entra?', texto: 'Luego cruza la <b>membrana plasmática</b> por ósmosis, a través de canales llamados <b>acuaporinas</b>.' },
+        { org: ['vacuola'], pista: '¿Dónde se guarda?', texto: 'Se acumula en la <b>vacuola central</b>: al llenarse empuja contra la pared y la célula queda firme (<b>turgencia</b>). Por eso una planta sin agua se marchita.' },
+      ] },
+  ];
+  // Puntos de llegada para las estructuras que ocupan toda la célula.
+  const ANCLAS = {
+    animal: { membrana: [583, 252], citoplasma: [236, 300], ribosoma: [250, 330] },
+    vegetal: { pared: [610, 300], membrana: [592, 300], citoplasma: [226, 188], ribosoma: [210, 120] },
+  };
+  let ruta = null, animRuta = null;
+  const rutasHechas = new Set(Util.leer('cel-rutas', []));
+
+  function centroOrganulo(clave, desde) {
+    const fijo = ANCLAS[tipo][clave];
+    if (fijo) return fijo;
+    const grupos = [...raiz.querySelectorAll(`#cel-svg .org[data-org="${clave}"]`)];
+    const centros = grupos.map(g => { const b = g.getBBox(); return [b.x + b.width / 2, b.y + b.height / 2]; });
+    if (!desde || centros.length === 1) return centros[0];
+    return centros.sort((a, b) => Math.hypot(a[0] - desde[0], a[1] - desde[1]) - Math.hypot(b[0] - desde[0], b[1] - desde[1]))[0];
+  }
+
+  function empezarRuta(id) {
+    if (quiz) terminarQuiz();
+    const r = RUTAS.find(x => x.id === id);
+    if (tipo !== r.tipo) cambiarTipo(r.tipo, true);
+    ruta = { r, i: 0, errores: 0, pos: r.inicio, rastro: [] };
+    seleccion = null;
+    marcar();
+    zoomA({ ...VB });
+    raiz.querySelector('#cel-rutas-btn').textContent = '✕ Salir de las rutas';
+    raiz.querySelector('#cel-lista').hidden = true;
+    raiz.querySelector('#cel-barra-quiz').hidden = false;
+    pintarRuta();
+  }
+
+  function terminarRuta() {
+    cancelAnimationFrame(animRuta);
+    ruta = null;
+    raiz.querySelector('#cel-rutas-btn').textContent = '🧭 Rutas en la célula';
+    raiz.querySelector('#cel-barra-quiz').hidden = true;
+    raiz.querySelector('#cel-lista').hidden = false;
+    raiz.querySelector('#cel-svg #cel-ruta')?.remove();
+    pintarInfo();
+  }
+
+  function capaRuta() {
+    const svg = raiz.querySelector('#cel-svg');
+    let g = svg.querySelector('#cel-ruta');
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.id = 'cel-ruta';
+      g.setAttribute('pointer-events', 'none');
+      svg.appendChild(g);
+    }
+    return g;
+  }
+
+  function dibujarRuta(actual) {
+    const { r, rastro } = ruta;
+    const p = actual || ruta.pos;
+    const icono = r.icono === '⬢'
+      ? `<polygon points="0,-9 7.8,-4.5 7.8,4.5 0,9 -7.8,4.5 -7.8,-4.5" fill="${r.color}"/>`
+      : `<text y="7" text-anchor="middle" font-size="20">${r.icono}</text>`;
+    capaRuta().innerHTML = `
+      ${rastro.length > 1 ? `<polyline points="${rastro.map(q => q.join(',')).join(' ')}" fill="none" stroke="${r.color}" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round" opacity="0.9"/>` : ''}
+      ${rastro.map((q, k) => {
+        const num = r.inicio ? k : k + 1; // si la ruta empieza afuera, el primer punto no es un paso
+        return num ? `<circle cx="${q[0]}" cy="${q[1]}" r="6" fill="${r.color}" opacity="0.5"/><text x="${q[0]}" y="${q[1] - 12}" text-anchor="middle" class="cel-ruta-num">${num}</text>` : '';
+      }).join('')}
+      ${p ? `<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><circle r="17" fill="${r.color}" opacity="0.28" class="cel-ruta-halo"/><circle r="11" fill="#12143a" opacity="0.6"/>${icono}</g>` : ''}`;
+  }
+
+  function moverRuta(destino, alTerminar) {
+    const origen = ruta.pos || destino, t0 = performance.now(), dur = ruta.pos ? 900 : 1;
+    cancelAnimationFrame(animRuta);
+    const paso = t => {
+      if (!ruta) return;
+      const k = Math.min(1, (t - t0) / dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      const p = [origen[0] + (destino[0] - origen[0]) * e, origen[1] + (destino[1] - origen[1]) * e - Math.sin(k * Math.PI) * 30];
+      dibujarRuta(p);
+      if (k < 1) animRuta = requestAnimationFrame(paso);
+      else { ruta.pos = destino; alTerminar(); }
+    };
+    animRuta = requestAnimationFrame(paso);
+  }
+
+  function responderRuta(clave) {
+    if (ruta.ocupado || ruta.i >= ruta.r.pasos.length) return;
+    const pasoActual = ruta.r.pasos[ruta.i];
+    const barra = raiz.querySelector('#cel-barra-quiz');
+    if (!pasoActual.org.includes(clave)) {
+      ruta.errores++;
+      barra.querySelector('.bd-texto').innerHTML = `${pasoActual.pista} <span class="bd-fb mal">✖ Eso es: ${ORGANULOS[clave].nombre}</span>`;
+      return;
+    }
+    ruta.ocupado = true;
+    if (!ruta.rastro.length && ruta.pos) ruta.rastro.push(ruta.pos);
+    const destino = centroOrganulo(clave, ruta.pos);
+    moverRuta(destino, () => {
+      ruta.rastro.push(destino);
+      ruta.ocupado = false;
+      ruta.i++;
+      if (ruta.i === ruta.r.pasos.length) {
+        rutasHechas.add(ruta.r.id);
+        Util.guardar('cel-rutas', [...rutasHechas]);
+      }
+      pintarRuta();
+    });
+  }
+
+  function pintarRuta() {
+    const { r, i } = ruta;
+    const fin = i >= r.pasos.length;
+    const barra = raiz.querySelector('#cel-barra-quiz');
+    barra.innerHTML = fin
+      ? `<span class="bd-texto">🏁 ¡Ruta completa! ${ruta.errores === 0 ? 'Sin errores 🏆' : `Con ${ruta.errores} error${ruta.errores > 1 ? 'es' : ''}.`}</span>
+         ${siguienteRuta() ? '<button class="btn primario chico" id="cel-ruta-sig">Siguiente ruta →</button>' : ''}`
+      : `<span class="bd-num">${i + 1}/${r.pasos.length}</span><span class="bd-texto">${r.pasos[i].pista}</span><span class="bd-puntos">${r.icono === '⬢' ? '⬢' : r.icono} ${r.titulo}</span>`;
+    barra.querySelector('#cel-ruta-sig')?.addEventListener('click', () => empezarRuta(siguienteRuta().id));
+    raiz.querySelector('#cel-info').innerHTML = `
+      <h2>${r.icono === '⬢' ? '⬢' : r.icono} ${r.titulo}</h2>
+      <p>${r.intro}</p>
+      <ol class="cel-ruta-pasos">${r.pasos.map((p, k) => `<li class="${k < i ? 'hecho' : k === i ? 'actual' : ''}">${k < i ? p.texto : k === i ? `<b>${p.pista}</b> Tócalo en el dibujo.` : '…'}</li>`).join('')}</ol>
+      <h3>Otras rutas</h3>
+      <div class="cel-rutas-lista">${RUTAS.map(x => `<button data-r="${x.id}" class="${x.id === r.id ? 'activo' : ''}">${x.icono} ${x.titulo} <small>${x.tipo === 'animal' ? 'célula animal' : 'célula vegetal'}${rutasHechas.has(x.id) ? ' · ✔' : ''}</small></button>`).join('')}</div>`;
+    raiz.querySelectorAll('.cel-rutas-lista button').forEach(b => b.addEventListener('click', () => empezarRuta(b.dataset.r)));
+    dibujarRuta();
+  }
+
+  const siguienteRuta = () => RUTAS.find(x => !rutasHechas.has(x.id)) || RUTAS[(RUTAS.indexOf(ruta.r) + 1) % RUTAS.length];
+
   // ---------- Juego: ¿Dónde está? ----------
 
   function empezarQuiz() {
-    const orden = Util.mezclar(presentes());
-    quiz = { preguntas: orden.slice(0, 8), i: 0, puntos: 0, esperando: false };
+    quiz = { preguntas: Util.tomar('celula-' + tipo, presentes(), 8, k => k), i: 0, puntos: 0, esperando: false };
     seleccion = null;
     marcar();
     zoomA({ ...VB });

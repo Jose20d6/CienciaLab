@@ -200,13 +200,13 @@ const TablaPeriodica = (function () {
   const FAMILIAS = ['alcalino', 'alcalinoterreo', 'halogeno', 'noble', 'metaloide', 'transicion'];
 
   const GENERADORES = [
-    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento <b>${e.nombre}</b>`, ok: z => z === e.z }; },
-    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento de símbolo <b>${e.simbolo}</b> y descubre su nombre`, ok: z => z === e.z }; },
-    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento de número atómico <b>${e.z}</b>`, ok: z => z === e.z }; },
+    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento <b>${e.nombre}</b>`, ok: z => z === e.z, z: e.z }; },
+    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento de símbolo <b>${e.simbolo}</b> y descubre su nombre`, ok: z => z === e.z, z: e.z }; },
+    () => { const e = POR_Z[Util.elegir(COMUNES)]; return { texto: `Toca el elemento de número atómico <b>${e.z}</b>`, ok: z => z === e.z, z: e.z }; },
     () => {
       const g = Util.elegir(GRUPOS_PRINCIPALES), p = 2 + Math.floor(Math.random() * 4);
       const e = ELEMENTOS.find(x => x.grupo === g && x.periodo === p);
-      return { texto: `Toca el elemento del <b>grupo ${g}</b> y el <b>período ${p}</b>`, ok: z => z === e.z };
+      return { texto: `Toca el elemento del <b>grupo ${g}</b> y el <b>período ${p}</b>`, ok: z => z === e.z, z: e.z };
     },
     () => {
       const f = Util.elegir(FAMILIAS);
@@ -214,13 +214,30 @@ const TablaPeriodica = (function () {
     },
     () => {
       const est = Util.elegir(['gas', 'liquido']);
-      return { texto: `Toca un elemento que sea <b>${est === 'gas' ? 'gaseoso' : 'líquido'}</b> a temperatura ambiente`, ok: z => POR_Z[z].estado === est };
+      return { texto: `Toca un elemento que sea <b>${est === 'gas' ? 'gaseoso' : 'líquido'}</b> a temperatura ambiente`, ok: z => POR_Z[z].estado === est, estado: est };
     },
   ];
   const TOTAL = 10;
 
+  // Genera preguntas sin repetir: cada elemento, familia o estado aparece una sola vez por ronda,
+  // y los elementos que salieron en la ronda anterior se evitan en la siguiente.
+  function preguntasDesafio() {
+    const recientes = new Set(Util.leer('tp-recientes', []));
+    const usados = new Set();
+    const preguntas = [];
+    for (let intentos = 0; preguntas.length < TOTAL && intentos < 500; intentos++) {
+      const q = Util.elegir(GENERADORES)();
+      const clave = q.familia ? 'f:' + q.familia : q.estado ? 'e:' + q.estado : 'z:' + q.z;
+      if (usados.has(clave) || (q.z && recientes.has(q.z) && intentos < 300)) continue;
+      usados.add(clave);
+      preguntas.push(q);
+    }
+    Util.guardar('tp-recientes', preguntas.filter(q => q.z).map(q => q.z));
+    return preguntas;
+  }
+
   function empezarDesafio() {
-    desafio = { preguntas: Array.from({ length: TOTAL }, () => Util.elegir(GENERADORES)()), i: 0, puntos: 0, inicio: Date.now(), esperando: false };
+    desafio = { preguntas: preguntasDesafio(), i: 0, puntos: 0, inicio: Date.now(), esperando: false };
     seleccionado = null;
     filtro = null;
     linea = null;

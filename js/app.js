@@ -37,5 +37,23 @@
     Util.guardar('proyector', raiz.classList.toggle('proyector'));
   });
 
+  // Modo oscuro: por defecto sigue al sistema; el botón lo fija a mano y se recuerda.
+  const botonTema = document.getElementById('btn-tema');
+  const sistemaOscuro = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  const esOscuro = () => raiz.dataset.theme ? raiz.dataset.theme === 'dark' : !!(sistemaOscuro && sistemaOscuro.matches);
+  const pintarBotonTema = () => {
+    botonTema.textContent = esOscuro() ? '☀️' : '🌙';
+    botonTema.title = esOscuro() ? 'Pasar a modo claro' : 'Pasar a modo oscuro';
+  };
+  const temaGuardado = Util.leer('tema', null);
+  if (temaGuardado) raiz.dataset.theme = temaGuardado;
+  pintarBotonTema();
+  botonTema.addEventListener('click', () => {
+    raiz.dataset.theme = esOscuro() ? 'light' : 'dark';
+    Util.guardar('tema', raiz.dataset.theme);
+    pintarBotonTema();
+  });
+  if (sistemaOscuro && sistemaOscuro.addEventListener) sistemaOscuro.addEventListener('change', pintarBotonTema);
+
   mostrar(location.hash.slice(1));
 })();
