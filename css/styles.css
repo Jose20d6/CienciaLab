@@ -1059,6 +1059,11 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .nu-off .nu-latido { animation: none; }
 .nu-rotulo { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
 .nu-sub { font-size: 11px; font-weight: 700; fill: #ffd166; }
+.nu-org { font-size: 10.5px; font-weight: 700; fill: #e9ebff; }
+.nu-mini { font-size: 10px; font-weight: 700; fill: #e5dbff; }
+.nu-org-etq, #nu-part { pointer-events: none; }
+.modo-viaje .nu-org-etq { display: none; }
+.nu-etq text { font-size: 9.5px; font-weight: 700; fill: #ffd166; }
 .nu-num { font-size: 10px; font-weight: 800; fill: #ffd166; }
 .nu-refs { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; justify-content: center; margin-top: 0.5rem; font-size: 0.82rem; color: #c9ccf5; }
 .nu-refs span { display: inline-flex; align-items: center; gap: 0.3rem; }
