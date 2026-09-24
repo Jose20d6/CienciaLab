@@ -15,6 +15,7 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla, juegan a "¿Dónde está?" y siguen **rutas en la célula** (la insulina desde el núcleo hasta afuera, la glucosa hasta la mitocondria, una bacteria hasta el lisosoma, la energía del Sol y el agua hasta la vacuola). |
 | ♻️ **Ciclos de la naturaleza** | Ciclos del agua, carbono y nitrógeno | Exploran un paisaje ilustrado donde gotas, vapor, copos y moléculas recorren cada proceso, siguen el viaje de una gota o un átomo eligiendo qué proceso ocurre en cada lugar, y ordenan las etapas. |
 | 🧬 **Biomoléculas** | Química de la vida (5.º año) | **Armar:** polisacáridos con α/β-glucosa y ramificaciones α(1→6) (amilosa, amilopectina, glucógeno, celulosa), proteínas con estructura primaria, hélice α y terciaria (núcleo hidrofóbico, puentes disulfuro y salinos), triglicéridos con ácidos grasos reales (16:0, 18:1 cis/trans, 18:2), fosfolípidos y saponificación, y ADN antiparalelo con %GC y temperatura de fusión. **Del gen a la proteína:** transcripción, traducción con el código genético y mutaciones. **Enzimas:** efecto de la temperatura, el pH, el sustrato y un inhibidor, con gráfico de mediciones. **Glucemia:** simulador de la respuesta a distintos alimentos (índice glucémico), con insulina, glucagón, glucógeno, ejercicio y diabetes tipo 1 y 2. **Laboratorio:** Lugol, Benedict, Biuret y Sudán, con hidrólisis previa y muestra incógnita. **Clasificar** moléculas por función o alimentos, y unir cada función de las proteínas con su descripción y un ejemplo. |
+| 🥗 **Alimentación saludable** | Nutrición | Exploran la **pirámide nutricional** (EE. UU., 1992), el **óvalo nutricional** (Argentina, 2000) y el **plato** de la Gráfica de la Alimentación Diaria (Guías Alimentarias para la Población Argentina, 2016): nutrientes y función de cada grupo y los 10 mensajes de las Guías. Comparan los tres modelos, arman un día de comidas y reciben una devolución, y clasifican alimentos en los grupos del plato. |
 
 ## Cómo usarla
 
@@ -25,7 +26,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
 - El botón **🌙/☀️** cambia entre modo claro y oscuro (por defecto sigue la configuración del dispositivo).
 - En las actividades con preguntas, cada ronda trae preguntas distintas y no se repiten las de la ronda anterior.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#invernadero`, `#celula`, `#ciclos` o `#biomoleculas`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas` o `#alimentacion`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -45,6 +46,7 @@ js/invernadero.js     Simulación del efecto invernadero
 js/celula.js          Orgánulos de las células animal y vegetal
 js/ciclos.js          Lugares, procesos y etapas de cada ciclo
 js/biomoleculas.js    Monómeros, reactivos de laboratorio y alimentos
+js/alimentacion.js    Guías alimentarias, alimentos ilustrados y actividades
 js/app.js             Navegación
 ```
 

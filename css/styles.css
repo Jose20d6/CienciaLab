@@ -135,8 +135,9 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .opciones { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0; }
 .btn-opcion {
   flex: 1 1 200px; padding: 1rem; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
-  border: 2px solid transparent; transition: transform 0.1s;
+  border: 2px solid var(--linea); background: var(--panel); color: var(--texto); transition: transform 0.1s;
 }
+.btn-opcion:hover:not(:disabled) { border-color: var(--primario); }
 .btn-opcion:hover:not(:disabled) { transform: translateY(-2px); }
 .btn-opcion.fisico { background: var(--fisico-suave); color: var(--fisico); border-color: #a5d0f7; }
 .btn-opcion.quimico { background: var(--quimico-suave); color: var(--quimico); border-color: #ffc9a8; }
@@ -979,6 +980,61 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .bm-fuentes li { margin-bottom: 0.35rem; font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) { .bm-pieza, .bm-ribosoma { transition: none; } .bm-gota, .bm-llama, .bm-hueco.actual { animation: none; } }
 
+/* ---------- Alimentación saludable ---------- */
+.ali-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1rem; align-items: start; }
+.ali-escena { background: #12143a; color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.35); padding: 0.9rem; }
+.ali-escena > svg { width: 100%; height: auto; display: block; border-radius: 12px; }
+.ali-sector { cursor: pointer; transition: opacity 0.25s, filter 0.25s; }
+.ali-sector:hover { filter: brightness(1.08); }
+#ali-svg.con-sel .ali-sector:not(.sel) { opacity: 0.35; }
+#ali-svg .ali-sector.sel { filter: drop-shadow(0 0 8px rgba(255, 209, 102, 0.8)); }
+.ali-etq { font-size: 13px; font-weight: 800; fill: #e9ebff; paint-order: stroke; stroke: #12143a; stroke-width: 4px; }
+.ali-etq-sub { font-size: 11px; font-weight: 600; fill: #ffd166; paint-order: stroke; stroke: #12143a; stroke-width: 3px; }
+.ali-pastilla { font-size: 11.5px; font-weight: 800; fill: #fff; }
+.ali-centro { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; fill: #c9ccf5; }
+.ali-pie { font-size: 10px; fill: #9aa3ff; }
+.ali-info h2 { display: flex; align-items: center; gap: 0.5rem; }
+.ali-info h3 { font-size: 0.95rem; margin: 0.9rem 0 0.35rem; }
+.ali-info p { margin: 0 0 0.55rem; }
+.ali-punto { width: 0.8rem; height: 0.8rem; border-radius: 50%; display: inline-block; flex: none; }
+.ali-porc { font-weight: 800; color: var(--primario); }
+.ali-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.ali-chips span { background: var(--primario-suave); color: var(--primario); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+.ali-funcion { background: var(--bg); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.9rem; }
+.ali-msg { background: var(--aviso-suave); border-radius: 10px; padding: 0.5rem 0.7rem; margin-top: 0.8rem; font-size: 0.9rem; }
+.ali-msg p { margin: 0.2rem 0 0 !important; }
+.ali-mensajes { padding-left: 1.3rem; margin: 0.3rem 0 0.8rem; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.ali-ayuda { color: var(--suave); font-size: 0.9rem; }
+.ali-ejemplos { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.ali-ejemplos span { display: inline-flex; align-items: center; gap: 0.3rem; background: #12143a; color: #e9ebff; border-radius: 999px; padding: 0.15rem 0.6rem 0.15rem 0.2rem; font-size: 0.82rem; }
+.ali-comp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+.ali-mini { background: #12143a; color: #e9ebff; border: 0; text-align: left; padding: 0.8rem; cursor: pointer; transition: transform 0.15s; }
+.ali-mini:hover { transform: translateY(-3px); }
+.ali-mini h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+.ali-mini svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+.ali-tabla { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.ali-tabla th, .ali-tabla td { border-bottom: 1px solid var(--linea); padding: 0.5rem 0.6rem; text-align: left; vertical-align: top; }
+.ali-tabla tbody th { color: var(--suave); white-space: nowrap; }
+.ali-alimentos { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 0.35rem; margin-top: 0.8rem; }
+.ali-alimentos button { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; border: 1px solid #3a3e85; background: #1f2256; color: #e9ebff; border-radius: 10px; padding: 0.35rem 0.2rem; font-size: 0.74rem; font-weight: 600; line-height: 1.15; }
+.ali-alimentos button:hover { border-color: #ffd166; transform: translateY(-2px); }
+.ali-escena .btn { background: transparent; color: #e9ebff; border-color: #3a3e85; }
+.ali-escena .btn:hover:not(:disabled) { border-color: #ffd166; color: #ffd166; }
+.ali-escena .btn.primario { background: #ffd166; color: #12143a; border-color: #ffd166; }
+.ali-barra { margin-bottom: 0.5rem; }
+.ali-barra-cab { display: flex; justify-content: space-between; align-items: center; font-size: 0.86rem; margin-bottom: 0.2rem; }
+.ali-barra-cab span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.ali-barra.ok b { color: var(--ok); }
+.ali-barra.mal b { color: var(--mal); }
+.ali-barra-fondo { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.ali-barra-fondo div { height: 100%; border-radius: 99px; transition: width 0.3s; }
+.ali-tarjeta { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0; }
+.ali-opciones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 1rem 0; }
+.ali-opciones .btn-opcion { display: flex; align-items: center; gap: 0.5rem; text-align: left; font-size: 0.95rem; }
+.ali-guia-item { display: flex; gap: 0.6rem; align-items: flex-start; background: var(--bg); border-radius: 10px; padding: 0.5rem 0.7rem; margin-bottom: 0.45rem; font-size: 0.9rem; }
+.ali-guia-item .ali-punto { margin-top: 0.3rem; }
+.ali-guia-item p { margin: 0.2rem 0 0; display: flex; gap: 0.2rem; }
+
 /* ---------- Pantallas chicas ---------- */
 @media (prefers-reduced-motion: reduce) {
   .burbuja, .gases span { animation-duration: 3s !important; }
@@ -989,7 +1045,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .reactivo { flex: 1 1 200px; }
   .grid-juego { grid-template-columns: 1fr; }
   .am-grid { grid-template-columns: 1fr; }
-  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles, .bm-emparejar { grid-template-columns: minmax(0, 1fr); }
+  .inv-grid, .cel-grid, .cic-grid, .cel-comparar, .bm-grid, .bm-lab, .bm-enz-controles, .bm-emparejar, .ali-grid, .ali-comp, .ali-opciones { grid-template-columns: minmax(0, 1fr); }
   .topbar { flex-wrap: wrap; }
   .tabs { order: 3; flex-basis: 100%; }
   .am-visor { order: -1; }

@@ -21,6 +21,7 @@
       <button data-go="celula">🔬 Célula</button>
       <button data-go="ciclos">♻️ Ciclos</button>
       <button data-go="biomoleculas">🧬 Biomoléculas</button>
+      <button data-go="alimentacion">🥗 Alimentación</button>
     </nav>
     <button id="btn-tema" class="ghost" title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
     <button id="btn-proyector" class="ghost" title="Modo proyector: agranda los textos para proyectar en el aula" aria-label="Modo proyector">📽️</button>
@@ -93,6 +94,12 @@
           <p>Arma polisacáridos, proteínas, lípidos y ADN, sigue el camino del gen a la proteína, experimenta con enzimas y analiza muestras en el laboratorio.</p>
           <span class="etiqueta">Química de la vida</span>
         </button>
+        <button class="tarjeta-modulo" data-go="alimentacion">
+          <span class="tm-emoji">🥗</span>
+          <h2>Alimentación saludable</h2>
+          <p>Explora la pirámide nutricional, el óvalo y el plato de las Guías Alimentarias argentinas, y armá un día de comidas equilibrado.</p>
+          <span class="etiqueta">Nutrición</span>
+        </button>
       </div>
     </section>
 
@@ -105,6 +112,7 @@
     <section id="celula" class="view" hidden></section>
     <section id="ciclos" class="view" hidden></section>
     <section id="biomoleculas" class="view" hidden></section>
+    <section id="alimentacion" class="view" hidden></section>
   </main>
 
   <script src="js/util.js"></script>
@@ -119,6 +127,7 @@
   <script src="js/celula.js"></script>
   <script src="js/ciclos.js"></script>
   <script src="js/biomoleculas.js"></script>
+  <script src="js/alimentacion.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
