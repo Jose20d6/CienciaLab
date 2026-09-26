@@ -304,6 +304,8 @@ const Nutricion = (function () {
         <button data-m="explorar">🧍 Explorar el cuerpo</button>
         <button data-m="viaje">🧭 Seguí el viaje</button>
         <button data-m="quepasa">⚠️ ¿Qué pasa si…?</button>
+        <button data-m="esquema">🧩 Completar el esquema</button>
+        <button data-m="ciudad">🏙️ La ciudad</button>
       </div>
       <div class="nu-grid">
         <div class="panel nu-escena"><svg id="nu-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Los sistemas que intervienen en la nutrición"><g id="nu-fijo"></g><g id="nu-part" filter="url(#nu-brillo)"></g><g id="nu-ui"></g></svg>
@@ -311,7 +313,8 @@ const Nutricion = (function () {
           <div id="nu-controles"></div>
         </div>
         <aside class="panel nu-info" id="nu-info"></aside>
-      </div>`;
+      </div>
+      <div id="nu-alt" hidden></div>`;
     raiz.querySelectorAll('#nu-modos button').forEach(b => b.addEventListener('click', () => cambiarModo(b.dataset.m)));
     raiz.querySelector('#nu-svg').addEventListener('click', e => {
       const g = e.target.closest('[data-s]');
@@ -330,6 +333,12 @@ const Nutricion = (function () {
     viaje = null;
     niveles = { nutrientes: 85, oxigeno: 90, desechos: 15, energia: 90 };
     raiz.querySelectorAll('#nu-modos button').forEach(b => b.classList.toggle('activo', b.dataset.m === m));
+    // Completar el esquema y La ciudad tienen su propia escena (nutricion-extra.js).
+    const aparte = m === 'esquema' || m === 'ciudad', alt = raiz.querySelector('#nu-alt');
+    raiz.querySelector('.nu-grid').style.display = aparte ? 'none' : '';
+    alt.hidden = !aparte;
+    if (aparte) { alt.innerHTML = ''; NutriExtra[m](alt); return; }
+    alt.innerHTML = '';
     raiz.querySelector('#nu-svg').classList.toggle('modo-viaje', m === 'viaje');
     redibujar();
     if (m === 'explorar') vistaExplorar();
@@ -362,7 +371,7 @@ const Nutricion = (function () {
     const dt = Math.min(0.05, (t - ultimo) / 1000);
     ultimo = t;
     // Con la pestaña oculta no se dibuja, pero el ciclo sigue para retomar al volver.
-    if (raiz.hidden) { anim = requestAnimationFrame(bucle); return; }
+    if (raiz.hidden || modo === 'esquema' || modo === 'ciudad') { anim = requestAnimationFrame(bucle); return; }
     reloj += dt;
     let s = '';
     const flujos = modo !== 'viaje' || !viaje;

@@ -1119,11 +1119,72 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .nu-consecuencia.mal { background: var(--mal-suave); }
 @media (prefers-reduced-motion: reduce) { .nu-latido { animation: none; } }
 
+/* ---------- Nutrición: completar el esquema y la ciudad ---------- */
+#nu-modos { flex-wrap: wrap; }
+.nx-txt { font-size: 13px; font-weight: 800; fill: #e9ebff; }
+.nx-lista { font-size: 10px; font-weight: 700; fill: #c9ccf5; }
+.nx-cel { font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; fill: #ffd166; }
+.nx-ley { font-size: 11px; font-weight: 700; fill: #e9ebff; }
+.nx-caja-t1 { font-size: 8.5px; font-weight: 800; letter-spacing: 0.14em; fill: #c9ccf5; }
+.nx-caja-t2 { font-size: 12.5px; font-weight: 800; letter-spacing: 0.04em; fill: #fff; }
+.nx-hueco { cursor: pointer; outline: none; }
+.nx-hueco rect { fill: #12143a; stroke: #ffd166; stroke-width: 2; stroke-dasharray: 5 4; transition: fill 0.2s; }
+.nx-hueco text { font-size: 12px; font-weight: 800; fill: #ffd166; pointer-events: none; }
+.nx-hueco text.chico { font-size: 10.5px; }
+.nx-hueco.sist rect { fill: #1f2256; }
+.nx-hueco:hover rect, .nx-hueco:focus-visible rect { fill: #262a70; }
+.nx-hueco.activo rect { fill: #3a3e85; stroke-dasharray: none; stroke-width: 3; }
+.nx-hueco.lleno rect { fill: #e9ebff; stroke: #e9ebff; stroke-dasharray: none; }
+.nx-hueco.lleno text { fill: #12143a; }
+.nx-hueco.ok rect { fill: #2fb67c; stroke: #b2f2bb; stroke-dasharray: none; }
+.nx-hueco.ok text { fill: #fff; }
+.nx-hueco.ok { cursor: default; }
+.nx-hueco.mal rect { fill: #ff6b6b; stroke: #ffc9c9; stroke-dasharray: none; }
+.nx-hueco.mal text { fill: #fff; }
+.nx-hueco.mal { animation: nx-sacudir 0.4s; }
+@keyframes nx-sacudir { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.nx-banco { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 0.7rem; min-height: 2.4rem; }
+.nx-ficha { border: 2px solid #3a3e85; background: #1f2256; color: #e9ebff; border-radius: 999px; padding: 0.4rem 0.9rem; font-weight: 800; font-size: 0.92rem; box-shadow: 0 3px 0 #0b0c2a; }
+.nx-ficha:hover { border-color: #ffd166; }
+.nx-ficha.activo { background: #ffd166; color: #12143a; border-color: #ffd166; transform: translateY(-2px); }
+.nx-banco-vacio { color: #c9ccf5; font-size: 0.9rem; align-self: center; }
+.nx-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; margin-top: 0.7rem; }
+.nu-escena .nx-acciones .btn { background: transparent; color: #e9ebff; border-color: #3a3e85; }
+.nu-escena .nx-acciones .btn.primario { background: #ffd166; color: #12143a; border-color: #ffd166; }
+.nx-nivel { display: inline-flex; border: 1px solid #3a3e85; border-radius: 999px; overflow: hidden; }
+.nx-nivel button { background: none; border: 0; color: #c9ccf5; padding: 0.35rem 0.8rem; font-weight: 700; font-size: 0.85rem; }
+.nx-nivel button.activo { background: #3a3e85; color: #fff; }
+.nx-progreso { height: 10px; border-radius: 99px; background: var(--bg); overflow: hidden; margin-top: 0.4rem; }
+.nx-progreso div { height: 100%; background: var(--ok); border-radius: 99px; transition: width 0.3s; }
+.nx-errores { margin: 0.3rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; }
+.nx-conectores { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.5rem; }
+.nx-conectores button { border: 1px solid var(--linea); background: var(--primario-suave); color: var(--primario); border-radius: 999px; padding: 0.2rem 0.65rem; font-weight: 700; font-size: 0.85rem; }
+#nx-texto { width: 100%; box-sizing: border-box; font: inherit; font-size: 0.95rem; padding: 0.6rem 0.7rem; border-radius: 10px; border: 1px solid var(--linea); background: var(--bg); color: var(--texto); resize: vertical; }
+.nx-check { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.6rem; font-size: 0.86rem; color: var(--suave); }
+.nx-check li.si { color: var(--texto); font-weight: 700; }
+.nx-ejemplo summary { cursor: pointer; font-weight: 700; color: var(--primario); }
+.nx-ejemplo p { font-size: 0.9rem; margin-top: 0.5rem; }
+.nx-lugar { cursor: pointer; transition: opacity 0.3s, filter 0.3s; }
+.nx-lugar:hover { filter: brightness(1.12); }
+.con-sel .nx-lugar:not(.sel) { opacity: 0.45; }
+.nx-lugar.sel { filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.7)); }
+.nx-pill { pointer-events: none; }
+.nx-pill rect { stroke: #ffd166; stroke-width: 2; }
+.nx-pill.hecho rect { stroke: #fff; }
+.nx-pill.activo rect { stroke-width: 3.5; }
+.nx-letra { font-size: 11px; font-weight: 900; fill: #ffd166; }
+.nx-pill-t { font-size: 12px; font-weight: 800; fill: #ffd166; }
+.nx-pill.hecho .nx-pill-t { fill: #12143a; }
+.nx-letra-h { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: #12143a; color: #ffd166; font-size: 0.95rem; flex: none; }
+.nx-caso { font-size: 1.05rem; background: var(--bg); border-radius: 12px; padding: 0.7rem 0.9rem; }
+
 /* ---------- Pantallas chicas ---------- */
 @media (max-width: 760px) {
   .grupo-actual { display: none; }
 }
 @media (max-width: 560px) {
+  .nx-scroll { overflow-x: auto; margin: 0 -0.4rem; }
+  .nx-scroll svg { min-width: 620px; display: block; }
   .topbar { flex-wrap: wrap; }
   .tabs { order: 3; flex-basis: 100%; }
   #btn-tema { margin-left: auto; }
