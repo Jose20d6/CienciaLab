@@ -295,6 +295,29 @@ const Laboratorio = (function () {
   let raiz, vaso, seleccion = [null, null], ocupado = false;
   let descubiertos = new Set(Util.leer('lab-descubiertos', []));
 
+  // Estantes con material de laboratorio (fondo de la mesa), en el estilo ilustrado de la app.
+  function decoracion() {
+    const { dosTonos } = Arte;
+    const vidrio = (d, x) => dosTonos(`<path d="${d}" fill="FILL"/>`, '#3b4290', '#2d3276', { x });
+    const erlen = (x, y, c) => `${vidrio(`M${x - 5},${y - 44} h10 v14 l16,26 q3,6 -3,6 h-36 q-6,0 -3,-6 l16,-26 Z`, x + 4)}<path d="M${x - 15},${y - 12} h30 l3,6 q2,4 -3,4 h-30 q-5,0 -3,-4 Z" fill="${c}" opacity="0.85"/>`;
+    const tubo = (x, y, c) => `${vidrio(`M${x - 5},${y - 40} h10 v34 a5,5 0 0 1 -10,0 Z`, x + 1)}<path d="M${x - 5},${y - 18} h10 v12 a5,5 0 0 1 -10,0 Z" fill="${c}" opacity="0.85"/>`;
+    const balon = (x, y, c) => `${vidrio(`M${x - 4},${y - 46} h8 v14 a18,18 0 1 1 -8,0 Z`, x + 4)}<path d="M${x - 16},${y - 14} a17,17 0 0 0 32,0 Z" fill="${c}" opacity="0.85"/>`;
+    return `<rect x="10" y="62" width="170" height="8" rx="3" fill="#4a3f7a"/><rect x="10" y="68" width="170" height="4" fill="#2a2455"/>
+      <rect x="420" y="62" width="170" height="8" rx="3" fill="#4a3f7a"/><rect x="420" y="68" width="170" height="4" fill="#2a2455"/>
+      ${erlen(40, 62, '#ff8fab')}${tubo(76, 62, '#7fd3ff')}${tubo(90, 62, '#ffd166')}${tubo(104, 62, '#94d82d')}${balon(146, 62, '#b197fc')}
+      ${balon(452, 62, '#7fd3ff')}${erlen(500, 62, '#ffd166')}${tubo(536, 62, '#ff6b6b')}${tubo(550, 62, '#b197fc')}${tubo(564, 62, '#7fd3ff')}
+      ${[[40, 62], [146, 62], [452, 62], [500, 62]].map(([x, y]) => `<path d="M${x - 10},${y - 22} v10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity="0.35"/>`).join('')}`;
+  }
+  // Mechero con trípode: el trípode siempre se ve; la llama, solo al calentar.
+  function mechero() {
+    const { dosTonos } = Arte;
+    return `<svg viewBox="0 0 120 70" width="120" height="70" aria-hidden="true">
+      <path d="M22,4 L10,66 M98,4 L110,66" stroke="#8f96b8" stroke-width="5" stroke-linecap="round"/><rect x="14" y="0" width="92" height="7" rx="3" fill="#b8bfdc"/>
+      <g class="fuego"><path d="M60,8 C44,24 46,40 60,48 C74,40 76,24 60,8 Z" fill="#ff9f43"/><path d="M60,18 C50,30 52,40 60,45 C68,40 70,30 60,18 Z" fill="#ffd166"/><path d="M60,30 C55,36 56,42 60,44 C64,42 65,36 60,30 Z" fill="#74c0fc"/></g>
+      ${dosTonos('<rect x="52" y="46" width="16" height="16" rx="3" fill="FILL"/><rect x="40" y="60" width="40" height="8" rx="4" fill="FILL"/>', '#8f96b8', '#5c6391', { x: 62 })}
+    </svg>`;
+  }
+
   function iniciar(el) {
     raiz = el;
     raiz.innerHTML = `
@@ -315,12 +338,14 @@ const Laboratorio = (function () {
         </aside>
 
         <section class="panel mesa-panel">
+          <div class="lab-escena">
           <div class="ranuras">
             <button class="ranura" data-slot="0"></button>
             <span class="mas">+</span>
             <button class="ranura" data-slot="1"></button>
           </div>
           <div class="mesa" id="lab-mesa">
+            <svg class="lab-deco" viewBox="0 0 600 300" preserveAspectRatio="xMidYMin meet" aria-hidden="true">${decoracion()}</svg>
             <div class="soporte">
               <div class="vaso" id="lab-vaso">
                 <div class="cayendo" aria-hidden="true"></div>
@@ -334,10 +359,10 @@ const Laboratorio = (function () {
                 </div>
                 <div class="flash"></div>
               </div>
-              <div class="llama">🔥</div>
+              <div class="llama">${mechero()}</div>
             </div>
             <div class="termometro">
-              <div class="tubo"><div class="mercurio"></div></div>
+              <div class="tubo"><div class="mercurio"></div></div><div class="bulbo"></div>
               <span class="temp-valor">20 °C</span>
             </div>
           </div>
@@ -345,6 +370,7 @@ const Laboratorio = (function () {
           <div class="lab-botones">
             <button id="lab-mezclar" class="btn primario" disabled>Mezclar ⚗️</button>
             <button id="lab-limpiar" class="btn">🧽 Limpiar mesa</button>
+          </div>
           </div>
           <div id="lab-resultado"></div>
         </section>

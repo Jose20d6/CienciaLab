@@ -62,7 +62,93 @@ const Transformaciones = (function () {
   const RONDA = 10;
   const NOMBRE = { fisico: 'cambio físico', quimico: 'cambio químico' };
 
-  let raiz, casos, indice, puntos, errores;
+  let raiz, casos, indice, puntos, errores, anim = null, bucle = null;
+
+  // ---------- Escena: lo que vemos y lo que pasa con las partículas ----------
+  const { esfera, estrellas } = Arte;
+  const LUPA = [470, 128], RL = 98, ORBE = [150, 128];
+  const ROJO = '#ff6b6b', AZUL = '#5b8def';
+  // Ocho moléculas de dos átomos: cuatro "rojas" y cuatro "azules", ordenadas antes del cambio.
+  const INICIO = Array.from({ length: 8 }, (_, i) => [LUPA[0] - 66 + (i % 4) * 44, LUPA[1] - 24 + Math.floor(i / 4) * 48 + (i % 2) * 6]);
+  const DESPUES = [[-52, -40], [4, -62], [52, -30], [-66, 14], [-12, -8], [40, 22], [-34, 44], [18, 50]].map(([x, y]) => [LUPA[0] + x, LUPA[1] + y]);
+  const ANG = [20, -40, 70, 10, -65, 35, -15, 80].map(a => a * Math.PI / 180);
+  function atomos(tipo) {
+    const lista = [];
+    for (let i = 0; i < 8; i++) {
+      const color = i < 4 ? ROJO : AZUL, [x, y] = INICIO[i];
+      [-1, 1].forEach(k => lista.push({ color, m: i, p0: [x + k * 8, y] }));
+    }
+    lista.forEach((a, j) => {
+      if (tipo === 'quimico') {
+        // Cada átomo rojo se junta con uno azul: se forman moléculas nuevas.
+        const k = a.color === ROJO ? j : j - 8, lado = a.color === ROJO ? -1 : 1;
+        const [cx, cy] = DESPUES[k], ang = ANG[k];
+        a.p1 = [cx + lado * 8 * Math.cos(ang), cy + lado * 8 * Math.sin(ang)];
+        a.m1 = 100 + k;
+      } else {
+        const [cx, cy] = DESPUES[a.m], ang = ANG[a.m], lado = j % 2 ? 1 : -1;
+        a.p1 = [cx + lado * 8 * Math.cos(ang), cy + lado * 8 * Math.sin(ang)];
+        a.m1 = a.m;
+      }
+    });
+    return lista;
+  }
+
+  function escenaFija(c) {
+    const [lx, ly] = LUPA, [ox, oy] = ORBE;
+    return `<defs>
+        <radialGradient id="tr-fondo" cx="0.4" cy="0.4" r="0.9"><stop offset="0" stop-color="#262a74"/><stop offset="1" stop-color="#0c0e30"/></radialGradient>
+        <radialGradient id="tr-halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0.55" stop-color="#ffd166" stop-opacity="0.28"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
+        <radialGradient id="tr-lupa" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#2c2468"/><stop offset="1" stop-color="#17153f"/></radialGradient>
+        <clipPath id="tr-clip"><circle cx="${lx}" cy="${ly}" r="${RL - 3}"/></clipPath>
+      </defs>
+      <rect width="640" height="256" rx="14" fill="url(#tr-fondo)"/>${estrellas(26, 640, 256)}
+      <path d="M${ox},${oy - 72} L${lx},${ly - RL} L${lx},${ly + RL} L${ox},${oy + 72} Z" fill="#b197fc" opacity="0.07"/>
+      <path d="M${ox},${oy - 72} L${lx},${ly - RL} M${ox},${oy + 72} L${lx},${ly + RL}" stroke="#c9b8ff" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.5"/>
+      <circle cx="${ox}" cy="${oy}" r="104" fill="url(#tr-halo)"/>
+      <circle cx="${ox + 5}" cy="${oy + 7}" r="72" fill="#05061a" opacity="0.45"/>
+      <circle cx="${ox}" cy="${oy}" r="72" fill="#2a2f76"/><circle cx="${ox}" cy="${oy}" r="72" fill="none" stroke="#ffd166" stroke-width="4"/>
+      <path d="M${ox - 50},${oy - 34} a60,60 0 0 1 36,-30" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.45"/>
+      <text x="${ox}" y="${oy + 26}" text-anchor="middle" class="tr-emoji">${c.e}</text>
+      <text x="${ox}" y="22" text-anchor="middle" class="tr-rotulo">LO QUE VEMOS</text>
+      <circle cx="${lx + 6}" cy="${ly + 8}" r="${RL}" fill="#05061a" opacity="0.45"/>
+      <circle cx="${lx}" cy="${ly}" r="${RL}" fill="url(#tr-lupa)"/>
+      <text x="${lx}" y="18" text-anchor="middle" class="tr-rotulo">🔍 LAS PARTÍCULAS</text>`;
+  }
+
+  function dibujarParticulas(ahora) {
+    const svg = raiz.querySelector('#tr-part');
+    if (!svg) return;
+    const [lx, ly] = LUPA, t = ahora / 1000;
+    let k = 0, lista = anim ? anim.atomos : atomos('fisico');
+    if (anim) k = Math.min(1, (ahora - anim.t0) / 1800);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    const amp = 1.2 + (anim && anim.tipo === 'fisico' ? 3 * e : 0);
+    let s = '';
+    // Enlaces (antes y después) y átomos con volumen.
+    const pos = lista.map(a => {
+      const m = e < 0.5 ? a.m : a.m1, fase = m * 1.7;
+      const x = a.p0[0] + (a.p1 ? (a.p1[0] - a.p0[0]) * e : 0) + Math.sin(t * 3 + fase) * amp;
+      const y = a.p0[1] + (a.p1 ? (a.p1[1] - a.p0[1]) * e : 0) + Math.cos(t * 2.6 + fase) * amp;
+      return [x, y, m];
+    });
+    const grupos = {};
+    pos.forEach((p, i) => { (grupos[p[2]] = grupos[p[2]] || []).push(i); });
+    if (!anim || e > 0.85 || e < 0.15) Object.values(grupos).forEach(g => {
+      if (g.length === 2) s += `<line x1="${pos[g[0]][0].toFixed(1)}" y1="${pos[g[0]][1].toFixed(1)}" x2="${pos[g[1]][0].toFixed(1)}" y2="${pos[g[1]][1].toFixed(1)}" stroke="#e9ebff" stroke-width="5" stroke-linecap="round" opacity="0.8"/>`;
+    });
+    pos.forEach(([x, y], i) => { s += esfera(x, y, 9, lista[i].color); });
+    let rotulo = '';
+    if (!anim) rotulo = `<g transform="translate(${lx} ${ly + 76})"><rect x="-86" y="-13" width="172" height="24" rx="12" fill="#12143a" stroke="#ffd166" stroke-opacity="0.6"/><text y="4" text-anchor="middle" class="tr-nota">Respondé y mirá qué pasa</text></g>`;
+    else if (k >= 1) rotulo = `<g transform="translate(${lx} ${ly + 82})"><rect x="-112" y="-13" width="224" height="24" rx="12" fill="${anim.tipo === 'fisico' ? '#1c7ed6' : '#e8590c'}"/><text y="4" text-anchor="middle" class="tr-nota blanca">${anim.tipo === 'fisico' ? 'Siguen siendo las mismas' : '¡Se formaron sustancias nuevas!'}</text></g>`;
+    svg.innerHTML = `<g clip-path="url(#tr-clip)">${s}</g><circle cx="${lx}" cy="${ly}" r="${RL}" fill="none" stroke="#e5dbff" stroke-width="5"/>
+      <path d="M${lx - 74},${ly - 50} a${RL - 12},${RL - 12} 0 0 1 48,-38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.45"/>${rotulo}`;
+  }
+
+  function animar(ahora) {
+    if (!raiz.hidden) dibujarParticulas(ahora);
+    bucle = requestAnimationFrame(animar);
+  }
 
   function iniciar(el) {
     raiz = el;
@@ -126,22 +212,23 @@ const Transformaciones = (function () {
     const c = casos[indice];
     const cont = raiz.querySelector('#tr-contenido');
     cont.innerHTML = `
-      <div class="tarjeta-caso">
-        <div class="emoji-grande">${c.e}</div>
-        <p class="caso-texto">${c.t}</p>
-      </div>
+      <div class="tr-escena"><svg viewBox="0 0 640 256" role="img" aria-label="${c.t}"><g id="tr-fijo">${escenaFija(c)}</g><g id="tr-part"></g></svg></div>
+      <p class="caso-texto">${c.t}</p>
       <div class="opciones">
         <button class="btn-opcion fisico" data-r="fisico">🔵 Cambio físico</button>
         <button class="btn-opcion quimico" data-r="quimico">🔴 Cambio químico</button>
       </div>
       <div id="tr-feedback"></div>`;
     cont.querySelectorAll('.btn-opcion').forEach(b => b.addEventListener('click', () => responder(b.dataset.r)));
+    anim = null;
+    if (!bucle) bucle = requestAnimationFrame(animar);
   }
 
   function responder(r) {
     const c = casos[indice];
     const ok = r === c.r;
     if (ok) puntos++; else errores.push(c);
+    anim = { tipo: c.r, t0: performance.now(), atomos: atomos(c.r) };
     raiz.querySelectorAll('.btn-opcion').forEach(b => {
       b.disabled = true;
       if (b.dataset.r === c.r) b.classList.add('correcta');

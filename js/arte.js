@@ -58,5 +58,17 @@ const Arte = (function () {
       <rect x="${x + 82}" y="${yb - 116}" width="6" height="64" fill="#000" opacity="0.15"/>
       <rect x="${x + 65}" y="${yb - 122}" width="26" height="8" rx="4" fill="#ff6b6b"/></g></g>`;
 
-  return { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica };
+  // Aclara (f > 0) u oscurece (f < 0) un color #rrggbb.
+  const tono = (hex, f) => {
+    const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255];
+    return '#' + c.map(v => Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f).toString(16).padStart(2, '0')).join('');
+  };
+  // Esfera con volumen: base oscura, cara iluminada corrida hacia arriba a la izquierda y un brillo.
+  const esfera = (x, y, r, color, brillo = 0.55) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${tono(color, -0.3)}"/>` +
+    `<circle cx="${(x - r * 0.12).toFixed(1)}" cy="${(y - r * 0.12).toFixed(1)}" r="${(r * 0.84).toFixed(1)}" fill="${color}"/>` +
+    `<ellipse cx="${(x - r * 0.38).toFixed(1)}" cy="${(y - r * 0.4).toFixed(1)}" rx="${(r * 0.28).toFixed(1)}" ry="${(r * 0.17).toFixed(1)}" fill="#fff" opacity="${brillo}" transform="rotate(-35 ${(x - r * 0.38).toFixed(1)} ${(y - r * 0.4).toFixed(1)})"/>`;
+  // Cielo nocturno con estrellas fijas (fondo de las escenas).
+  const estrellas = (n, w, h, semilla = 0) => Array.from({ length: n }, (_, i) => `<circle cx="${((i + semilla) * 97.3) % w}" cy="${((i + semilla) * 53.9) % h}" r="${0.7 + (i % 3) * 0.5}" fill="#c9ccf5" opacity="${0.15 + (i % 4) * 0.08}"/>`).join('');
+
+  return { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica, tono, esfera, estrellas };
 })();

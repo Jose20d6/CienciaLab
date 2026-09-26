@@ -324,8 +324,9 @@ main { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .humo span:nth-child(2) { animation-delay: 0.6s !important; left: -30px; }
 .humo span:nth-child(3) { animation-delay: 1.2s !important; left: -5px; }
 @keyframes humo { from { transform: translateY(0) scale(.5); opacity: .8; } to { transform: translateY(-70px) scale(1.6); opacity: 0; } }
-.llama { font-size: 2.6rem; line-height: 1; margin-top: 0.3rem; visibility: hidden; transform-origin: bottom; }
-.con-calor .llama { visibility: visible; animation: titilar 0.25s ease-in-out infinite alternate; }
+.llama { line-height: 0; margin-top: -2px; }
+.llama .fuego { visibility: hidden; transform-box: fill-box; transform-origin: 50% 100%; }
+.con-calor .llama .fuego { visibility: visible; animation: titilar 0.25s ease-in-out infinite alternate; }
 @keyframes titilar { from { transform: scale(1, 1); } to { transform: scale(1.06, 0.92); } }
 .sin-transicion, .sin-transicion * { transition: none !important; }
 
@@ -514,9 +515,9 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .am-paso:disabled { opacity: 0.35; }
 .am-num { text-align: center; font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
 .particula { display: inline-block; width: 14px; height: 14px; border-radius: 50%; flex: none; }
-.particula.proton, #am-svg-atomo .proton { background: #1c7ed6; fill: #1c7ed6; stroke: #145a9c; }
-.particula.neutron, #am-svg-atomo .neutron { background: #adb5bd; fill: #adb5bd; stroke: #7b858e; }
-.particula.electron, #am-svg-atomo .electron { background: #e03131; fill: #e03131; stroke: #a51d1d; }
+.particula.proton { background: #4dabf7; }
+.particula.neutron { background: #ced4da; }
+.particula.electron { background: #ff6b6b; }
 .nucleo { transform-box: view-box; transform-origin: 50% 50%; }
 .nucleo.inestable { animation: vibrar 0.18s linear infinite; }
 @keyframes vibrar {
@@ -563,8 +564,9 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 #am-svg-mol { width: 100%; height: auto; background: var(--bg); border-radius: 12px; touch-action: none; user-select: none; }
 .am-atomo { cursor: grab; }
 .am-sim { font-size: 17px; font-weight: 800; pointer-events: none; }
-.am-anillo { fill: none; stroke: var(--primario); stroke-width: 3; stroke-dasharray: 6 4; }
-.am-enlace { stroke: #495057; stroke-width: 4; stroke-linecap: round; }
+.am-anillo { fill: rgba(255, 209, 102, 0.12); stroke: #ffd166; stroke-width: 3; stroke-dasharray: 6 4; }
+.am-enlace { stroke: #dbe1ff; stroke-width: 5; stroke-linecap: round; }
+.am-enlace-sombra { stroke: #05061a; opacity: 0.35; stroke-linecap: round; }
 .am-libres { fill: #fff3bf; stroke: #f59f00; stroke-width: 1.5; }
 .am-libres.completo { fill: #d3f9d8; stroke: var(--ok); }
 .am-libres-txt { font-size: 12px; font-weight: 800; fill: #5c3c00; pointer-events: none; }
@@ -1119,6 +1121,83 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .nu-consecuencia.mal { background: var(--mal-suave); }
 @media (prefers-reduced-motion: reduce) { .nu-latido { animation: none; } }
 
+/* ---------- Átomos: visor oscuro ---------- */
+.am-visor { background: radial-gradient(ellipse at 50% 40%, #262a74, #0c0e30 85%); color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
+.am-visor .am-leyenda, .am-visor .am-ayuda { color: #c9ccf5; }
+.am-visor .am-ayuda b { color: #ffd166; }
+.am-visor .am-vacio { fill: #9aa0d8; }
+.am-visor .am-aviso { color: #ffd166; }
+#am-svg-mol { border-radius: 12px; background: #16184a radial-gradient(#2e3280 1.3px, transparent 1.5px) 0 0 / 24px 24px; }
+.am-bolita { border: 0; box-shadow: inset -3px -4px 0 rgba(0,0,0,.28), inset 3px 3px 0 rgba(255,255,255,.35); }
+
+/* ---------- Tabla periódica: fichas con volumen sobre fondo oscuro ---------- */
+.tp-escena { background: radial-gradient(ellipse at 50% 20%, #262a74, #0c0e30 85%); border-radius: 16px; padding: 1rem 0.8rem 0.9rem; color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
+.tp-escena .tp-celda { border: 0; border-radius: 8px; color: #1d2433;
+  background-image: linear-gradient(155deg, rgba(255,255,255,.55) 0 18%, rgba(255,255,255,0) 42%), linear-gradient(to bottom right, rgba(0,0,0,0) 55%, rgba(0,0,0,.16));
+  box-shadow: 0 3px 0 rgba(0,0,0,.4), inset 0 -2px 0 rgba(0,0,0,.12); }
+.tp-escena button.tp-celda:hover { box-shadow: 0 6px 14px rgba(0,0,0,.5), 0 0 0 2px #ffd166; }
+.tp-escena .tp-celda.marcador-f { background: transparent !important; background-image: none; color: #9aa0d8; border: 1.5px dashed #3a3e85; box-shadow: none; }
+.tp-escena .tp-celda.seleccionado { outline: 3px solid #ffd166; }
+.tp-escena .tp-grupo, .tp-escena .tp-periodo { color: #c9ccf5; }
+.tp-escena .tp-grupo:hover, .tp-escena .tp-periodo:hover { background: #262a70; color: #fff; }
+.tp-escena .tp-grupo.activo, .tp-escena .tp-periodo.activo { background: #ffd166; color: #12143a; }
+.tp-escena .tp-esquina, .tp-escena .tp-serie, .tp-escena .tp-detalle-vacio, .tp-escena .det-cat, .tp-escena .ley-ayuda { color: #9aa0d8; }
+.tp-escena .det-info b { color: #ffd166; }
+.tp-escena .ficha { border: 0; color: #1d2433; box-shadow: 0 5px 0 rgba(0,0,0,.4), inset 0 -3px 0 rgba(0,0,0,.12);
+  background-image: linear-gradient(155deg, rgba(255,255,255,.55) 0 18%, rgba(255,255,255,0) 42%), linear-gradient(to bottom right, rgba(0,0,0,0) 55%, rgba(0,0,0,.16)); }
+.tp-escena .uso { color: #e9ebff; }
+.tp-escena .ley-item { background: rgba(255,255,255,.06); border-color: #3a3e85; color: #e9ebff; }
+.tp-escena .ley-item.activo { border-color: #ffd166; }
+.tp-escena .muestra { border: 0; box-shadow: inset 0 -2px 0 rgba(0,0,0,.2); }
+
+/* ---------- Balanceo: balanza ilustrada ---------- */
+.bal-escena { background: #12143a; border-radius: 14px; padding: 0.35rem; margin: 0.6rem 0 1rem; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
+.bal-escena svg { display: block; width: 100%; height: auto; }
+.bal-mov { transition: transform 0.7s cubic-bezier(.3, 1.4, .5, 1); }
+#bal-viga { transform-box: view-box; transform-origin: 380px 70px; }
+.bal-rotulo { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
+.bal-total { font-size: 13px; font-weight: 800; fill: #ffd166; }
+.bal-mov.ok .bal-borde { stroke: #69db7c; }
+.bal-mov.ok .bal-total { fill: #69db7c; }
+
+/* ---------- Laboratorio: escena ilustrada ---------- */
+.lab-escena { background: radial-gradient(ellipse at 50% 30%, #262a74, #0c0e30 85%); border-radius: 14px; padding: 0.9rem; color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
+.lab-escena .ranura { background: rgba(255,255,255,.05); border-color: #3a3e85; color: #e9ebff; }
+.lab-escena .ranura .vacia, .lab-escena .ranura .quitar, .lab-escena .mas { color: #9aa0d8; }
+.lab-escena .ranura.llena { border-color: #ffd166; background: rgba(255, 209, 102, 0.12); }
+.lab-escena .mesa { z-index: 0; }
+.lab-escena .mesa::after { content: ""; position: absolute; left: -0.9rem; right: -0.9rem; bottom: -12px; height: 26px; z-index: -1;
+  background: linear-gradient(#8a5a3c 0 5px, #6b432c 5px 100%); box-shadow: 0 8px 18px rgba(0,0,0,.35); }
+.lab-deco { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.lab-escena .vaso-interior { border-color: rgba(214, 228, 255, 0.75); border-width: 3px; background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.03) 45%, rgba(255,255,255,.1)); }
+.lab-escena .vaso-interior::before { content: ""; position: absolute; right: 10px; top: 30px; width: 14px; height: 130px; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(transparent 0 24px, rgba(214,228,255,.55) 24px 26px); }
+.lab-escena .vaso-interior::after { content: ""; position: absolute; left: 12px; top: 14px; bottom: 26px; width: 9px; border-radius: 9px; z-index: 2; pointer-events: none; background: rgba(255,255,255,.35); }
+.lab-escena .vaso::before, .lab-escena .vaso::after { background: rgba(214, 228, 255, 0.85); }
+.lab-escena .tubo { background: rgba(255,255,255,.08); border-color: rgba(214, 228, 255, 0.75); border-radius: 12px 12px 0 0; border-bottom: 0; }
+.lab-escena .mercurio { background: linear-gradient(90deg, #ff8787, #e03131); }
+.lab-escena .bulbo { width: 30px; height: 30px; margin-top: -6px; border-radius: 50%; border: 3px solid rgba(214, 228, 255, 0.75);
+  background: radial-gradient(circle at 35% 35%, #ffc9c9 0 18%, #e03131 20%); }
+.lab-escena .termometro { gap: 0; }
+.lab-escena .temp-valor { margin-top: 0.4rem; background: #12143a; border: 1px solid #3a3e85; border-radius: 999px; padding: 0.1rem 0.6rem; }
+.lab-escena .narracion { margin-top: 1.7rem; }
+.lab-escena .narracion li { background: #1f2256; color: #e9ebff; }
+.lab-escena .btn { background: transparent; color: #e9ebff; border-color: #3a3e85; }
+.lab-escena .btn.primario { background: #ffd166; color: #12143a; border-color: #ffd166; }
+.lab-escena .btn.primario:disabled { opacity: 0.45; }
+.lab-escena .gases span { color: #a5d8ff; background: #15304f; border-color: #2a5a8f; }
+.reactivo .ico { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; flex: none; border-radius: 50%; font-size: 1.25rem;
+  background: radial-gradient(circle at 35% 30%, #3b4290, #1f2256 70%); box-shadow: inset 0 -3px 0 rgba(0,0,0,.3), 0 2px 4px rgba(18,20,58,.25); }
+
+/* ---------- Transformaciones: escena ---------- */
+.tr-escena { background: #12143a; border-radius: 14px; padding: 0.35rem; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
+.tr-escena svg { display: block; width: 100%; height: auto; }
+.tr-emoji { font-size: 74px; }
+.tr-rotulo { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
+.tr-nota { font-size: 11.5px; font-weight: 800; fill: #ffd166; }
+.tr-nota.blanca { fill: #fff; }
+.tr-escena + .caso-texto { text-align: center; margin: 0.9rem 0 1rem; }
+
 /* ---------- Nutrición: completar el esquema y la ciudad ---------- */
 #nu-modos { flex-wrap: wrap; }
 .nx-txt { font-size: 13px; font-weight: 800; fill: #e9ebff; }
@@ -1183,6 +1262,8 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .grupo-actual { display: none; }
 }
 @media (max-width: 560px) {
+  .tabla-atomos { min-width: 0; width: 100%; }
+  .tabla-atomos th, .tabla-atomos td { padding: 0.35rem 0.4rem; }
   .nx-scroll { overflow-x: auto; margin: 0 -0.4rem; }
   .nx-scroll svg { min-width: 620px; display: block; }
   .topbar { flex-wrap: wrap; }

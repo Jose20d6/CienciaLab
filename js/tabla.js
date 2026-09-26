@@ -40,6 +40,7 @@ const TablaPeriodica = (function () {
         <button class="btn primario" id="tp-desafio">🎯 Desafío</button>
       </div>
       <div id="tp-barra-desafio" class="barra-desafio" hidden></div>
+      <div class="tp-escena">
       <div class="tp-scroll">
         <div class="tp-grid" id="tp-grid">
           <div class="tp-esquina" style="grid-row:1;grid-column:1"><span>Grupo →</span><span>Período ↓</span></div>
@@ -53,7 +54,8 @@ const TablaPeriodica = (function () {
           <div class="tp-serie" style="grid-row:11;grid-column:2 / 4">Actínidos<small>período 7</small></div>
         </div>
       </div>
-      <div class="leyenda" id="tp-leyenda"></div>`;
+      <div class="leyenda" id="tp-leyenda"></div>
+      </div>`;
 
     raiz.querySelectorAll('#tp-modos button').forEach(b => b.addEventListener('click', () => cambiarModo(b.dataset.modo)));
     raiz.querySelector('#tp-grid').addEventListener('click', e => {
@@ -92,7 +94,7 @@ const TablaPeriodica = (function () {
     raiz.querySelectorAll('.tp-celda[data-z]').forEach(c => {
       const e = POR_Z[+c.dataset.z];
       const k = M.clave(e);
-      c.style.background = M.leyenda[k].color;
+      c.style.backgroundColor = M.leyenda[k].color;
       const fueraDeLinea = linea && (linea.g ? e.grupo !== linea.g : e.periodo !== linea.p);
       c.classList.toggle('atenuado', (filtro !== null && filtro !== k) || !!fueraDeLinea);
       c.classList.toggle('seleccionado', seleccionado === e.z);
@@ -150,16 +152,18 @@ const TablaPeriodica = (function () {
 
   function bohr(e, capas) {
     const tam = 150, c = tam / 2;
-    let svg = `<svg class="bohr" viewBox="0 0 ${tam} ${tam}" role="img" aria-label="Modelo de Bohr de ${e.nombre}">`;
+    let svg = `<svg class="bohr" viewBox="0 0 ${tam} ${tam}" role="img" aria-label="Modelo de Bohr de ${e.nombre}">
+      <circle cx="${c}" cy="${c}" r="${c}" fill="#1a1c4f"/><circle cx="${c}" cy="${c}" r="26" fill="#ff9f6b" opacity="0.18"/>`;
     capas.forEach((n, i) => {
       const r = 24 + i * 14;
-      svg += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".3"/>`;
+      svg += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#9aa3ff" stroke-opacity=".35" stroke-dasharray="3 3"/>`;
       for (let j = 0; j < n; j++) {
         const a = (j / n) * Math.PI * 2 - Math.PI / 2;
-        svg += `<circle cx="${(c + r * Math.cos(a)).toFixed(1)}" cy="${(c + r * Math.sin(a)).toFixed(1)}" r="3.5" fill="#1c7ed6"/>`;
+        const x = (c + r * Math.cos(a)).toFixed(1), y = (c + r * Math.sin(a)).toFixed(1);
+        svg += `<circle cx="${x}" cy="${y}" r="6" fill="#74c0fc" opacity="0.3"/><circle cx="${x}" cy="${y}" r="3.4" fill="#a5d8ff"/>`;
       }
     });
-    svg += `<circle cx="${c}" cy="${c}" r="15" fill="#e8590c"/><text x="${c}" y="${c + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${e.z}p⁺</text></svg>`;
+    svg += `${Arte.esfera(c, c, 15, '#ff8a4c')}<text x="${c}" y="${c + 4}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">${e.z}p⁺</text></svg>`;
     return svg;
   }
 
@@ -176,7 +180,7 @@ const TablaPeriodica = (function () {
     const principal = e.grupo && (e.grupo <= 2 || e.grupo >= 13);
     const valencia = principal ? (e.z === 2 ? 2 : e.grupo <= 2 ? e.grupo : e.grupo - 10) : null;
     det.innerHTML = `
-      <div class="ficha" style="background:${cat.color}">
+      <div class="ficha" style="background-color:${cat.color}">
         <span class="z">${e.z}</span>
         <span class="sim">${e.simbolo}</span>
         <span class="masa">${String(e.masa).replace('.', ',')}</span>

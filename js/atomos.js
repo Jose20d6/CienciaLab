@@ -41,9 +41,9 @@ const Atomos = (function () {
 
   const TIPOS_ATOMO = {
     H: { nombre: 'hidrógeno', valencia: 1, color: '#f8f9fa', texto: '#343a40', r: 20 },
-    C: { nombre: 'carbono', valencia: 4, color: '#343a40', texto: '#fff', r: 26 },
-    N: { nombre: 'nitrógeno', valencia: 3, color: '#3b5bdb', texto: '#fff', r: 26 },
-    O: { nombre: 'oxígeno', valencia: 2, color: '#e03131', texto: '#fff', r: 26 },
+    C: { nombre: 'carbono', valencia: 4, color: '#5c636a', texto: '#fff', r: 26 },
+    N: { nombre: 'nitrógeno', valencia: 3, color: '#4c6ef5', texto: '#fff', r: 26 },
+    O: { nombre: 'oxígeno', valencia: 2, color: '#f03e3e', texto: '#fff', r: 26 },
     S: { nombre: 'azufre', valencia: 2, color: '#fab005', texto: '#343a40', r: 28 },
     Cl: { nombre: 'cloro', valencia: 1, color: '#2f9e44', texto: '#fff', r: 28 },
   };
@@ -250,26 +250,28 @@ const Atomos = (function () {
 
     // Núcleo: protones y neutrones mezclados, acomodados en espiral.
     const total = at.p + at.n;
-    let svg = '';
+    let svg = `<defs><radialGradient id="am-halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffd166" stop-opacity="0.35"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="160" cy="160" r="${total ? 30 + Math.sqrt(total) * 6 : 0}" fill="url(#am-halo)"/>`;
     const niveles = capas(at.e);
     niveles.forEach((n, i) => {
       const r = 62 + i * 26;
-      svg += `<circle cx="160" cy="160" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="3 4"/>`;
+      svg += `<circle cx="160" cy="160" r="${r}" fill="none" stroke="#9aa3ff" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="3 5"/>`;
       let puntos = '';
       for (let j = 0; j < n; j++) {
-        const a = (j / n) * Math.PI * 2 - Math.PI / 2;
-        puntos += `<circle cx="${(160 + r * Math.cos(a)).toFixed(1)}" cy="${(160 + r * Math.sin(a)).toFixed(1)}" r="6" class="electron"/>`;
+        const a = (j / n) * Math.PI * 2 - Math.PI / 2, x = 160 + r * Math.cos(a), y = 160 + r * Math.sin(a);
+        puntos += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="#ff6b6b" opacity="0.22"/>${Arte.esfera(x, y, 6, '#ff6b6b', 0.7)}`;
       }
       svg += `<g class="orbita" style="animation-duration:${12 + i * 6}s">${puntos}</g>`;
     });
     // Si el núcleo es inestable, vibra levemente.
     const inestable = at.p > 0 && !ESTABLES[at.p].includes(at.n);
     svg += `<g class="nucleo${inestable ? ' inestable' : ''}">`;
-    for (let i = 0; i < total; i++) {
+    // Del borde hacia el centro, para que las partículas del medio queden adelante.
+    for (let i = total - 1; i >= 0; i--) {
       const esProton = Math.floor((i + 1) * at.p / total) > Math.floor(i * at.p / total);
       const r = 6.3 * Math.sqrt(i + 0.3);
       const a = i * 2.39996;
-      svg += `<circle cx="${(160 + r * Math.cos(a)).toFixed(1)}" cy="${(160 + r * Math.sin(a)).toFixed(1)}" r="6.5" class="${esProton ? 'proton' : 'neutron'}"/>`;
+      svg += Arte.esfera(160 + r * Math.cos(a), 160 + r * Math.sin(a), 7, esProton ? '#4dabf7' : '#ced4da');
     }
     svg += '</g>';
     if (!total) svg += `<text x="160" y="165" text-anchor="middle" class="am-vacio">Núcleo vacío</text>`;
@@ -476,6 +478,7 @@ const Atomos = (function () {
     let svg = '';
     enlaces.forEach(b => {
       const a = buscar(b.a), c = buscar(b.b);
+      svg += `<line x1="${a.x}" y1="${a.y}" x2="${c.x}" y2="${c.y}" class="am-enlace-sombra" stroke-width="${b.orden * 9 + 6}"/>`;
       const dx = c.x - a.x, dy = c.y - a.y, len = Math.hypot(dx, dy) || 1;
       const nx = -dy / len, ny = dx / len;
       const desp = b.orden === 1 ? [0] : b.orden === 2 ? [-4.5, 4.5] : [-7, 0, 7];
@@ -489,7 +492,7 @@ const Atomos = (function () {
       const sel = seleccion === a.id;
       svg += `<g data-id="${a.id}" class="am-atomo${sel ? ' sel' : ''}">
         ${sel ? `<circle cx="${a.x}" cy="${a.y}" r="${t.r + 7}" class="am-anillo"/>` : ''}
-        <circle cx="${a.x}" cy="${a.y}" r="${t.r}" fill="${t.color}" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
+        <ellipse cx="${a.x + 4}" cy="${a.y + t.r * 0.9}" rx="${t.r * 0.8}" ry="${t.r * 0.22}" fill="#05061a" opacity="0.35"/>${Arte.esfera(a.x, a.y, t.r, t.color)}
         <text x="${a.x}" y="${a.y + 6}" text-anchor="middle" fill="${t.texto}" class="am-sim">${a.s}</text>
         <circle cx="${a.x + t.r * 0.8}" cy="${a.y - t.r * 0.8}" r="10" class="am-libres ${l ? '' : 'completo'}"/>
         <text x="${a.x + t.r * 0.8}" y="${a.y - t.r * 0.8 + 4}" text-anchor="middle" class="am-libres-txt">${l ? l : '✓'}</text>
