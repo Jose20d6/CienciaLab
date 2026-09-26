@@ -1121,6 +1121,53 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .nu-consecuencia.mal { background: var(--mal-suave); }
 @media (prefers-reduced-motion: reduce) { .nu-latido { animation: none; } }
 
+/* ---------- Niveles de organización ---------- */
+#nv-svg { display: block; width: 100%; height: auto; }
+.nv-fila { cursor: pointer; }
+.nv-fila rect { fill: #1f2256; stroke: #3a3e85; stroke-width: 1.5; transition: fill 0.2s; }
+.nv-fila:hover rect { fill: #2a2f76; }
+.nv-fila-t { font-size: 12px; font-weight: 700; fill: #c9ccf5; }
+.nv-fila-e { font-size: 13px; }
+.nv-fila.activo rect { fill: #ffd166; stroke: #ffd166; }
+.nv-fila.activo .nv-fila-t { fill: #12143a; font-weight: 800; }
+.nv-fila.ok rect { fill: #2fb67c; stroke: #b2f2bb; }
+.nv-fila.ok .nv-fila-t, .nv-fila.mal .nv-fila-t { fill: #fff; }
+.nv-fila.mal rect { fill: #ff6b6b; stroke: #ffc9c9; }
+.nv-llave { font-size: 9.5px; font-weight: 800; letter-spacing: 0.12em; fill: #74c0fc; }
+.nv-llave.vida { fill: #69db7c; }
+.nv-flechita { font-size: 10px; font-weight: 700; fill: #9aa0d8; }
+.nv-pill { font-size: 11px; font-weight: 800; fill: #ffd166; }
+.nv-sim { font-size: 20px; font-weight: 800; fill: #fff; pointer-events: none; }
+.nv-sim.osc { font-size: 14px; fill: #343a40; }
+.nv-carga { font-size: 34px; font-weight: 900; fill: #fff; }
+.nv-quiz-e { font-size: 120px; }
+.nv-quiz-t { font-size: 20px; font-weight: 800; fill: #ffd166; }
+.nv-foco { cursor: pointer; }
+.nv-botones { display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.7rem; }
+.nu-escena .nv-botones .btn { background: transparent; color: #e9ebff; border-color: #3a3e85; }
+.nu-escena .nv-botones .btn.primario { background: #ffd166; color: #12143a; border-color: #ffd166; }
+.nu-escena .nv-botones .btn:disabled { opacity: 0.4; }
+.nv-sello { display: inline-block; background: var(--primario-suave); color: var(--primario); border-radius: 999px; padding: 0.2rem 0.75rem; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.6rem; }
+.nv-sello.vida { background: var(--ok-suave); color: var(--ok); }
+.nv-escala { background: var(--bg); border-radius: 10px; padding: 0.5rem 0.7rem; margin: 0.5rem 0; }
+.nv-destacado { background: var(--aviso-suave); border-radius: 10px; padding: 0.5rem 0.7rem; }
+.nv-rel { padding-left: 1.1rem; margin: 0.4rem 0 0; }
+.nv-ordenar { padding: 0.4rem; }
+.nv-ord-titulo { text-align: center; color: #e9ebff; margin: 0.2rem 0 0.8rem; }
+.nv-ord-titulo b { color: #ffd166; }
+.nv-hilera { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; align-items: center; margin-bottom: 1rem; }
+.nv-flecha { color: #9aa0d8; font-weight: 800; }
+.nv-casilla { min-width: 92px; min-height: 58px; border-radius: 12px; border: 2px dashed #3a3e85; background: rgba(255,255,255,.04); color: #e9ebff; font-weight: 700; font-size: 0.82rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem; padding: 0.3rem 0.5rem; }
+.nv-casilla small { color: #9aa0d8; font-size: 1rem; }
+.nv-casilla span { font-size: 1.2rem; }
+.nv-casilla.llena { border-style: solid; border-color: #e9ebff; background: #262a70; }
+.nv-casilla.ok { border-color: #69db7c; background: #1f5f3f; }
+.nv-casilla.mal { border-color: #ff6b6b; background: #6b2530; animation: nx-sacudir 0.4s; }
+.nv-banco { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; min-height: 2.6rem; }
+.nv-correcto { padding-left: 1.4rem; margin: 0.6rem 0 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.nv-correcto li.vida { color: var(--ok); font-weight: 600; }
+
 /* ---------- Átomos: visor oscuro ---------- */
 .am-visor { background: radial-gradient(ellipse at 50% 40%, #262a74, #0c0e30 85%); color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.3); }
 .am-visor .am-leyenda, .am-visor .am-ayuda { color: #c9ccf5; }

@@ -11,6 +11,7 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | ⚖️ **Balanceo de ecuaciones** | Ecuaciones químicas / Ley de Lavoisier | Ajustan coeficientes con una balanza visual y una tabla de conteo de átomos. Tiene 3 niveles y pistas. |
 | 🧩 **Tabla periódica** | Tabla periódica | Exploran los 118 elementos coloreados por familia, por tipo (metal/no metal) o por estado. Cada ficha muestra protones, neutrones, configuración electrónica y modelo de Bohr (hasta Z = 20). Incluye un **desafío** de 10 preguntas con récord. |
 | ⚛️ **Átomos y moléculas** | Estructura de la materia | Arman átomos con protones, neutrones y electrones (hasta Z = 20) y ven qué elemento, isótopo o ion formaron, si el núcleo es estable y su notación con número másico y atómico. Luego unen átomos (H, C, N, O, S, Cl) con enlaces simples, dobles o triples respetando cuántos enlaces forma cada uno. Ambos modos tienen misiones. |
+| 🔭 **Niveles de organización** | La materia y la vida | **Viaje con zoom:** acercan una lupa desde la biosfera hasta las partículas subatómicas, siguiendo a un carpincho de los Esteros del Iberá, con el tamaño de cada nivel y si tiene vida o no. **Ordenar:** acomodan los niveles del más pequeño al más grande (6 o los 14). **¿Qué nivel es?:** reconocen a qué nivel pertenecen ejemplos cotidianos. |
 | 🌍 **Efecto invernadero** | Cambio climático | Suben o bajan el CO₂ (con un deslizador, momentos históricos o acciones humanas) y ven la radiación solar y el calor en la atmósfera, la temperatura media año a año en un gráfico y sus consecuencias. Modelo simplificado: +3 °C por cada duplicación del CO₂. |
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla, juegan a "¿Dónde está?" y siguen **rutas en la célula** (la insulina desde el núcleo hasta afuera, la glucosa hasta la mitocondria, una bacteria hasta el lisosoma, la energía del Sol y el agua hasta la vacuola). |
 | ♻️ **Ciclos de la naturaleza** | Ciclos del agua, carbono y nitrógeno | Exploran un paisaje ilustrado donde gotas, vapor, copos y moléculas recorren cada proceso, siguen el viaje de una gota o un átomo eligiendo qué proceso ocurre en cada lugar, y ordenan las etapas. |
@@ -27,7 +28,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
 - El botón **🌙/☀️** cambia entre modo claro y oscuro (por defecto sigue la configuración del dispositivo).
 - En las actividades con preguntas, cada ronda trae preguntas distintas y no se repiten las de la ronda anterior.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion` o `#nutricion`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion` o `#nutricion`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -43,6 +44,7 @@ js/laboratorio.js     Reactivos y reacciones (fáciles de ampliar)
 js/balanceo.js        Lista de ecuaciones por nivel
 js/tabla.js
 js/atomos.js          Átomos y moléculas (misiones y moléculas conocidas)
+js/niveles.js         Niveles de organización de la materia
 js/invernadero.js     Simulación del efecto invernadero
 js/celula.js          Orgánulos de las células animal y vegetal
 js/ciclos.js          Lugares, procesos y etapas de cada ciclo

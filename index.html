@@ -24,6 +24,7 @@
       <div class="grupo">
         <button class="grupo-btn" aria-haspopup="true" aria-expanded="false">🌱 Ciencias naturales <span class="grupo-actual"></span><span class="flecha" aria-hidden="true">▾</span></button>
         <div class="grupo-menu" hidden>
+          <button data-go="niveles">🔭 Niveles de organización</button>
           <button data-go="invernadero">🌍 Efecto invernadero</button>
           <button data-go="celula">🔬 Célula</button>
           <button data-go="ciclos">♻️ Ciclos</button>
@@ -80,6 +81,12 @@
 
       <h2 class="seccion-inicio">🌱 Ciencias naturales</h2>
       <div class="tarjetas-inicio">
+        <button class="tarjeta-modulo" data-go="niveles">
+          <span class="tm-emoji">🔭</span>
+          <h2>Niveles de organización</h2>
+          <p>Hacé zoom desde la Tierra hasta un protón, ordená los niveles y reconocé ejemplos de cada uno.</p>
+          <span class="etiqueta">La materia y la vida</span>
+        </button>
         <button class="tarjeta-modulo" data-go="invernadero">
           <span class="tm-emoji">🌍</span>
           <h2>Efecto invernadero</h2>
@@ -127,6 +134,7 @@
     <section id="invernadero" class="view" hidden></section>
     <section id="celula" class="view" hidden></section>
     <section id="ciclos" class="view" hidden></section>
+    <section id="niveles" class="view" hidden></section>
     <section id="biomoleculas" class="view" hidden></section>
     <section id="alimentacion" class="view" hidden></section>
     <section id="nutricion" class="view" hidden></section>
@@ -143,6 +151,7 @@
   <script src="js/invernadero.js"></script>
   <script src="js/celula.js"></script>
   <script src="js/ciclos.js"></script>
+  <script src="js/niveles.js"></script>
   <script src="js/biomoleculas.js"></script>
   <script src="js/alimentacion.js"></script>
   <script src="js/nutricion-extra.js"></script>
