@@ -40,10 +40,12 @@ const Niveles = (function () {
       ejemplo: 'Todos los carpinchos que viven en una laguna de los Esteros del Iberá.' },
     { id: 'comunidad', n: 'Comunidad', e: '🐊', escala: '1 km', vida: true,
       desc: 'Todas las <b>poblaciones de distintas especies</b> que conviven en un lugar y se relacionan entre sí.',
-      ejemplo: 'Carpinchos, yacarés, garzas, peces, juncos y ceibos de la misma laguna.' },
+      ejemplo: 'Carpinchos, yacarés, garzas, peces, juncos y ceibos de la misma laguna.',
+      clave: 'Solo cuenta a los <b>seres vivos</b> y cómo se relacionan: quién come a quién, quién da refugio. No incluye el agua, el suelo ni la luz.' },
     { id: 'ecosistema', n: 'Ecosistema', e: '🏞️', escala: '10 km', vida: true,
       desc: 'La <b>comunidad</b> junto con el <b>ambiente</b> donde vive: el agua, el suelo, el aire, la luz y la temperatura.',
-      ejemplo: 'Los Esteros del Iberá, en Corrientes: sus seres vivos y su ambiente.' },
+      ejemplo: 'Los Esteros del Iberá, en Corrientes: sus seres vivos y su ambiente.',
+      clave: 'Suma el <b>ambiente sin vida</b>: agua, suelo, aire, luz y temperatura. <b>Comunidad + ambiente = ecosistema.</b>' },
     { id: 'biosfera', n: 'Biosfera', e: '🌍', escala: '12 700 km (el diámetro de la Tierra)', vida: true,
       desc: 'Todos los <b>ecosistemas del planeta</b>: la parte de la Tierra donde hay vida.',
       ejemplo: 'Todo el planeta Tierra, desde el fondo del mar hasta las montañas.' },
@@ -85,21 +87,42 @@ const Niveles = (function () {
   const pill = (x, y, t) => { const w = t.length * 6.6 + 18; return `<g transform="translate(${x} ${y})"><rect x="${-w / 2}" y="-11" width="${w}" height="22" rx="11" fill="#12143a" opacity="0.92"/><text y="4" text-anchor="middle" class="nv-pill">${t}</text></g>`; };
 
   // ---------- Ilustraciones de cada nivel (centradas en 0,0; radio visible 212) ----------
-  function paisaje(comunidad) {
-    let s = `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-cielo)"/>
-      <circle cx="120" cy="-120" r="56" fill="#ffd43b" opacity="0.25"/><circle cx="120" cy="-120" r="30" fill="#ffd43b"/>
+  // Ecosistema: los seres vivos y el ambiente sin vida (luz, aire, agua, suelo, temperatura).
+  function ecosistema() {
+    return `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-cielo)"/>
+      ${[-40, -10, 20, 50, 80].map(a => `<path d="M120,-120 L${120 + Math.cos((a + 160) * Math.PI / 180) * 240},${-120 + Math.sin((a + 160) * Math.PI / 180) * 240}" stroke="#ffe066" stroke-width="10" opacity="0.18"/>`).join('')}
+      <circle cx="120" cy="-120" r="56" fill="#ffd43b" opacity="0.3"/><circle cx="120" cy="-120" r="30" fill="#ffd43b"/>
       ${[[-120, -140], [10, -110]].map(([x, y]) => `<g fill="#fff" opacity="0.85"><ellipse cx="${x}" cy="${y}" rx="34" ry="12"/><ellipse cx="${x + 20}" cy="${y - 8}" rx="22" ry="12"/></g>`).join('')}
+      ${[0, 1, 2].map(i => `<path d="M${-170 + i * 14},${-92 + i * 12} q14,-8 28,0 t28,0" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.8"/>`).join('')}
       <path d="M-220,10 C-160,-20 -80,0 -20,-12 C40,-24 120,-4 220,-16 V60 H-220 Z" fill="#40c057"/>
       ${dosTonos('<path d="M-220,40 C-120,20 -20,40 60,34 C140,28 180,40 220,36 V220 H-220 Z" fill="FILL"/>', '#8ce99a', '#69db7c', { y: 120 })}
-      ${dosTonos('<ellipse cx="110" cy="130" rx="150" ry="70" fill="FILL"/>', '#4dabf7', '#339af0', { y: 140 })}
-      ${[[70, 110], [130, 150], [60, 165]].map(([x, y]) => `<path d="M${x - 20},${y} h40" stroke="#d0ebff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>`).join('')}`;
-    if (comunidad) s += `<rect x="-220" y="-220" width="440" height="440" fill="#0c0e30" opacity="0.55"/>`;
-    s += `${ceibo(-150, 40, 1)}${[-10, 4, 18, 30, 170, 182, 196].map((x, i) => junco(x, 90 + (i % 3) * 8, 44 + (i % 2) * 14)).join('')}
-      ${pez(120, 175, 0.9)}${pez(60, 140, 0.7, '#ffd43b')}${garza(150, 70, 1)}${yacare(90, 118, 0.8)}
-      ${carpincho(-110, 110, 0.5)}${carpincho(-40, 135, 0.42)}${carpincho(-150, 150, 0.38)}`;
-    if (comunidad) s += `${pill(-80, 80, 'carpinchos')}${pill(150, 16, 'garza')}${pill(60, 96, 'yacaré')}${pill(-150, -60, 'ceibo')}${pill(20, 60, 'juncos')}${pill(150, 196, 'peces')}`;
-    else s += `${pill(120, -76, '☀️ luz')}${pill(-80, -150, '💨 aire')}${pill(110, 150, '💧 agua')}${pill(-70, 168, '🟫 suelo')}`;
-    return s;
+      ${dosTonos('<ellipse cx="110" cy="120" rx="150" ry="62" fill="FILL"/>', '#4dabf7', '#339af0', { y: 130 })}
+      ${[[70, 104], [130, 140], [60, 150]].map(([x, y]) => `<path d="M${x - 20},${y} h40" stroke="#d0ebff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>`).join('')}
+      <path d="M-220,168 C-100,158 40,172 220,160 V220 H-220 Z" fill="#8a5a36"/><path d="M-220,168 C-100,158 40,172 220,160" stroke="#6e4529" stroke-width="4" fill="none"/>
+      ${[[-150, 190], [-60, 184], [30, 196], [110, 186], [170, 200]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="6" fill="#b08968"/>`).join('')}
+      <g transform="translate(-30 -52)"><rect x="-5" y="-26" width="10" height="36" rx="5" fill="#fff"/><circle cy="14" r="9" fill="#fff"/><rect x="-2" y="-12" width="4" height="24" fill="#f03e3e"/><circle cy="14" r="6" fill="#f03e3e"/></g>
+      ${ceibo(-150, 40, 1)}${[-10, 4, 18, 30, 170, 182, 196].map((x, i) => junco(x, 84 + (i % 3) * 8, 44 + (i % 2) * 14)).join('')}
+      ${pez(120, 158, 0.9)}${pez(60, 128, 0.7, '#ffd43b')}${garza(150, 64, 1)}${yacare(90, 108, 0.8)}
+      ${carpincho(-110, 104, 0.5)}${carpincho(-40, 128, 0.42)}${carpincho(-150, 142, 0.38)}
+      ${pill(0, -176, 'SERES VIVOS + AMBIENTE')}
+      ${pill(120, -72, '☀️ luz')}${pill(-104, -118, '💨 aire')}${pill(-30, -92, '🌡️ temperatura')}${pill(110, 90, '💧 agua')}${pill(-20, 186, '🟫 suelo')}`;
+  }
+
+  // Comunidad: solo los seres vivos (sin el ambiente) y cómo se relacionan entre sí.
+  function comunidad() {
+    const flecha = (d, t, x, y) => `<path d="${d}" stroke="#ffd166" stroke-width="3" fill="none" stroke-dasharray="7 5" marker-end="url(#nv-punta)"/>${pill(x, y, t)}`;
+    const grupo = (x, y, r, t, ty) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="0.06" stroke="#9aa3ff" stroke-opacity="0.35" stroke-width="2"/><text x="${x}" y="${ty}" text-anchor="middle" class="nv-pob">${t}</text>`;
+    return `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-suave)"/>
+      ${grupo(-100, 88, 70, 'carpinchos', 164)}${grupo(-110, -46, 52, 'juncos', -104)}${grupo(40, -74, 50, 'garzas', -130)}
+      ${grupo(120, 50, 48, 'peces', 112)}${grupo(40, 124, 50, 'yacarés', 186)}${grupo(142, -66, 46, 'ceibos', -120)}
+      ${[-140, -126, -112, -98, -84].map((x, i) => junco(x, -12, 44 + (i % 2) * 14)).join('')}
+      ${carpincho(-120, 76, 0.5)}${carpincho(-70, 104, 0.42)}${carpincho(-126, 118, 0.36)}
+      ${garza(34, -84, 1)}${pez(110, 38, 1)}${pez(134, 66, 0.8, '#ffd43b')}${yacare(30, 128, 0.8)}${ceibo(142, -30, 0.62)}
+      ${flecha('M-96,30 C-100,6 -104,-4 -106,-14', 'comen', -60, 4)}
+      ${flecha('M58,-44 C80,-10 94,10 104,26', 'come', 104, -8)}
+      ${flecha('M70,116 C92,100 104,86 112,72', 'come', 92, 150)}
+      ${flecha('M70,-84 C90,-90 104,-84 116,-74', 'anida', 90, -108)}
+      ${pill(0, -178, 'SOLO SERES VIVOS')}`;
   }
 
   const DIBUJO = {
@@ -112,21 +135,25 @@ const Niveles = (function () {
         ${[[-60, -20, 60], [40, -110, 50], [70, 90, 70]].map(([x, y, w]) => `<path d="M${x},${y} q${w / 2},-10 ${w},0" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.6"/>`).join('')}
         <circle cx="-40" cy="-40" r="230" fill="none" stroke="#05061a" stroke-width="130" opacity="0.3"/></g>
       ${brillo('M-120,-60 a130,130 0 0 1 70,-74', 6)}`,
-    ecosistema: () => paisaje(false),
-    comunidad: () => paisaje(true),
+    ecosistema: () => ecosistema(),
+    comunidad: () => comunidad(),
     poblacion: () => `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-cielo)"/>
       ${dosTonos('<path d="M-220,-40 C-100,-70 60,-50 220,-70 V220 H-220 Z" fill="FILL"/>', '#8ce99a', '#69db7c', { y: 90 })}
       ${[[-150, -10], [-60, 30], [90, -20], [150, 60], [-120, 120], [10, 150]].map(([x, y]) => `<path d="M${x},${y} l4,-10 l4,10 M${x + 14},${y + 4} l4,-10 l4,10" stroke="#2f9e44" stroke-width="2.4" fill="none"/>`).join('')}
       ${carpincho(-110, -10, 0.62, -1)}${carpincho(80, 0, 0.55)}${carpincho(40, 50, 0.85)}${carpincho(-60, 110, 0.72)}${carpincho(110, 130, 0.45)}${carpincho(-150, 70, 0.4)}
       ${pill(0, -150, 'todos de la misma especie')}`,
     organismo: () => `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-suave)"/>${carpincho(-30, 20, 2.1)}${pill(0, 170, 'un carpincho')}`,
-    sistema: () => `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-suave)"/>
-      <g opacity="0.35">${carpincho(-30, 20, 2.1)}</g>
-      ${[['M18,4 C60,-20 100,-40 140,-44', '#ff6b6b'], ['M18,4 C-40,-20 -100,-20 -120,10', '#ff6b6b'], ['M18,4 C30,40 40,70 36,100', '#ff6b6b'], ['M18,4 C-20,40 -60,70 -80,100', '#ff6b6b'],
-        ['M26,14 C66,-10 104,-28 146,-30', '#5b8def'], ['M26,14 C-34,-8 -96,-6 -116,22', '#5b8def'], ['M26,14 C40,48 48,76 46,104', '#5b8def'], ['M26,14 C-12,48 -52,78 -70,104', '#5b8def']]
-        .map(([d, c]) => `<path d="${d}" stroke="#05061a" stroke-width="9" fill="none" opacity="0.3"/><path d="${d}" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}
-      <g transform="translate(22 8) scale(0.36)">${dosTonos(`<path d="${CORAZON}" fill="FILL"/>`, '#ff6b6b', '#d63c3c', { x: 10 })}</g>
-      ${pill(0, 170, 'sistema circulatorio')}`,
+    // El sistema circulatorio se dibuja en las mismas coordenadas del carpincho, así queda adentro del cuerpo.
+    sistema: () => {
+      const vaso = (d, c) => `<path d="${d}" stroke="#05061a" stroke-width="4.2" fill="none" opacity="0.3" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+      const arterias = ['M22,0 C34,-8 44,-14 58,-14 C64,-14 68,-10 70,-4', 'M18,2 C0,-6 -20,-8 -40,-4', 'M22,6 C24,14 26,22 28,34', 'M20,8 C16,18 14,26 13,34', 'M-20,-6 C-26,6 -30,20 -31,34', 'M-10,-6 C-12,10 -14,24 -15,34'];
+      const venas = ['M62,-6 C48,-4 36,0 26,6', 'M-42,4 C-20,4 0,6 18,9', 'M32,36 C31,26 29,16 26,10', 'M17,36 C19,26 21,18 23,12', 'M-27,36 C-25,24 -21,12 -16,6', 'M-11,36 C-9,26 -7,16 -4,8'];
+      return `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-suave)"/>
+        <g opacity="0.4">${carpincho(-30, 20, 2.1)}</g>
+        <g transform="translate(-30 20) scale(2.1)">${venas.map(d => vaso(d, '#5b8def')).join('')}${arterias.map(d => vaso(d, '#ff6b6b')).join('')}
+          <g transform="translate(21 3) scale(0.13)">${dosTonos(`<path d="${CORAZON}" fill="FILL"/>`, '#ff6b6b', '#d63c3c', { x: 10 })}</g></g>
+        ${pill(0, 150, 'sistema circulatorio')}${pill(0, 176, 'corazón, arterias y venas')}`;
+    },
     organo: () => `<rect x="-220" y="-220" width="440" height="440" fill="url(#nv-suave)"/>
       <path d="M20,-80 C20,-150 90,-160 110,-110" stroke="#d63c3c" stroke-width="30" fill="none" stroke-linecap="round"/><path d="M20,-80 C20,-150 90,-160 110,-110" stroke="#ff8787" stroke-width="14" fill="none" stroke-linecap="round"/>
       <path d="M-40,-70 L-40,-160" stroke="#3f63c9" stroke-width="28" stroke-linecap="round"/><path d="M-40,-70 L-40,-160" stroke="#7aa7ff" stroke-width="12" stroke-linecap="round"/>
@@ -184,7 +211,7 @@ const Niveles = (function () {
       ${pill(-100, 60, 'protón')}${pill(80, 40, 'neutrón')}${pill(10, 160, 'electrón (mucho más chico)')}`,
   };
   // Dónde está el nivel siguiente (más pequeño) dentro de cada dibujo.
-  const FOCO = { biosfera: [10, 70], ecosistema: [-110, 110], comunidad: [-110, 110], poblacion: [40, 50], organismo: [22, 20], sistema: [22, 10], organo: [40, 10],
+  const FOCO = { biosfera: [10, 70], ecosistema: [-100, 104], comunidad: [-100, 88], poblacion: [40, 50], organismo: [16, 28], sistema: [14, 26], organo: [40, 10],
     tisular: [0, 0], celular: [110, 30], organela: [30, -34], macromolecular: [pts46()[22][0], pts46()[22][1]], molecular: [-10, 20], atomico: [0, 0] };
   function pts46() {
     return Array.from({ length: 46 }, (_, i) => {
@@ -208,6 +235,7 @@ const Niveles = (function () {
         <linearGradient id="nv-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4dabf7"/><stop offset="0.6" stop-color="#a5d8ff"/></linearGradient>
         <radialGradient id="nv-suave" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#34307a"/><stop offset="1" stop-color="#191a4d"/></radialGradient>
         <clipPath id="nv-lente"><circle cx="${C[0]}" cy="${C[1]}" r="${R}"/></clipPath>
+        <marker id="nv-punta" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ffd166"/></marker>
         <clipPath id="nv-tierra"><circle cx="0" cy="0" r="160"/></clipPath>
       </defs>
       <rect width="${W}" height="${H}" rx="14" fill="url(#nv-fondo)"/>${estrellas(30, W, H)}
@@ -287,6 +315,7 @@ const Niveles = (function () {
       <p>${n.desc}</p>
       <p><b>En nuestro viaje:</b> ${n.ejemplo}</p>
       <div class="nv-escala">📏 Tamaño aproximado: <b>${n.escala}</b></div>
+      ${n.clave ? `<p class="nv-clave">🔑 ${n.clave}</p>` : ''}
       ${n.id === 'celular' ? '<p class="nv-destacado">⭐ Es el <b>primer nivel con vida</b>: todos los niveles de abajo son materia sin vida.</p>' : ''}
       <ul class="nv-rel">${menor ? `<li>⬇️ Está formado por: <b>${menor.n.toLowerCase()}</b></li>` : '<li>⬇️ Es el nivel más pequeño.</li>'}${mayor ? `<li>⬆️ Forma parte de: <b>${mayor.n.toLowerCase()}</b></li>` : '<li>⬆️ Es el nivel más grande: incluye a todos los demás.</li>'}</ul>`;
   }
