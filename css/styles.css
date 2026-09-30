@@ -89,7 +89,12 @@ h1, h2, h3 { line-height: 1.2; }
   background: var(--panel);
   border-bottom: 1px solid var(--linea);
 }
-.brand { background: none; border: 0; font-weight: 800; font-size: 1.2rem; color: var(--primario); padding: 0.25rem 0; }
+.brand { background: none; border: 0; font-weight: 800; font-size: 1.2rem; color: var(--texto); padding: 0.25rem 0; display: inline-flex; align-items: center; gap: 0.35rem; }
+.brand b { color: var(--primario); }
+.brand-logo { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; font-size: 1.05rem;
+  background: radial-gradient(circle at 35% 30%, #3b4290, #1f2256 70%); box-shadow: inset 0 -3px 0 rgba(0,0,0,.3), 0 2px 6px rgba(18,20,58,.3); }
+.firma { text-align: right; padding: 0.4rem 1rem 1rem; font-size: 0.8rem; color: var(--suave); max-width: 1240px; margin: 0 auto; }
+.firma b { color: var(--texto); font-weight: 700; }
 .tabs { display: flex; gap: 0.4rem; flex: 1; min-width: 0; }
 .grupo { position: relative; }
 .grupo-btn {
@@ -1147,6 +1152,50 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .md-tabla { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .md-tabla td { border: 1px solid var(--linea); padding: 0.3rem 0.45rem; }
 
+/* ---------- Física: MRU ---------- */
+#mr-calle, #mr-graf { display: block; width: 100%; height: auto; }
+#mr-graf { margin-top: 0.5rem; }
+.mr-marca { font-size: 10.5px; font-weight: 700; fill: #c9ccf5; }
+.mr-eje { font-size: 11px; font-weight: 600; fill: #9aa0d8; }
+.mr-eje.chico { font-size: 9px; }
+.mr-tit { font-size: 11px; font-weight: 800; fill: #c9ccf5; }
+.mr-reloj { font-size: 14px; font-weight: 800; fill: #ffd166; }
+.mr-cartel { font-size: 13px; font-weight: 800; fill: #12143a; }
+.mr-letra { font-size: 16px; font-weight: 900; fill: #ffd166; }
+.mr-panel { cursor: pointer; }
+.mr-panel-fondo { fill: #1a1c4f; stroke: #3a3e85; stroke-width: 2; }
+.mr-panel:hover .mr-panel-fondo { stroke: #ffd166; }
+.mr-panel.ok .mr-panel-fondo { stroke: #69db7c; stroke-width: 4; fill: #1f3f3f; }
+.mr-panel.mal .mr-panel-fondo { stroke: #ff6b6b; stroke-width: 4; }
+.mr-panel.off { opacity: 0.5; }
+.mr-ctrl { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.7rem; color: #e9ebff; }
+.mr-slider { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) 9rem; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 0.9rem; }
+.mr-slider input { accent-color: var(--c); width: 100%; }
+.mr-slider b { color: var(--c); font-variant-numeric: tabular-nums; }
+.mr-check { font-weight: 700; font-size: 0.9rem; display: flex; gap: 0.4rem; align-items: center; }
+.mr-ec { border-left: 5px solid var(--c); background: var(--bg); border-radius: 8px; padding: 0.45rem 0.6rem; margin: 0.35rem 0; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.mr-ideas { padding-left: 1.1rem; font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.3rem; }
+
+/* ---------- Física: electricidad ---------- */
+#el-svg { display: block; width: 100%; height: auto; }
+.el-lugar { cursor: pointer; }
+.el-lugar:hover { filter: brightness(1.15); }
+.el-mas { font-size: 20px; font-weight: 900; fill: #9aa0d8; }
+.el-polo { font-size: 16px; font-weight: 900; fill: #fff; }
+.el-alerta { font-size: 14px; font-weight: 800; fill: #fff; }
+.el-suena { animation: el-sonar 0.15s linear infinite alternate; transform-box: fill-box; transform-origin: 50% 0; }
+@keyframes el-sonar { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+.el-herr { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin-top: 0.7rem; }
+.el-herr button { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 74px; border: 2px solid #3a3e85; background: #1f2256; color: #e9ebff; border-radius: 12px; padding: 0.35rem 0.5rem; font-weight: 700; font-size: 0.8rem; }
+.el-herr button span { font-size: 1.35rem; }
+.el-herr button.activo { border-color: #ffd166; background: #3a3e85; box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.25); }
+.el-misiones { list-style: none; padding: 0; margin: 0.4rem 0 0.8rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.el-misiones li { background: var(--bg); border-radius: 10px; padding: 0.45rem 0.6rem; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.el-misiones li span { color: var(--suave); }
+.el-misiones li.hecha { background: var(--ok-suave); }
+.el-misiones li.recien { animation: aparecer 0.5s ease; outline: 2px solid var(--ok); }
+@media (prefers-reduced-motion: reduce) { .el-suena { animation: none; } }
+
 /* ---------- Niveles de organización ---------- */
 #nv-svg { display: block; width: 100%; height: auto; }
 .nv-fila { cursor: pointer; }
@@ -1341,6 +1390,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .grupo-actual { display: none; }
 }
 @media (max-width: 560px) {
+  .mr-slider { grid-template-columns: 1fr; gap: 0.15rem; }
   .tabla-atomos { min-width: 0; width: 100%; }
   .tabla-atomos th, .tabla-atomos td { padding: 0.35rem 0.4rem; }
   .nx-scroll { overflow-x: auto; margin: 0 -0.4rem; }

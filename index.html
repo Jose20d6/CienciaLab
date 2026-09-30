@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QuímicaLab</title>
-  <meta name="description" content="Aplicación interactiva de química para secundaria: transformaciones físicas y químicas, laboratorio virtual, balanceo de ecuaciones y tabla periódica.">
+  <title>CienciaLab</title>
+  <meta name="description" content="CienciaLab: aplicación interactiva de Química, Ciencias Naturales y Física para la escuela secundaria.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <header class="topbar">
-    <button class="brand" data-go="inicio">⚗️ QuímicaLab</button>
+    <button class="brand" data-go="inicio"><span class="brand-logo" aria-hidden="true">🔬</span><span>Ciencia<b>Lab</b></span></button>
     <nav class="tabs" aria-label="Actividades">
       <div class="grupo">
         <button class="grupo-btn" aria-haspopup="true" aria-expanded="false">⚗️ Química <span class="grupo-actual"></span><span class="flecha" aria-hidden="true">▾</span></button>
@@ -37,6 +37,8 @@
         <button class="grupo-btn" aria-haspopup="true" aria-expanded="false">⚡ Física <span class="grupo-actual"></span><span class="flecha" aria-hidden="true">▾</span></button>
         <div class="grupo-menu" hidden>
           <button data-go="mediciones">📏 Mediciones: área y volumen</button>
+          <button data-go="mru">🚗 Movimiento (MRU)</button>
+          <button data-go="electricidad">⚡ Electricidad: circuitos</button>
         </div>
       </div>
     </nav>
@@ -139,6 +141,18 @@
           <p>Calculá el área total y el volumen de cajas de todo tipo, con medidas en metros, centímetros y milímetros.</p>
           <span class="etiqueta">Magnitudes y unidades</span>
         </button>
+        <button class="tarjeta-modulo" data-go="mru">
+          <span class="tm-emoji">🚗</span>
+          <h2>Movimiento rectilíneo uniforme</h2>
+          <p>Hacé andar autos a distintas velocidades, mirá cómo se dibujan los gráficos y resolvé problemas de MRU.</p>
+          <span class="etiqueta">Cinemática</span>
+        </button>
+        <button class="tarjeta-modulo" data-go="electricidad">
+          <span class="tm-emoji">💡</span>
+          <h2>Electricidad: circuitos</h2>
+          <p>Armá circuitos con pilas, lamparitas, interruptores y timbres, en serie y en paralelo, y descubrí qué materiales conducen.</p>
+          <span class="etiqueta">Circuitos eléctricos</span>
+        </button>
       </div>
     </section>
 
@@ -155,7 +169,11 @@
     <section id="alimentacion" class="view" hidden></section>
     <section id="nutricion" class="view" hidden></section>
     <section id="mediciones" class="view" hidden></section>
+    <section id="mru" class="view" hidden></section>
+    <section id="electricidad" class="view" hidden></section>
   </main>
+
+  <footer class="firma">Hecho por <b>Avila del Cali Jose</b> · CienciaLab</footer>
 
   <script src="js/util.js"></script>
   <script src="js/arte.js"></script>
@@ -174,6 +192,8 @@
   <script src="js/nutricion-extra.js"></script>
   <script src="js/nutricion.js"></script>
   <script src="js/mediciones.js"></script>
+  <script src="js/mru.js"></script>
+  <script src="js/electricidad.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,6 +1,8 @@
-# ⚗️ QuímicaLab
+# 🔬 CienciaLab
 
-Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 años), pensada para usar en clase.
+Aplicación web interactiva de Química, Ciencias Naturales y Física para estudiantes de secundaria, pensada para usar en clase.
+
+Hecha por **Avila del Cali Jose**.
 
 ## Módulos
 
@@ -19,6 +21,8 @@ Aplicación web interactiva de química para estudiantes de secundaria (14 a 16 
 | 🥗 **Alimentación saludable** | Nutrición | Exploran la **pirámide nutricional** (EE. UU., 1992), el **óvalo nutricional** (Argentina, 2000) y el **plato** de la Gráfica de la Alimentación Diaria (Guías Alimentarias para la Población Argentina, 2016): nutrientes y función de cada grupo y los 10 mensajes de las Guías. Comparan los tres modelos, arman un día de comidas y reciben una devolución, y clasifican alimentos en los grupos del plato. |
 | 🫀 **Sistemas de la nutrición** | Cuerpo humano (2.º año) | **Explorar el cuerpo:** tocan cada sistema (digestivo, respiratorio, circulatorio y excretor) y la célula para ver sus órganos, qué recibe, qué entrega y una analogía. **Seguí el viaje:** acompañan a la glucosa, el oxígeno, el dióxido de carbono, la urea y la fibra eligiendo por qué sistema pasa cada una. **¿Qué pasa si…?:** desconectan un sistema y miran cómo cambian los nutrientes, el oxígeno, los desechos y la energía de las células. **Completar el esquema:** ubican los rótulos del esquema de la clase (en el nivel 2, también los sistemas) y después escriben un texto con conectores. **La ciudad:** unen cada lugar de una ciudad con el sistema al que se parece y resuelven situaciones. |
 | 📏 **Mediciones: área y volumen** | Física · Magnitudes y unidades | Calculan el área total y el volumen de cajas ilustradas (caja de cartón, pecera, contenedor, pileta, dado, libro…) con medidas en m, cm y mm. Tres niveles: misma unidad, unidades distintas y resultado en otra unidad (m², m³, dm³ o litros). Pistas paso a paso, fórmulas y equivalencias, y la resolución completa al comprobar. |
+| 🚗 **Movimiento rectilíneo uniforme** | Física · Cinemática | **Simulador:** eligen velocidad y posición inicial de uno o dos autos y ven el recorrido (con banderitas cada segundo), los gráficos posición-tiempo y velocidad-tiempo en vivo y el punto de encuentro. **Problemas:** calculan posición, tiempo, velocidad, distancia con km/h y encuentros, y luego ven la simulación. **¿Qué gráfico es?:** eligen el gráfico x-t que corresponde a cada descripción. |
+| 💡 **Electricidad: circuitos** | Física · Circuitos eléctricos | **Armar circuitos:** ponen pilas, cables, lamparitas, interruptores y timbres en un tablero; la corriente se calcula de verdad (serie, paralelo, dos pilas, cortocircuito) y se ven los electrones moverse. Siete desafíos. **¿Conduce o no?:** predicen si un objeto es conductor o aislante y lo prueban en el circuito. |
 
 ## Cómo usarla
 
@@ -29,7 +33,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
 - El botón **🌙/☀️** cambia entre modo claro y oscuro (por defecto sigue la configuración del dispositivo).
 - En las actividades con preguntas, cada ronda trae preguntas distintas y no se repiten las de la ronda anterior.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#nutricion` o `#mediciones`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#nutricion`, `#mediciones`, `#mru` o `#electricidad`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -54,6 +58,8 @@ js/alimentacion.js    Guías alimentarias, alimentos ilustrados y actividades
 js/nutricion.js      Sistemas de la nutrición: cuerpo, viajes y sistemas desconectados
 js/nutricion-extra.js  Sistemas de la nutrición: esquema para completar y la ciudad
 js/mediciones.js      Física: área y volumen de cajas con distintas unidades
+js/mru.js             Física: movimiento rectilíneo uniforme
+js/electricidad.js    Física: circuitos eléctricos, conductores y aislantes
 js/app.js             Navegación
 ```
 
