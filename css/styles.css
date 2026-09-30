@@ -99,6 +99,7 @@ h1, h2, h3 { line-height: 1.2; }
 }
 .grupo-btn:hover, .grupo-btn[aria-expanded="true"] { background: var(--bg); border-color: var(--linea); }
 .grupo-btn.activo { background: var(--primario-suave); color: var(--primario); }
+.g-corto { display: none; }
 .grupo-actual { font-weight: 600; font-size: 0.88rem; opacity: 0.85; }
 .grupo-actual:empty { display: none; }
 .flecha { font-size: 0.8rem; transition: transform 0.15s; }
@@ -1121,6 +1122,31 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .nu-consecuencia.mal { background: var(--mal-suave); }
 @media (prefers-reduced-motion: reduce) { .nu-latido { animation: none; } }
 
+/* ---------- Física: mediciones ---------- */
+#md-svg { display: block; width: 100%; height: auto; }
+.md-titulo { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
+.md-cota { font-size: 14px; font-weight: 800; }
+.md-cota2 { font-size: 12px; font-weight: 700; fill: #69db7c; }
+.md-eje { font-size: 11px; font-weight: 700; }
+.md-leyenda { display: flex; gap: 1rem; justify-content: center; margin-top: 0.5rem; font-size: 0.88rem; color: #c9ccf5; }
+.md-leyenda span::before { content: ""; display: inline-block; width: 18px; height: 4px; border-radius: 2px; background: var(--c); margin-right: 0.35rem; vertical-align: middle; }
+.md-cab { display: flex; justify-content: space-between; color: var(--suave); font-weight: 700; font-size: 0.9rem; }
+.md-campo { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 2.6rem; align-items: center; gap: 0.5rem; margin: 0.5rem 0; font-weight: 700; }
+.md-campo input { font: inherit; font-size: 1.1rem; padding: 0.5rem 0.7rem; border-radius: 10px; border: 2px solid var(--linea); background: var(--bg); color: var(--texto); min-width: 0; }
+.md-campo input:focus { outline: none; border-color: var(--primario); }
+.md-campo b { color: var(--primario); }
+.md-campo.ok input { border-color: var(--ok); background: var(--ok-suave); }
+.md-campo.mal input { border-color: var(--mal); background: var(--mal-suave); }
+.md-botones { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0; }
+.md-pasos { padding-left: 1.2rem; margin: 0.4rem 0; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.9rem; background: var(--aviso-suave); border-radius: 10px; padding: 0.6rem 0.8rem 0.6rem 1.8rem; }
+.md-pasos li { list-style: none; margin-left: -1rem; }
+.md-sol { margin: 0.3rem 0 !important; font-size: 0.92rem; }
+.md-ayudas { margin-top: 0.8rem; }
+.md-ayudas summary { cursor: pointer; font-weight: 700; color: var(--primario); }
+.md-ayudas p { margin: 0.4rem 0; font-size: 0.92rem; }
+.md-tabla { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.md-tabla td { border: 1px solid var(--linea); padding: 0.3rem 0.45rem; }
+
 /* ---------- Niveles de organización ---------- */
 #nv-svg { display: block; width: 100%; height: auto; }
 .nv-fila { cursor: pointer; }
@@ -1323,7 +1349,11 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .tabs { order: 3; flex-basis: 100%; }
   #btn-tema { margin-left: auto; }
   .tabs .grupo { flex: 1; }
-  .grupo-btn { width: 100%; justify-content: center; }
+  .grupo-btn { width: 100%; justify-content: center; padding: 0.45rem 0.4rem; font-size: 0.86rem; gap: 0.2rem; }
+  .tabs { gap: 0.2rem; }
+  .tabs .grupo { min-width: 0; }
+  .g-largo { display: none; }
+  .g-corto { display: inline; }
   .grupo-menu { min-width: 0; width: max(100%, 240px); }
   .grupo:last-child .grupo-menu { left: auto; right: 0; }
 }
