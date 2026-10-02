@@ -584,8 +584,14 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .am-enlaces-cuenta { font-size: 0.9rem; color: var(--suave); }
 
 /* ---------- Efecto invernadero ---------- */
-.inv-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 1rem; align-items: start; margin-bottom: 1rem; }
-.inv-escena { position: relative; width: 100%; aspect-ratio: 600 / 380; border-radius: 12px; overflow: hidden; }
+.inv-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start; margin-bottom: 1rem; }
+.inv-controles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1.2fr); gap: 0 1.5rem; align-items: start; }
+.inv-col h3:first-child { margin-top: 0; }
+.kz-aspas { animation: kz-girar 3s linear infinite; }
+@keyframes kz-girar { to { transform: rotate(360deg); } }
+@media (max-width: 1000px) { .inv-controles { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 640px) { .inv-controles { grid-template-columns: minmax(0, 1fr); } .inv-escena-scroll { overflow-x: auto; } .inv-escena-scroll .inv-escena { min-width: 640px; } }
+.inv-escena { position: relative; width: 100%; aspect-ratio: 1000 / 400; border-radius: 12px; overflow: hidden; }
 .inv-escena svg, .inv-escena canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .inv-escena-panel { background: #12143a; color: #e9ebff; box-shadow: 0 8px 30px rgba(18, 20, 58, 0.35); }
 .inv-escena-panel .inv-leyenda { color: #b8bcf0; }

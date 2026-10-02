@@ -6,9 +6,10 @@ const Invernadero = (function () {
   const CO2_MIN = 150, CO2_MAX = 1200;
   const ANIO_INICIAL = 1850, MS_POR_ANIO = 350, TAU = 8; // TAU: años que tarda en acercarse al equilibrio
   const VENTANA = 150; // años visibles en el gráfico
-  const W = 600, H = 380; // escena
+  const W = 1000, H = 400; // escena (ancha, para aprovechar toda la pantalla)
+  const DX = 200; // el paisaje se dibujó para 600 px de ancho: se corre al centro
   // El planeta se ve como un gran arco en la parte de abajo; la atmósfera es una franja alrededor.
-  const PX = 300, PY = 1060, PR = 760, ATM = 170;
+  const PX = 300 + DX, PY = 1060, PR = 760, ATM = 170;
   const SOL = { x: 46, y: 44 };
 
   const PRESETS = [
@@ -53,10 +54,10 @@ const Invernadero = (function () {
       </div>
       <div class="inv-grid">
         <div class="panel inv-escena-panel">
-          <div class="inv-escena">
+          <div class="inv-escena-scroll"><div class="inv-escena">
             <svg viewBox="0 0 ${W} ${H}" class="inv-fondo" id="inv-fondo" aria-hidden="true"></svg>
             <canvas id="inv-canvas" aria-label="Animación de la radiación solar y el calor"></canvas>
-          </div>
+          </div></div>
           <div class="inv-leyenda">
             <span><i style="background:#ffe08a;box-shadow:0 0 6px #ffd166"></i>Luz del Sol</span>
             <span><i style="background:#ff7a45;box-shadow:0 0 6px #ff5a36"></i>Calor (infrarrojo)</span>
@@ -71,6 +72,7 @@ const Invernadero = (function () {
         </div>
 
         <div class="panel inv-controles">
+          <div class="inv-col">
           <div class="inv-lecturas">
             <div><span class="inv-num" id="inv-temp"></span><span class="inv-lab">Temperatura media</span></div>
             <div><span class="inv-num" id="inv-ppm"></span><span class="inv-lab">CO₂ en el aire</span></div>
@@ -80,14 +82,19 @@ const Invernadero = (function () {
           <label class="inv-slider-lab" for="inv-slider">Cantidad de CO₂ (partes por millón)</label>
           <input type="range" id="inv-slider" min="${CO2_MIN}" max="${CO2_MAX}" step="10">
           <div class="inv-escala"><span>${CO2_MIN}</span><span>${CO2_MAX} ppm</span></div>
+          </div>
+          <div class="inv-col">
 
           <h3>Momentos de la historia</h3>
           <div class="inv-botones">${PRESETS.map(p => `<button class="inv-btn" data-ppm="${p.ppm}">${p.texto}<small>${p.sub}</small></button>`).join('')}</div>
+          </div>
+          <div class="inv-col">
           <h3>¿Qué hacemos los humanos?</h3>
           <div class="inv-botones">${ACCIONES.map(a => `<button class="inv-btn ${a.d > 0 ? 'sube' : 'baja'}" data-d="${a.d}">${a.texto}<small>${a.sub}</small></button>`).join('')}</div>
 
           <label class="inv-check"><input type="checkbox" id="inv-sin-atm"> Quitar los gases de efecto invernadero</label>
           <div class="inv-consecuencia" id="inv-consecuencia"></div>
+          </div>
         </div>
       </div>
 
@@ -189,6 +196,8 @@ const Invernadero = (function () {
   }
 
   function dibujarFondo() {
+    // El paisaje usa sus coordenadas originales (0 a 600) dentro de un grupo corrido DX.
+    const PX = 300, superficie = x => PY - Math.sqrt(PR * PR - (x - PX) * (x - PX));
     const anomalia = (T ?? tEquilibrio()) - T_BASE;
     const atm = colorAtmosfera(anomalia);
     const { hielo, derretido, subida, avance } = estadoHielo(anomalia);
@@ -237,6 +246,13 @@ const Invernadero = (function () {
       <path d="M${tx - tw * 0.9},${ty + 1} L${tx + tw * 0.9},${ty + 1} L${tx + tw * 0.6},${ty + 7} L${tx - tw * 0.55},${ty + 6} Z" fill="#bcd6ff" opacity="0.35"/>
       ${dosTonos(`<path d="M${tx - tw},${ty + 1} L${tx - tw + 3},${ty - 4} L${tx + tw - 5},${ty - 5} L${tx + tw},${ty + 1} Z" fill="FILL"/>`, '#f4f6ff', '#b9c6ff', { y: ty - 1 })}
       ${oso(tx + 2, ty - 10, 0.42, false)}</g>`;
+    const molino = (x, e) => {
+      const y = superficie(x);
+      return `<g transform="translate(${x} ${y}) scale(${e})">${sombra(4, 2, 16)}
+        ${dosTonos('<path d="M-3,0 L-1.6,-110 H1.6 L3,0 Z" fill="FILL"/>', '#f1f3ff', '#c9d1ff', { x: 0.5 })}
+        <g transform="translate(0 -112)"><g class="kz-aspas">${[0, 120, 240].map(a => `<path d="M0,0 C4,-12 3,-40 0,-52 C-2,-40 -3,-12 0,0 Z" fill="#f1f3ff" transform="rotate(${a})"/>`).join('')}</g>
+        <circle r="4.5" fill="#9aa6ff"/></g></g>`;
+    };
     const montania = (x, w, h) => `
       <path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
       <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.3},${sx(x + w * 0.3)} Z" fill="#2a3468"/>
@@ -282,24 +298,26 @@ const Invernadero = (function () {
       <g class="kz-sol-latido"><circle cx="${SOL.x}" cy="${SOL.y}" r="130" fill="url(#kz-sol)" opacity="0.5"/></g>
       <circle cx="${SOL.x}" cy="${SOL.y}" r="58" fill="url(#kz-sol)"/>
       <circle cx="${SOL.x}" cy="${SOL.y}" r="30" fill="#fff3c4"/>
+      <g transform="translate(${DX} 0)">
       ${sinAtmosfera ? '' : `<circle cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" fill="url(#kz-halo)"/>
         ${[60, 110].map(d => `<circle cx="${PX}" cy="${PY}" r="${PR + d}" fill="none" stroke="${atm}" stroke-opacity="0.12" stroke-width="1.5"/>`).join('')}`}
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="url(#kz-mar)"/>
       <g clip-path="url(#kz-planeta)">
         <ellipse cx="150" cy="${superficie(150) + 8}" rx="60" ry="9" fill="url(#kz-brillo)"/>
         ${[[150, 330], [205, 345], [170, 362], [235, 368]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
-        <path d="M-20,${sx(0) - 20} L${costaI},${sx(costaI) - 20} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-20,${H} Z" fill="url(#kz-tierra)"/>
-        <path d="M${costaD},${sx(costaD) - 20} L620,${sx(620) - 20} L620,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
-        <path d="M-20,${sx(0) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 620,${sx(620) + 40} L620,${H} L-20,${H} Z" fill="#0a0d2e" opacity="0.28"/>
+        <path d="M-220,${sx(-220) - 20} L${costaI},${sx(costaI) - 20} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-220,${H} Z" fill="url(#kz-tierra)"/>
+        <path d="M${costaD},${sx(costaD) - 20} L820,${sx(820) - 20} L820,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
+        <path d="M-220,${sx(-220) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 820,${sx(820) + 40} L820,${H} L-220,${H} Z" fill="#0a0d2e" opacity="0.28"/>
       </g>
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
-      ${[[150, 58, 1], [455, 70, 0.8], [300, 92, 0.6]].map(([x, alto, e], i) => `<g class="kz-nube" style="animation-delay:${-i * 3}s">
+      ${[[150, 58, 1], [455, 70, 0.8], [300, 92, 0.6], [-40, 60, 0.7], [620, 66, 0.75]].map(([x, alto, e], i) => `<g class="kz-nube" style="animation-delay:${-i * 3}s">
         <g transform="translate(${x} ${superficie(x) - alto}) scale(${e})"><rect x="-38" y="-6" width="76" height="16" rx="8" fill="#fff" opacity="0.92"/>
         <circle cx="-12" cy="-8" r="13" fill="#fff" opacity="0.92"/><circle cx="10" cy="-12" r="16" fill="#fff" opacity="0.92"/>
         <rect x="-38" y="6" width="76" height="4" rx="2" fill="#c9d3ff" opacity="0.7"/></g></g>`).join('')}
       ${montania(500, 48, 62)}${nieve(500, 48, 62)}
       ${montania(548, 34, 40)}${nieve(548, 34, 40)}
-      ${[262, 292, 306, 454, 590].map((x, i) => arbol(x, 17 + (i % 3) * 4)).join('')}
+      ${[262, 292, 306, 454, 590, 612, 634].map((x, i) => arbol(x, 17 + (i % 3) * 4)).join('')}
+      ${[[-30, 0.32], [10, 0.38]].map(([x, e]) => molino(x, e)).join('')}
       ${seco < 2 ? [[276, 20], [440, 22], [468, 18]].map(([x, h]) => pino(x, superficie(x) + 1, h)).join('') : [276, 440, 468].map(x => arbol(x, 16)).join('')}
       <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}</g>
       <g transform="translate(386 ${superficie(404) + 1}) scale(0.3)">${fabrica(0, 0)}</g>
@@ -309,7 +327,8 @@ const Invernadero = (function () {
       ${inundacion}
       ${tempano}
       ${regla}
-      ${sinAtmosfera ? '' : `<text x="${W - 14}" y="${superficie(W - 14) - 125}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
+      </g>
+      ${sinAtmosfera ? '' : `<text x="${W - 120}" y="${superficie(W - 320) - 140}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
       <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>
       <rect width="${W}" height="${H}" fill="url(#kz-vineta)" pointer-events="none"/>`;
   }
@@ -347,15 +366,15 @@ const Invernadero = (function () {
 
   function animarParticulas(dt) {
     // Moléculas de CO₂: flotan en la franja de la atmósfera, siguiendo la curva del planeta.
-    const objetivo = sinAtmosfera ? 0 : Math.round(ppm / 24);
+    const objetivo = sinAtmosfera ? 0 : Math.round(ppm / 17);
     while (moleculas.length < objetivo) {
-      moleculas.push({ ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.0, rad: PR + 28 + Math.random() * (ATM - 55), vel: (Math.random() - 0.5) * 0.012, rot: Math.random() * 6, brillo: 0 });
+      moleculas.push({ ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.1, rad: PR + 28 + Math.random() * (ATM - 55), vel: (Math.random() - 0.5) * 0.012, rot: Math.random() * 6, brillo: 0 });
     }
     if (moleculas.length > objetivo) moleculas.length = objetivo;
     moleculas.forEach(m => {
       m.ang += m.vel * dt;
-      if (m.ang < -Math.PI / 2 - 0.5) m.ang += 1.0;
-      if (m.ang > -Math.PI / 2 + 0.5) m.ang -= 1.0;
+      if (m.ang < -Math.PI / 2 - 0.55) m.ang += 1.1;
+      if (m.ang > -Math.PI / 2 + 0.55) m.ang -= 1.1;
       m.rot += dt * 0.6;
       m.brillo = Math.max(0, m.brillo - dt * 1.4);
       m.x = PX + m.rad * Math.cos(m.ang);
@@ -364,7 +383,7 @@ const Invernadero = (function () {
 
     // Rayos de sol: salen del Sol hacia un punto al azar de la superficie.
     if (Math.random() < dt * 5) {
-      const destinoX = 150 + Math.random() * 450, destinoY = superficie(destinoX);
+      const destinoX = 230 + Math.random() * 600, destinoY = superficie(destinoX);
       const dx = destinoX - SOL.x, dy = destinoY - SOL.y, d = Math.hypot(dx, dy);
       fotones.push({ tipo: 'sol', x: SOL.x + dx / d * 30, y: SOL.y + dy / d * 30, vx: dx / d * 190, vy: dy / d * 190, vida: 0 });
     }
@@ -424,7 +443,7 @@ const Invernadero = (function () {
         cuenta.escapan++;
       }
     });
-    fotones = fotones.filter(f => f.y > -20 && f.x > -20 && f.x < W + 20 && f.vida < 12 && distancia(f.x, f.y) < PR + ATM + 100);
+    fotones = fotones.filter(f => f.y > -20 && f.x > -20 && f.x < W + 20 && f.vida < 12 && (f.tipo === 'sol' || distancia(f.x, f.y) < PR + ATM + 100));
     if (fotones.length > 140) fotones.splice(0, fotones.length - 140);
 
     // ---- Dibujo ----
