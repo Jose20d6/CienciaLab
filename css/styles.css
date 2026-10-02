@@ -587,6 +587,19 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .inv-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start; margin-bottom: 1rem; }
 .inv-controles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1.2fr); gap: 0 1.5rem; align-items: start; }
 .inv-col h3:first-child { margin-top: 0; }
+.kz-ch4 { display: inline-flex; position: relative; width: 22px; height: 16px; }
+.kz-ch4 i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #f1f3f5; }
+.kz-ch4 i:nth-child(1) { left: 0; top: 5px; } .kz-ch4 i:nth-child(2) { right: 0; top: 5px; } .kz-ch4 i:nth-child(3) { left: 8px; top: 0; } .kz-ch4 i:nth-child(4) { left: 8px; bottom: 0; }
+.kz-ch4 i:nth-child(5) { left: 6px; top: 3px; width: 10px; height: 10px; background: #5c636a; }
+.inv-volcan { width: 100%; margin-bottom: 0.3rem; }
+.inv-volcan.activo { border-color: #e8590c; background: rgba(232, 89, 12, 0.12); }
+.inv-aportes { margin: 0.5rem 0; }
+.inv-aporte { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) 3.6rem; align-items: center; gap: 0.4rem; font-size: 0.85rem; margin: 0.2rem 0; }
+.inv-aporte b { text-align: right; font-variant-numeric: tabular-nums; }
+.inv-aporte-barra { height: 9px; border-radius: 99px; background: var(--panel); overflow: hidden; }
+.inv-aporte-barra i { display: block; height: 100%; border-radius: 99px; }
+.inv-aporte-barra.mas i { background: #e8590c; }
+.inv-aporte-barra.menos i { background: #1c7ed6; }
 .kz-aspas { animation: kz-girar 3s linear infinite; }
 @keyframes kz-girar { to { transform: rotate(360deg); } }
 @media (max-width: 1000px) { .inv-controles { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
@@ -626,6 +639,8 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .inv-lab { font-size: 0.78rem; color: var(--suave); }
 .inv-slider-lab { font-weight: 700; display: block; margin-bottom: 0.3rem; }
 #inv-slider { width: 100%; accent-color: var(--quimico); }
+#inv-slider-ch4 { width: 100%; accent-color: #5c636a; }
+.inv-slider-lab + #inv-slider-ch4, .inv-escala + .inv-slider-lab { margin-top: 0.7rem; }
 .inv-escala { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--suave); }
 .inv-controles h3 { font-size: 0.95rem; margin: 1rem 0 0.4rem; }
 .inv-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }

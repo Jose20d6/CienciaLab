@@ -4,6 +4,9 @@
 const Invernadero = (function () {
   const T_BASE = 14, CO2_BASE = 280, SENSIBILIDAD = 3, T_SIN_ATMOSFERA = -18;
   const CO2_MIN = 150, CO2_MAX = 1200;
+  const CH4_BASE = 700, CH4_MIN = 350, CH4_MAX = 4000; // metano en partes por mil millones (ppb)
+  // Forzamiento radiativo (W/m²) → temperatura: con λ, duplicar el CO₂ da +3 °C.
+  const LAMBDA = 3 / (5.35 * Math.LN2);
   const ANIO_INICIAL = 1850, MS_POR_ANIO = 350, TAU = 8; // TAU: años que tarda en acercarse al equilibrio
   const VENTANA = 150; // años visibles en el gráfico
   const W = 1000, H = 400; // escena (ancha, para aprovechar toda la pantalla)
@@ -13,10 +16,16 @@ const Invernadero = (function () {
   const SOL = { x: 46, y: 44 };
 
   const PRESETS = [
-    { ppm: 180, texto: '🧊 Glaciación', sub: '180 ppm' },
-    { ppm: 280, texto: '🏭 Antes de la industria', sub: '280 ppm' },
-    { ppm: 420, texto: '📍 Hoy', sub: '≈ 420 ppm' },
-    { ppm: 900, texto: '🔥 Año 2100 (muchas emisiones)', sub: '≈ 900 ppm' },
+    { ppm: 180, ch4: 380, texto: '🧊 Glaciación', sub: '180 ppm · 380 ppb' },
+    { ppm: 280, ch4: 700, texto: '🏭 Antes de la industria', sub: '280 ppm · 700 ppb' },
+    { ppm: 420, ch4: 1900, texto: '📍 Hoy', sub: '≈ 420 ppm · 1900 ppb' },
+    { ppm: 900, ch4: 3500, texto: '🔥 Año 2100 (muchas emisiones)', sub: '≈ 900 ppm · 3500 ppb' },
+  ];
+  const ACCIONES_CH4 = [
+    { d: 300, texto: '🐄 Más ganado', sub: '+300 ppb de metano' },
+    { d: 150, texto: '🌾 Arrozales y basurales', sub: '+150 ppb' },
+    { d: 200, texto: '⛽ Pérdidas de gas natural', sub: '+200 ppb' },
+    { d: -300, texto: '♻️ Aprovechar el biogás', sub: '−300 ppb' },
   ];
   const ACCIONES = [
     { d: 40, texto: '🚗 Quemar combustibles fósiles', sub: '+40 ppm' },
@@ -34,15 +43,33 @@ const Invernadero = (function () {
   ];
 
   let raiz, canvas, ctx, grafico;
-  let ppm = 420, sinAtmosfera = false, T = null, anio = ANIO_INICIAL, historial = [];
-  let pausado = false, ultimo = 0, acumulado = 0, fotones = [], moleculas = [];
-  let cuenta = { escapan: 0, vuelven: 0 };
+  let ppm = 420, ch4 = 1900, aerosol = 0, conAlbedo = true, sinAtmosfera = false, T = null, anio = ANIO_INICIAL, historial = [];
+  let pausado = false, ultimo = 0, acumulado = 0, fotones = [], moleculas = [], ceniza = [];
+  let cuenta = { escapan: 0, vuelven: 0, solar: 0, reflejados: 0 };
   let activo = false, velocidad = 1;
   const VELOCIDADES = [{ f: 0.4, texto: '🐢 Lenta' }, { f: 1, texto: 'Normal' }, { f: 2.5, texto: '🐇 Rápida' }];
 
-  const tEquilibrio = () => (sinAtmosfera ? T_SIN_ATMOSFERA : T_BASE + SENSIBILIDAD * Math.log2(ppm / CO2_BASE));
-  // Probabilidad de que el calor (infrarrojo) sea absorbido y devuelto por la atmósfera.
-  const pAbsorcion = () => (sinAtmosfera ? 0 : 1 - Math.exp(-ppm / 380));
+  // Cada efecto empuja la temperatura: CO₂ y metano calientan; el hielo que se derrite refleja menos luz
+  // (calienta más, retroalimentación del albedo) y la ceniza de un volcán tapa el sol (enfría).
+  // El albedo depende de cuánto hielo queda, que a su vez depende de la temperatura:
+  // se busca la temperatura de equilibrio que es coherente consigo misma (retroalimentación).
+  const forzantes = () => {
+    const f = { co2: 5.35 * Math.log(ppm / CO2_BASE), ch4: 0.036 * (Math.sqrt(ch4) - Math.sqrt(CH4_BASE)), volcan: -2.5 * aerosol, albedo: 0 };
+    if (conAlbedo) {
+      let a = LAMBDA * (f.co2 + f.ch4 + f.volcan);
+      for (let i = 0; i < 30; i++) { f.albedo = 1.2 * (1 - estadoHielo(a).hielo); a = LAMBDA * (f.co2 + f.ch4 + f.volcan + f.albedo); }
+    }
+    return f;
+  };
+  const tEquilibrio = () => {
+    if (sinAtmosfera) return T_SIN_ATMOSFERA;
+    const f = forzantes();
+    return T_BASE + LAMBDA * (f.co2 + f.ch4 + f.albedo + f.volcan);
+  };
+  // Probabilidad de que el calor (infrarrojo) sea absorbido y devuelto por los gases.
+  const pAbsorcion = () => (sinAtmosfera ? 0 : 1 - Math.exp(-(ppm / 380 + ch4 / 6000)));
+  // Fracción de la luz del sol que se refleja: nubes (fija) + hielo (cambia con la temperatura).
+  const pHielo = () => 0.2 * Math.min(1.3, estadoHielo((T ?? T_BASE) - T_BASE).hielo);
 
   function iniciar(el) {
     raiz = el;
@@ -62,6 +89,8 @@ const Invernadero = (function () {
             <span><i style="background:#ffe08a;box-shadow:0 0 6px #ffd166"></i>Luz del Sol</span>
             <span><i style="background:#ff7a45;box-shadow:0 0 6px #ff5a36"></i>Calor (infrarrojo)</span>
             <span><b class="kz-co2"><i></i><i></i><i></i></b>Molécula de CO₂</span>
+            <span><b class="kz-ch4"><i></i><i></i><i></i><i></i><i></i></b>Molécula de metano</span>
+            <span><i style="background:#f8f9ff;box-shadow:0 0 6px #fff"></i>Luz reflejada</span>
           </div>
           <p class="inv-balance" id="inv-balance"></p>
           <div class="inv-velocidad">
@@ -78,20 +107,30 @@ const Invernadero = (function () {
             <div><span class="inv-num" id="inv-ppm"></span><span class="inv-lab">CO₂ en el aire</span></div>
             <div><span class="inv-num" id="inv-anio"></span><span class="inv-lab">Año simulado</span></div>
             <div><span class="inv-num" id="inv-hielo"></span><span class="inv-lab">Hielo en las montañas</span></div>
+            <div><span class="inv-num" id="inv-ch4"></span><span class="inv-lab">Metano en el aire</span></div>
+            <div><span class="inv-num" id="inv-refleja"></span><span class="inv-lab">Luz del sol reflejada</span></div>
           </div>
           <label class="inv-slider-lab" for="inv-slider">Cantidad de CO₂ (partes por millón)</label>
           <input type="range" id="inv-slider" min="${CO2_MIN}" max="${CO2_MAX}" step="10">
           <div class="inv-escala"><span>${CO2_MIN}</span><span>${CO2_MAX} ppm</span></div>
+          <label class="inv-slider-lab" for="inv-slider-ch4">Cantidad de metano, CH₄ (partes por mil millones)</label>
+          <input type="range" id="inv-slider-ch4" min="${CH4_MIN}" max="${CH4_MAX}" step="50">
+          <div class="inv-escala"><span>${CH4_MIN}</span><span>${CH4_MAX} ppb</span></div>
           </div>
           <div class="inv-col">
 
           <h3>Momentos de la historia</h3>
-          <div class="inv-botones">${PRESETS.map(p => `<button class="inv-btn" data-ppm="${p.ppm}">${p.texto}<small>${p.sub}</small></button>`).join('')}</div>
+          <div class="inv-botones">${PRESETS.map(p => `<button class="inv-btn" data-ppm="${p.ppm}" data-ch4="${p.ch4}">${p.texto}<small>${p.sub}</small></button>`).join('')}</div>
+          <h3>Metano: ¿de dónde sale?</h3>
+          <div class="inv-botones">${ACCIONES_CH4.map(a => `<button class="inv-btn ${a.d > 0 ? 'sube' : 'baja'}" data-d4="${a.d}">${a.texto}<small>${a.sub}</small></button>`).join('')}</div>
           </div>
           <div class="inv-col">
           <h3>¿Qué hacemos los humanos?</h3>
           <div class="inv-botones">${ACCIONES.map(a => `<button class="inv-btn ${a.d > 0 ? 'sube' : 'baja'}" data-d="${a.d}">${a.texto}<small>${a.sub}</small></button>`).join('')}</div>
 
+          <h3>La naturaleza también influye</h3>
+          <button class="inv-btn inv-volcan" id="inv-volcan">🌋 Erupción volcánica<small>La ceniza tapa parte del sol durante unos años</small></button>
+          <label class="inv-check"><input type="checkbox" id="inv-albedo" checked> Efecto albedo: el hielo refleja la luz del sol</label>
           <label class="inv-check"><input type="checkbox" id="inv-sin-atm"> Quitar los gases de efecto invernadero</label>
           <div class="inv-consecuencia" id="inv-consecuencia"></div>
           </div>
@@ -110,7 +149,7 @@ const Invernadero = (function () {
           <svg id="inv-svg-grafico" viewBox="0 0 1000 250" role="img" aria-label="Gráfico de la temperatura media a lo largo de los años"></svg>
           <div class="inv-tooltip" id="inv-tooltip" hidden></div>
         </div>
-        <p class="inv-nota">Modelo simplificado: la temperatura se acerca de a poco al valor de equilibrio, que sube unos 3 °C cada vez que se duplica el CO₂. La línea punteada marca los 14 °C de antes de la industria.</p>
+        <p class="inv-nota">Modelo simplificado: la temperatura se acerca de a poco al valor de equilibrio, que sube unos 3 °C cada vez que se duplica el CO₂. El metano atrapa mucho más calor por molécula, pero hay mucho menos. Con el efecto albedo, al derretirse el hielo se refleja menos luz y la Tierra se calienta todavía más. La ceniza de un volcán enfría la Tierra durante algunos años. La línea punteada marca los 14 °C de antes de la industria; 🌋 marca las erupciones.</p>
       </div>`;
 
     canvas = raiz.querySelector('#inv-canvas');
@@ -120,7 +159,12 @@ const Invernadero = (function () {
 
     const slider = raiz.querySelector('#inv-slider');
     slider.addEventListener('input', () => cambiarCO2(+slider.value));
-    raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.addEventListener('click', () => cambiarCO2(+b.dataset.ppm)));
+    raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.addEventListener('click', () => { cambiarCH4(+b.dataset.ch4); cambiarCO2(+b.dataset.ppm); }));
+    const sliderCH4 = raiz.querySelector('#inv-slider-ch4');
+    sliderCH4.addEventListener('input', () => cambiarCH4(+sliderCH4.value));
+    raiz.querySelectorAll('.inv-btn[data-d4]').forEach(b => b.addEventListener('click', () => cambiarCH4(ch4 + +b.dataset.d4)));
+    raiz.querySelector('#inv-volcan').addEventListener('click', erupcion);
+    raiz.querySelector('#inv-albedo').addEventListener('change', e => { conAlbedo = e.target.checked; actualizarLecturas(); });
     raiz.querySelectorAll('.inv-btn[data-d]').forEach(b => b.addEventListener('click', () => cambiarCO2(ppm + +b.dataset.d)));
     raiz.querySelector('#inv-sin-atm').addEventListener('change', e => { sinAtmosfera = e.target.checked; actualizarLecturas(); dibujarFondo(); });
     const alternarPausa = () => {
@@ -145,13 +189,29 @@ const Invernadero = (function () {
 
   function reiniciar() {
     ppm = 280;
+    ch4 = CH4_BASE;
+    aerosol = 0;
     anio = ANIO_INICIAL;
     T = tEquilibrio();
-    historial = [{ anio, T, ppm }];
-    cuenta = { escapan: 0, vuelven: 0 };
+    historial = [{ anio, T, ppm, ch4 }];
+    cuenta = { escapan: 0, vuelven: 0, solar: 0, reflejados: 0 };
     raiz.querySelector('#inv-slider').value = ppm;
+    raiz.querySelector('#inv-slider-ch4').value = ch4;
+    dibujarFondo();
     actualizarLecturas();
     dibujarGrafico();
+  }
+
+  function cambiarCH4(v) {
+    ch4 = Math.max(CH4_MIN, Math.min(CH4_MAX, Math.round(v)));
+    raiz.querySelector('#inv-slider-ch4').value = ch4;
+    actualizarLecturas();
+  }
+
+  function erupcion() {
+    aerosol = Math.min(1.5, aerosol + 1);
+    dibujarFondo();
+    actualizarLecturas();
   }
 
   function cambiarCO2(v) {
@@ -253,6 +313,19 @@ const Invernadero = (function () {
         <g transform="translate(0 -112)"><g class="kz-aspas">${[0, 120, 240].map(a => `<path d="M0,0 C4,-12 3,-40 0,-52 C-2,-40 -3,-12 0,0 Z" fill="#f1f3ff" transform="rotate(${a})"/>`).join('')}</g>
         <circle r="4.5" fill="#9aa6ff"/></g></g>`;
     };
+    // Volcán: dormido, o en erupción con lava y una columna de ceniza.
+    const volcan = () => {
+      const x = 52, y = superficie(x), h = 44, w = 40, act = aerosol > 0.05;
+      const columna = act ? Array.from({ length: 7 }, (_, i) => `<circle cx="${x + Math.sin(i * 1.7) * (4 + i * 3)}" cy="${y - h - 10 - i * 17 * Math.min(1, aerosol)}" r="${7 + i * 3.4 * Math.min(1.2, aerosol)}" fill="${i < 2 ? '#7a6f78' : '#9a929e'}" opacity="${0.95 - i * 0.08}"/>`).join('') : '';
+      return `<g>${sombra(x + 4, y + 2, w)}
+        <path d="M${x - w},${y + 6} L${x - 8},${y - h} H${x + 8} L${x + w},${y + 6} Z" fill="#7b5c5c"/>
+        <path d="M${x + 2},${y - h} H${x + 8} L${x + w},${y + 6} H${x + 10} Z" fill="#5a4040"/>
+        <path d="M${x - w},${y + 6} L${x - 8},${y - h}" stroke="#a88a8a" stroke-width="1.6" opacity="0.7"/>
+        <ellipse cx="${x}" cy="${y - h}" rx="9" ry="3" fill="${act ? '#ff8a3d' : '#3e2b2b'}"/>
+        ${act ? `<path d="M${x - 3},${y - h + 1} q-6,14 -14,${h - 6} M${x + 4},${y - h + 1} q4,16 12,${h - 4}" stroke="#ff6b2d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <circle cx="${x}" cy="${y - h}" r="16" fill="#ff922b" opacity="0.35"/>` : ''}
+        ${columna}</g>`;
+    };
     const montania = (x, w, h) => `
       <path d="M${x - w},${sx(x - w)} L${x},${superficie(x) - h} L${x + w},${sx(x + w)} Z" fill="#3d4a8a"/>
       <path d="M${x},${superficie(x) - h} L${x + w},${sx(x + w)} L${x + w * 0.3},${sx(x + w * 0.3)} Z" fill="#2a3468"/>
@@ -317,7 +390,8 @@ const Invernadero = (function () {
       ${montania(500, 48, 62)}${nieve(500, 48, 62)}
       ${montania(548, 34, 40)}${nieve(548, 34, 40)}
       ${[262, 292, 306, 454, 590, 612, 634].map((x, i) => arbol(x, 17 + (i % 3) * 4)).join('')}
-      ${[[-30, 0.32], [10, 0.38]].map(([x, e]) => molino(x, e)).join('')}
+      ${[[-48, 0.3], [-20, 0.34]].map(([x, e]) => molino(x, e)).join('')}
+      ${volcan()}
       ${seco < 2 ? [[276, 20], [440, 22], [468, 18]].map(([x, h]) => pino(x, superficie(x) + 1, h)).join('') : [276, 440, 468].map(x => arbol(x, 16)).join('')}
       <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}</g>
       <g transform="translate(386 ${superficie(404) + 1}) scale(0.3)">${fabrica(0, 0)}</g>
@@ -351,7 +425,8 @@ const Invernadero = (function () {
       acumulado -= MS_POR_ANIO;
       anio++;
       T += (tEquilibrio() - T) / TAU;
-      historial.push({ anio, T, ppm });
+      aerosol = aerosol < 0.03 ? 0 : aerosol * Math.exp(-1 / 3); // la ceniza va cayendo en pocos años
+      historial.push({ anio, T, ppm, ch4, volcan: aerosol > 0.45 });
       cambio = true;
     }
     if (cambio) {
@@ -366,11 +441,17 @@ const Invernadero = (function () {
 
   function animarParticulas(dt) {
     // Moléculas de CO₂: flotan en la franja de la atmósfera, siguiendo la curva del planeta.
-    const objetivo = sinAtmosfera ? 0 : Math.round(ppm / 17);
-    while (moleculas.length < objetivo) {
-      moleculas.push({ ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.1, rad: PR + 28 + Math.random() * (ATM - 55), vel: (Math.random() - 0.5) * 0.012, rot: Math.random() * 6, brillo: 0 });
-    }
-    if (moleculas.length > objetivo) moleculas.length = objetivo;
+    const objetivos = { co2: sinAtmosfera ? 0 : Math.round(ppm / 17), ch4: sinAtmosfera ? 0 : Math.round(ch4 / 130) };
+    Object.entries(objetivos).forEach(([tipo, objetivo]) => {
+      let n = moleculas.filter(m => m.tipo === tipo).length;
+      for (; n > objetivo; n--) moleculas.splice(moleculas.findIndex(m => m.tipo === tipo), 1);
+      for (; n < objetivo; n++) moleculas.push({ tipo, ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.1, rad: PR + 28 + Math.random() * (ATM - 55), vel: (Math.random() - 0.5) * 0.012, rot: Math.random() * 6, brillo: 0 });
+    });
+    // Ceniza volcánica: partículas grises en la atmósfera mientras dure la erupción.
+    const nCeniza = Math.round(aerosol * 70);
+    while (ceniza.length < nCeniza) ceniza.push({ ang: -Math.PI / 2 + (Math.random() - 0.5) * 1.1, rad: PR + 40 + Math.random() * (ATM - 50), vel: (Math.random() - 0.5) * 0.02 });
+    if (ceniza.length > nCeniza) ceniza.length = nCeniza;
+    ceniza.forEach(c => { c.ang += c.vel * dt; c.x = PX + c.rad * Math.cos(c.ang); c.y = PY + c.rad * Math.sin(c.ang); });
     moleculas.forEach(m => {
       m.ang += m.vel * dt;
       if (m.ang < -Math.PI / 2 - 0.55) m.ang += 1.1;
@@ -383,9 +464,20 @@ const Invernadero = (function () {
 
     // Rayos de sol: salen del Sol hacia un punto al azar de la superficie.
     if (Math.random() < dt * 5) {
-      const destinoX = 230 + Math.random() * 600, destinoY = superficie(destinoX);
+      // Algunos rayos van a parar al hielo o a una nube, y se reflejan (albedo).
+      let destinoX = 230 + Math.random() * 600, destinoY = superficie(destinoX), refleja = null;
+      const r = Math.random(), hielo = Math.min(1.3, estadoHielo(T - T_BASE).hielo);
+      if (r < pHielo()) {
+        const blancos = [[500, 62 - 18 * hielo], [548, 40 - 12 * hielo], [158, 3]];
+        const [bx, alto] = blancos[Math.floor(Math.random() * blancos.length)];
+        refleja = { x: bx + DX + (Math.random() - 0.5) * 10 * hielo, y: superficie(bx + DX) - alto };
+      } else if (r < pHielo() + 0.12) {
+        const [bx, alto] = [[150, 56], [455, 68], [300, 90]][Math.floor(Math.random() * 3)];
+        refleja = { x: bx + DX + (Math.random() - 0.5) * 40, y: superficie(bx + DX) - alto };
+      }
+      if (refleja) { destinoX = refleja.x; destinoY = refleja.y; }
       const dx = destinoX - SOL.x, dy = destinoY - SOL.y, d = Math.hypot(dx, dy);
-      fotones.push({ tipo: 'sol', x: SOL.x + dx / d * 30, y: SOL.y + dy / d * 30, vx: dx / d * 190, vy: dy / d * 190, vida: 0 });
+      fotones.push({ tipo: 'sol', x: SOL.x + dx / d * 30, y: SOL.y + dy / d * 30, vx: dx / d * 190, vy: dy / d * 190, vida: 0, refleja });
     }
 
     const p = pAbsorcion();
@@ -422,6 +514,14 @@ const Invernadero = (function () {
       f.x += f.vx * dt;
       f.y += f.vy * dt;
       const d = distancia(f.x, f.y);
+      const rebotar = () => { f.tipo = 'refl'; f.vx = f.vx * 0.8 + (Math.random() - 0.5) * 60; f.vy = -Math.abs(f.vy); f.refleja = null; };
+      if (f.tipo === 'sol' && aerosol > 0.02 && !f.vioCeniza && d < PR + ATM - 10) {
+        // La ceniza del volcán refleja parte de la luz antes de que llegue al suelo.
+        f.vioCeniza = true;
+        if (Math.random() < aerosol * 0.35) { rebotar(); return; }
+      }
+      if (f.tipo === 'sol' && f.refleja && (f.y >= f.refleja.y || Math.hypot(f.x - f.refleja.x, f.y - f.refleja.y) < 6)) { rebotar(); return; }
+      if (f.tipo === 'refl') return;
       if (d <= PR) {
         // Llega a la superficie: la luz (o el calor que vuelve) calienta el suelo, que emite infrarrojo.
         f.tipo = 'ir';
@@ -443,14 +543,26 @@ const Invernadero = (function () {
         cuenta.escapan++;
       }
     });
-    fotones = fotones.filter(f => f.y > -20 && f.x > -20 && f.x < W + 20 && f.vida < 12 && (f.tipo === 'sol' || distancia(f.x, f.y) < PR + ATM + 100));
+    fotones = fotones.filter(f => f.y > -20 && f.x > -20 && f.x < W + 20 && f.vida < 12 && (f.tipo !== 'ir' || distancia(f.x, f.y) < PR + ATM + 100));
     if (fotones.length > 140) fotones.splice(0, fotones.length - 140);
 
     // ---- Dibujo ----
     ctx.clearRect(0, 0, W, H);
     ctx.lineCap = 'round';
     fotones.forEach(f => {
-      if (f.tipo === 'sol') {
+      if (f.tipo === 'refl') {
+        const v = Math.hypot(f.vx, f.vy);
+        ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (distancia(f.x, f.y) - PR - ATM) / 140));
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = '#f8f9ff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(f.x, f.y);
+        ctx.lineTo(f.x - f.vx / v * 16, f.y - f.vy / v * 16);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      } else if (f.tipo === 'sol') {
         const v = Math.hypot(f.vx, f.vy);
         ctx.shadowColor = '#ffd166';
         ctx.shadowBlur = 10;
@@ -479,6 +591,14 @@ const Invernadero = (function () {
         ctx.globalAlpha = 1;
       }
     });
+    if (aerosol > 0.02) {
+      // Velo de ceniza alrededor del planeta.
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = `rgba(150, 140, 135, ${Math.min(0.45, aerosol * 0.35)})`;
+      ctx.lineWidth = ATM - 40;
+      ctx.beginPath(); ctx.arc(PX, PY, PR + 20 + ATM / 2, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ceniza.forEach(c => { ctx.fillStyle = 'rgba(110, 100, 100, 0.85)'; ctx.beginPath(); ctx.arc(c.x, c.y, 2.6, 0, 7); ctx.fill(); });
+    }
     moleculas.forEach(m => {
       const ox = Math.cos(m.rot) * 8, oy = Math.sin(m.rot) * 8;
       if (m.brillo > 0) {
@@ -493,6 +613,20 @@ const Invernadero = (function () {
       const vib = m.brillo * 2 * Math.sin(performance.now() / 25);
       ctx.shadowColor = 'rgba(0,0,0,0.35)';
       ctx.shadowBlur = 4;
+      if (m.tipo === 'ch4') {
+        // Metano: un carbono con cuatro hidrógenos blancos.
+        for (let k = 0; k < 4; k++) {
+          const a = m.rot + k * Math.PI / 2;
+          ctx.fillStyle = '#f1f3f5';
+          ctx.beginPath(); ctx.arc(m.x + Math.cos(a) * (7 + vib), m.y + Math.sin(a) * 7, 3.1, 0, 7); ctx.fill();
+        }
+        ctx.fillStyle = '#5c636a';
+        ctx.beginPath(); ctx.arc(m.x, m.y, 4.6, 0, 7); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.beginPath(); ctx.arc(m.x - 1.4, m.y - 1.6, 1.4, 0, 7); ctx.fill();
+        return;
+      }
       [[-1, '#ff6b6b'], [1, '#ff6b6b']].forEach(([s, c]) => {
         ctx.fillStyle = c;
         ctx.beginPath(); ctx.arc(m.x + s * (ox + vib), m.y + s * oy, 4.2, 0, 7); ctx.fill();
@@ -510,7 +644,7 @@ const Invernadero = (function () {
     const pct = Math.round(p * 100);
     raiz.querySelector('#inv-balance').innerHTML = sinAtmosfera
       ? 'Sin gases de efecto invernadero, <b>todo el calor escapa al espacio</b> y la Tierra se congela.'
-      : `De cada 100 "rayos" de calor, unos <b>${pct}</b> son atrapados por el CO₂ y <b>${100 - pct}</b> escapan al espacio. Mira cómo <b>brillan</b> las moléculas al absorberlos.`;
+      : `☀️ De cada 100 rayos de sol, unos <b>${Math.round((0.12 + pHielo() + aerosol * 0.25) * 100)}</b> se reflejan en las nubes y el hielo${aerosol > 0.05 ? ' y la ceniza' : ''}. 🔥 De cada 100 "rayos" de calor, <b>${pct}</b> son atrapados por el CO₂ y el metano y <b>${100 - pct}</b> escapan al espacio.`;
   }
 
   // ---------- Lecturas ----------
@@ -521,14 +655,29 @@ const Invernadero = (function () {
     raiz.querySelector('#inv-anio').textContent = anio;
     const eh = estadoHielo(T - T_BASE);
     raiz.querySelector('#inv-hielo').textContent = Math.round(Math.min(1, eh.hielo) * 100) + ' %';
-    raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.classList.toggle('activo', +b.dataset.ppm === ppm));
+    raiz.querySelector('#inv-ch4').textContent = sinAtmosfera ? '—' : ch4 + ' ppb';
+    raiz.querySelector('#inv-refleja').textContent = Math.round((0.12 + pHielo() + aerosol * 0.25) * 100) + ' %';
+    raiz.querySelectorAll('.inv-btn[data-ppm]').forEach(b => b.classList.toggle('activo', +b.dataset.ppm === ppm && +b.dataset.ch4 === ch4));
+    raiz.querySelector('#inv-volcan').classList.toggle('activo', aerosol > 0.05);
     const anomalia = T - T_BASE;
     const c = CONSECUENCIAS.find(x => anomalia <= x.hasta);
     const signo = anomalia >= 0 ? '+' : '−';
     raiz.querySelector('#inv-consecuencia').innerHTML = `
       <p class="inv-anomalia">${signo}${Math.abs(anomalia).toFixed(1).replace('.', ',')} °C respecto de antes de la industria</p>
       <p><span class="inv-cons-ico">${c.icono}</span> ${c.texto}</p>
+      ${sinAtmosfera ? '' : desglose()}
+      ${aerosol > 0.05 ? '<p class="inv-tendencia">🌋 La ceniza del volcán refleja la luz del sol: la Tierra se enfría un poco hasta que la ceniza cae (como pasó con el Pinatubo en 1991).</p>' : ''}
       ${Math.abs(tEquilibrio() - T) > 0.15 ? `<p class="inv-tendencia">${tEquilibrio() > T ? '↗ La temperatura sigue subiendo' : '↘ La temperatura sigue bajando'} hasta ${tEquilibrio().toFixed(1).replace('.', ',')} °C.</p>` : '<p class="inv-tendencia">La temperatura ya casi no cambia: llegó al equilibrio.</p>'}`;
+  }
+
+  // Cuánto aporta cada efecto a la temperatura de equilibrio.
+  function desglose() {
+    const f = forzantes(), fila = (n, v) => {
+      const t = LAMBDA * v, ancho = Math.min(100, Math.abs(t) / 4 * 100);
+      return `<div class="inv-aporte"><span>${n}</span><div class="inv-aporte-barra ${t >= 0 ? 'mas' : 'menos'}"><i style="width:${ancho}%"></i></div><b>${t >= 0 ? '+' : '−'}${Math.abs(t).toFixed(1).replace('.', ',')} °C</b></div>`;
+    };
+    return `<div class="inv-aportes"><p class="inv-tendencia">Cuánto aporta cada efecto (en equilibrio):</p>
+      ${fila('🏭 CO₂', f.co2)}${fila('🐄 Metano', f.ch4)}${conAlbedo ? fila('🧊 Albedo (hielo)', f.albedo) : ''}${aerosol > 0.02 ? fila('🌋 Volcán', f.volcan) : ''}</div>`;
   }
 
   // ---------- Gráfico ----------
@@ -565,6 +714,7 @@ const Invernadero = (function () {
       svg += `<path d="M${G.x0 + (s.x(historial[0].anio) - G.x0)},${G.y1} L${pts.join(' L')} L${s.x(historial[historial.length - 1].anio)},${G.y1} Z" class="g-area"/>`;
       svg += `<polyline points="${pts.join(' ')}" class="g-linea"/>`;
     }
+    historial.forEach((h, k) => { if (h.volcan && !(historial[k - 1] || {}).volcan) svg += `<text x="${s.x(h.anio)}" y="${G.y0 + 12}" text-anchor="middle" font-size="14">🌋</text>`; });
     const ult = historial[historial.length - 1];
     svg += `<circle cx="${s.x(ult.anio)}" cy="${s.y(ult.T)}" r="4.5" class="g-punto"/>`;
     if (marcado) {
@@ -585,7 +735,7 @@ const Invernadero = (function () {
     dibujarGrafico(h);
     const tip = raiz.querySelector('#inv-tooltip');
     tip.hidden = false;
-    tip.innerHTML = `<b>Año ${h.anio}</b><br>${h.T.toFixed(1).replace('.', ',')} °C · ${h.ppm} ppm de CO₂`;
+    tip.innerHTML = `<b>Año ${h.anio}</b><br>${h.T.toFixed(1).replace('.', ',')} °C · ${h.ppm} ppm de CO₂ · ${h.ch4} ppb de metano${h.volcan ? '<br>🌋 Erupción volcánica' : ''}`;
     const caja = raiz.querySelector('#inv-grafico').getBoundingClientRect();
     const x = (s.x(h.anio) / GW) * caja.width;
     tip.style.left = Math.min(caja.width - 170, Math.max(0, x + 10)) + 'px';
