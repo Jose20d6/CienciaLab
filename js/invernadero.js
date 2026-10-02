@@ -262,6 +262,8 @@ const Invernadero = (function () {
     const atm = colorAtmosfera(anomalia);
     const { hielo, derretido, subida, avance } = estadoHielo(anomalia);
     const sx = x => superficie(x).toFixed(1);
+    // Borde de la tierra siguiendo la curva del planeta (un poco por encima de la superficie).
+    const curva = (a, b) => { const p = []; for (let x = a; x < b; x += 16) p.push(`${x.toFixed(1)},${(superficie(x) - 20).toFixed(1)}`); p.push(`${b.toFixed(1)},${(superficie(b) - 20).toFixed(1)}`); return p.join(' L'); };
     const costaI = 112 - avance * 0.6, costaD = 248 + avance; // las costas avanzan tierra adentro cuando sube el mar
 
     const { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica } = Arte;
@@ -314,16 +316,21 @@ const Invernadero = (function () {
         <circle r="4.5" fill="#9aa6ff"/></g></g>`;
     };
     // Volcán: dormido, o en erupción con lava y una columna de ceniza.
+    // Volcán: girado según la curva del planeta para que toda la base apoye en el suelo.
+    // Dormido, o en erupción con lava y una columna de ceniza (que sale siempre hacia arriba).
     const volcan = () => {
-      const x = 52, y = superficie(x), h = 44, w = 40, act = aerosol > 0.05;
-      const columna = act ? Array.from({ length: 7 }, (_, i) => `<circle cx="${x + Math.sin(i * 1.7) * (4 + i * 3)}" cy="${y - h - 10 - i * 17 * Math.min(1, aerosol)}" r="${7 + i * 3.4 * Math.min(1.2, aerosol)}" fill="${i < 2 ? '#7a6f78' : '#9a929e'}" opacity="${0.95 - i * 0.08}"/>`).join('') : '';
-      return `<g>${sombra(x + 4, y + 2, w)}
-        <path d="M${x - w},${y + 6} L${x - 8},${y - h} H${x + 8} L${x + w},${y + 6} Z" fill="#7b5c5c"/>
-        <path d="M${x + 2},${y - h} H${x + 8} L${x + w},${y + 6} H${x + 10} Z" fill="#5a4040"/>
-        <path d="M${x - w},${y + 6} L${x - 8},${y - h}" stroke="#a88a8a" stroke-width="1.6" opacity="0.7"/>
-        <ellipse cx="${x}" cy="${y - h}" rx="9" ry="3" fill="${act ? '#ff8a3d' : '#3e2b2b'}"/>
-        ${act ? `<path d="M${x - 3},${y - h + 1} q-6,14 -14,${h - 6} M${x + 4},${y - h + 1} q4,16 12,${h - 4}" stroke="#ff6b2d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-          <circle cx="${x}" cy="${y - h}" r="16" fill="#ff922b" opacity="0.35"/>` : ''}
+      const x = 16, y = superficie(x), h = 44, w = 38, act = aerosol > 0.05;
+      const giro = Math.atan((x - PX) / Math.sqrt(PR * PR - (x - PX) * (x - PX)));
+      const cx = x + h * Math.sin(giro), cy = y - h * Math.cos(giro);
+      const columna = act ? Array.from({ length: 7 }, (_, i) => `<circle cx="${(cx + Math.sin(i * 1.7) * (4 + i * 3)).toFixed(1)}" cy="${(cy - 10 - i * 17 * Math.min(1, aerosol)).toFixed(1)}" r="${(7 + i * 3.4 * Math.min(1.2, aerosol)).toFixed(1)}" fill="${i < 2 ? '#7a6f78' : '#9a929e'}" opacity="${0.95 - i * 0.08}"/>`).join('') : '';
+      return `<g>${sombra(x + 4, y + 3, w)}
+        <g transform="translate(${x} ${y}) rotate(${(giro * 180 / Math.PI).toFixed(1)})">
+        <path d="M${-w - 4},10 L${-w},4 L-8,${-h} H8 L${w},4 L${w + 4},10 Z" fill="#7b5c5c"/>
+        <path d="M2,${-h} H8 L${w},4 L${w + 4},10 H10 Z" fill="#5a4040"/>
+        <path d="M${-w},4 L-8,${-h}" stroke="#a88a8a" stroke-width="1.6" opacity="0.7"/>
+        <ellipse cx="0" cy="${-h}" rx="9" ry="3" fill="${act ? '#ff8a3d' : '#3e2b2b'}"/>
+        ${act ? `<path d="M-3,${-h + 1} q-6,14 -14,${h - 6} M4,${-h + 1} q4,16 12,${h - 4}" stroke="#ff6b2d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <circle cx="0" cy="${-h}" r="16" fill="#ff922b" opacity="0.35"/>` : ''}</g>
         ${columna}</g>`;
     };
     const montania = (x, w, h) => `
@@ -378,8 +385,8 @@ const Invernadero = (function () {
       <g clip-path="url(#kz-planeta)">
         <ellipse cx="150" cy="${superficie(150) + 8}" rx="60" ry="9" fill="url(#kz-brillo)"/>
         ${[[150, 330], [205, 345], [170, 362], [235, 368]].map(([x, y]) => `<path d="M${x - 14},${y} q7,-4 14,0 t14,0" stroke="#9ec5ff" stroke-opacity="0.35" stroke-width="2" fill="none"/>`).join('')}
-        <path d="M-220,${sx(-220) - 20} L${costaI},${sx(costaI) - 20} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-220,${H} Z" fill="url(#kz-tierra)"/>
-        <path d="M${costaD},${sx(costaD) - 20} L820,${sx(820) - 20} L820,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
+        <path d="M${curva(-220, costaI)} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-220,${H} Z" fill="url(#kz-tierra)"/>
+        <path d="M${curva(costaD, 820)} L820,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
         <path d="M-220,${sx(-220) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 820,${sx(820) + 40} L820,${H} L-220,${H} Z" fill="#0a0d2e" opacity="0.28"/>
       </g>
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
@@ -390,7 +397,7 @@ const Invernadero = (function () {
       ${montania(500, 48, 62)}${nieve(500, 48, 62)}
       ${montania(548, 34, 40)}${nieve(548, 34, 40)}
       ${[262, 292, 306, 454, 590, 612, 634].map((x, i) => arbol(x, 17 + (i % 3) * 4)).join('')}
-      ${[[-48, 0.3], [-20, 0.34]].map(([x, e]) => molino(x, e)).join('')}
+      ${[[-56, 0.3], [600, 0.32]].map(([x, e]) => molino(x, e)).join('')}
       ${volcan()}
       ${seco < 2 ? [[276, 20], [440, 22], [468, 18]].map(([x, h]) => pino(x, superficie(x) + 1, h)).join('') : [276, 440, 468].map(x => arbol(x, 16)).join('')}
       <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}</g>
