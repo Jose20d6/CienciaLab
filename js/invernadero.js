@@ -343,13 +343,30 @@ const Invernadero = (function () {
         <path d="M${x},${hy} L${x + w * 0.42 * k},${hy + h * 0.42 * k} L${x + w * 0.18 * k},${hy + h * 0.34 * k} L${x},${hy + h * 0.44 * k} Z" fill="#c9d1ff"/>`;
     };
     // Agua que cubre las zonas bajas cuando sube el nivel del mar.
+    // Suba del mar: la costa avanza tierra adentro. Lo que antes era tierra queda bajo agua clara y poco
+    // profunda; hay arena en la orilla actual y una marca punteada donde estaba la costa en 1850.
+    const C0I = 112, C0D = 248;
+    const banda = (a, b, prof) => {
+      if (b - a < 1) return '';
+      const arriba = [], abajo = [];
+      for (let x = a; x <= b + 0.01; x += Math.max(2, (b - a) / 12)) { arriba.push(`${x.toFixed(1)},${sx(x)}`); abajo.unshift(`${x.toFixed(1)},${(superficie(x) + prof).toFixed(1)}`); }
+      return `M${arriba.join(' L')} L${abajo.join(' L')} Z`;
+    };
     let inundacion = '';
-    if (subida > 0.5) {
-      const pts = [];
-      for (let x = costaI - 4; x <= costaD + 4; x += 12) pts.push(`${x.toFixed(1)},${(superficie(x) - subida).toFixed(1)}`);
-      inundacion = `<path d="M${(costaI - 16).toFixed(1)},${sx(costaI - 16)} L${pts.join(' L')} L${(costaD + 16).toFixed(1)},${sx(costaD + 16)} Z" fill="url(#kz-mar)"/>
-        <path d="M${pts.join(' L')}" stroke="#bcd6ff" stroke-width="1.6" fill="none" opacity="0.8"/>`;
+    if (avance > 1) {
+      const zonas = banda(costaI, C0I, 22) + banda(C0D, costaD, 22);
+      inundacion += `<path d="${zonas}" fill="#74c0fc" opacity="0.55"/>
+        ${[C0I, C0D].map(x => `<path d="M${x},${(superficie(x) - 14).toFixed(1)} V${(superficie(x) + 16).toFixed(1)}" stroke="#ffd166" stroke-width="1.6" stroke-dasharray="3 3"/>`).join('')}
+        ${costaD - C0D > 45 ? `<text x="${((C0D + costaD) / 2).toFixed(1)}" y="${(superficie((C0D + costaD) / 2) + 34).toFixed(1)}" text-anchor="middle" class="kz-rotulo chico">ZONA INUNDADA</text>` : ''}
+        ${Array.from({ length: Math.floor((costaD - C0D) / 18) }, (_, k) => { const x = C0D + 9 + k * 18; return `<g opacity="0.55"><rect x="${x - 1.2}" y="${(superficie(x) - 1).toFixed(1)}" width="2.4" height="8" fill="#6e4529"/><circle cx="${x}" cy="${(superficie(x) + 1).toFixed(1)}" r="4" fill="#2f9e44"/></g>`; }).join('')}`;
     }
+    // Arena en la orilla actual de cada lado.
+    inundacion += `<path d="${banda(costaI - 12, costaI, 5)}${banda(costaD, costaD + 12, 5)}" fill="#f1d9a6"/>`;
+    // Olas suaves sobre todo el mar.
+    const olas = [];
+    for (let x = costaI + 2; x <= costaD - 2; x += 6) olas.push(`${x.toFixed(1)},${(superficie(x) - 1.2 + Math.sin(x * 0.45) * 1.2).toFixed(1)}`);
+    inundacion += `<path d="M${olas.join(' L')}" stroke="#d0ebff" stroke-width="1.6" fill="none" opacity="0.85" stroke-linejoin="round"/>`;
+
     // Regla de marea en el mar: muestra hasta dónde llega el agua.
     const rx = 196, base = superficie(rx);
     const regla = `<g>
