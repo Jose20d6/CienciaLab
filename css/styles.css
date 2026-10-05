@@ -600,6 +600,39 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .inv-aporte-barra i { display: block; height: 100%; border-radius: 99px; }
 .inv-aporte-barra.mas i { background: #e8590c; }
 .inv-aporte-barra.menos i { background: #1c7ed6; }
+.inv-extra { margin-top: 0; }
+.inv-ayuda { font-size: 0.86rem; color: var(--suave); margin: 0.3rem 0; }
+.inv-matriz-barra { display: flex; height: 26px; border-radius: 99px; overflow: hidden; margin: 0.5rem 0 0.3rem; font-size: 0.78rem; font-weight: 800; color: #fff; }
+.inv-matriz-barra span { display: flex; align-items: center; justify-content: center; transition: width 0.4s; white-space: nowrap; }
+.inv-matriz-barra .fosil { background: linear-gradient(#6c5f5b, #4a403d); }
+.inv-matriz-barra .renov { background: linear-gradient(#51cf66, #2f9e44); }
+.inv-emis { margin: 0.3rem 0; font-size: 0.92rem; }
+#inv-renov { width: 100%; accent-color: #2f9e44; }
+#inv-hora { width: 100%; accent-color: #f08c00; }
+.inv-esc { border-left: 5px solid var(--c); }
+.inv-esc.activo { border-color: var(--c); background: var(--primario-suave); }
+.inv-fila-botones { display: flex; gap: 0.5rem; margin: 0.4rem 0; }
+.inv-estaciones { margin: 0.3rem 0 0.6rem; }
+.inv-estaciones button { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+.inv-impacto, .inv-impacto-vacio { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0.6rem; align-items: center; }
+.inv-impacto-vacio p { font-size: 0.9rem; margin: 0; }
+.inv-termo { width: 90px; height: auto; }
+.inv-termo-t { font-size: 10px; font-weight: 700; fill: var(--suave); }
+.inv-termo-t.paris { fill: #e8590c; }
+.inv-imp-temp { font-size: 2rem; font-weight: 800; margin: 0; color: var(--quimico); }
+.inv-imp { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.15rem; font-size: 0.85rem; margin: 0.45rem 0; }
+.inv-imp b { font-variant-numeric: tabular-nums; }
+.inv-comp { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.6rem 0 0.3rem; }
+.inv-comp th, .inv-comp td { border-bottom: 1px solid var(--linea); padding: 0.25rem 0.3rem; text-align: left; }
+.inv-comp tr.activo td { font-weight: 800; background: var(--primario-suave); }
+.inv-mini { width: 100%; height: auto; display: block; margin: 0.4rem 0; }
+.inv-mini-fondo { fill: var(--bg); }
+.inv-mini-clima { stroke: var(--quimico); stroke-width: 2; stroke-dasharray: 5 4; }
+.inv-mini-tiempo { fill: none; stroke: #1c7ed6; stroke-width: 2; stroke-linejoin: round; }
+.inv-mini-t { font-size: 9px; font-weight: 700; fill: var(--suave); }
+.g-paris { stroke: #e8590c; stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.7; }
+.g-paris-t { font-size: 11px; font-weight: 700; fill: #e8590c; opacity: 0.85; }
+.g-esc { font-size: 12px; font-weight: 800; }
 .kz-aspas { animation: kz-girar 3s linear infinite; }
 @keyframes kz-girar { to { transform: rotate(360deg); } }
 @media (max-width: 1000px) { .inv-controles { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }

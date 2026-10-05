@@ -13,7 +13,7 @@ const Invernadero = (function () {
   const DX = 200; // el paisaje se dibujó para 600 px de ancho: se corre al centro
   // El planeta se ve como un gran arco en la parte de abajo; la atmósfera es una franja alrededor.
   const PX = 300 + DX, PY = 1060, PR = 760, ATM = 170;
-  const SOL = { x: 46, y: 44 };
+  const SOL = { x: 270, y: 124 }; // se mueve con la hora del día
 
   const PRESETS = [
     { ppm: 180, ch4: 380, texto: '🧊 Glaciación', sub: '180 ppm · 380 ppb' },
@@ -47,7 +47,46 @@ const Invernadero = (function () {
   let pausado = false, ultimo = 0, acumulado = 0, fotones = [], moleculas = [], ceniza = [];
   let cuenta = { escapan: 0, vuelven: 0, solar: 0, reflejados: 0 };
   let activo = false, velocidad = 1;
+  // Matriz energética (fracción de energía renovable), escenario del futuro en curso, hora y estación.
+  let renovable = 0.2, futuro = null, hora = 10, estacion = 'primavera', cicloDia = false, muestras = [];
   const VELOCIDADES = [{ f: 0.4, texto: '🐢 Lenta' }, { f: 1, texto: 'Normal' }, { f: 2.5, texto: '🐇 Rápida' }];
+
+  // ---------- Hacia el futuro (2025 → 2100) ----------
+  // Cada camino define cuánta energía usa el mundo (D), qué parte es renovable (r) y cuánto CO₂ se captura.
+  // Las emisiones salen de ahí, y la temperatura sube según el CO₂ emitido en total (como estima el IPCC:
+  // unos 0,5 °C por cada 1000 millones de toneladas… multiplicadas por mil).
+  const ESCENARIOS = {
+    altas: { n: '🔥 Emisiones altas', sub: 'Cada vez más combustibles fósiles', color: '#e03131', D: [[2025, 1], [2100, 2.3]], r: [[2025, 0.2], [2100, 0.25]], cap: [[2025, 0], [2100, 0]] },
+    medias: { n: '⚖️ Emisiones medias', sub: 'La energía limpia crece despacio', color: '#f08c00', D: [[2025, 1], [2100, 1.5]], r: [[2025, 0.2], [2060, 0.45], [2100, 0.7]], cap: [[2025, 0], [2100, 0]] },
+    netzero: { n: '🌱 Cero neto en 2050', sub: 'Energía 100 % limpia y captura de carbono', color: '#2f9e44', D: [[2025, 1], [2100, 1.3]], r: [[2025, 0.2], [2050, 1], [2100, 1]], cap: [[2025, 0], [2050, 2], [2100, 4]] },
+    plan: { n: '🎛️ Mi plan', sub: 'Con la matriz que elijas para 2050', color: '#5b8def', D: [[2025, 1], [2100, 1.5]], r: null, cap: [[2025, 0], [2100, 0]] },
+  };
+  const interp = (pts, t) => {
+    for (let i = 1; i < pts.length; i++) if (t <= pts[i][0]) { const [a, va] = pts[i - 1], [b, vb] = pts[i]; return va + (vb - va) * (t - a) / (b - a); }
+    return pts[pts.length - 1][1];
+  };
+  // Emisiones de CO₂ (miles de millones de toneladas por año) según la energía usada y la parte renovable.
+  const emisiones = (D, r, cap = 0) => 40 * D * (1 - r) / 0.8 - cap;
+  function simularFuturo(clave, rPlan) {
+    const e = ESCENARIOS[clave], rs = e.r || [[2025, 0.2], [2050, rPlan], [2100, rPlan]];
+    let p = 425, c = 1900, acum = 0;
+    const amp = conAlbedo ? 1.15 : 1, datos = [];
+    for (let a = 2025; a <= 2100; a++) {
+      const D = interp(e.D, a), r = interp(rs, a), E = emisiones(D, r, interp(e.cap, a));
+      if (a > 2025) {
+        acum += E;
+        p += 0.61 * E / 7.8 - 0.0045 * (p - 280); // parte queda en el aire; el océano y las plantas absorben algo
+        c += (1000 + 900 * D * (1 - r) / 0.8 - c) / 10;
+      }
+      datos.push({ anio: a, ppm: p, ch4: c, E, r, T: T_BASE + 1.2 + amp * (0.5 * acum / 1000 + 0.0002 * (c - 1900)) });
+    }
+    return datos;
+  }
+  // Impactos aproximados en 2100 según el calentamiento (valores de referencia del IPCC).
+  function impactos(dT) {
+    const especies = interp([[0, 0], [1.5, 14], [2, 18], [3, 29], [4, 39], [5, 48], [6, 55]], Math.max(0, dT));
+    return { mar: Math.round(20 + 14 * Math.max(0, dT)), glaciares: Math.round(Math.max(5, Math.min(70, 26 + 6 * (dT - 1.5)))), especies: Math.round(especies) };
+  }
 
   // Cada efecto empuja la temperatura: CO₂ y metano calientan; el hielo que se derrite refleja menos luz
   // (calienta más, retroalimentación del albedo) y la ceniza de un volcán tapa el sol (enfría).
@@ -135,6 +174,30 @@ const Invernadero = (function () {
           <div class="inv-consecuencia" id="inv-consecuencia"></div>
           </div>
         </div>
+
+        <div class="panel inv-controles inv-extra">
+          <div class="inv-col">
+            <h3>⚡ Matriz energética</h3>
+            <p class="inv-ayuda">¿De dónde sale la energía del mundo? Hoy, cerca del 80 % viene de quemar petróleo, gas y carbón.</p>
+            <label class="inv-slider-lab" for="inv-renov">Energía renovable (sol, viento, agua): <b id="inv-renov-t"></b></label>
+            <input type="range" id="inv-renov" min="0" max="100" step="5" value="20">
+            <div class="inv-matriz" id="inv-matriz"></div>
+            <h3>🔮 Hacia el futuro (2025 → 2100)</h3>
+            <div class="inv-botones">${Object.entries(ESCENARIOS).map(([k, e]) => `<button class="inv-btn inv-esc" data-esc="${k}" style="--c:${e.color}">${e.n}<small>${e.sub}</small></button>`).join('')}</div>
+            <p class="inv-ayuda" id="inv-futuro-estado">Elegí un camino: la simulación salta a 2025 y avanza hasta 2100.</p>
+          </div>
+          <div class="inv-col" id="inv-impactos"></div>
+          <div class="inv-col">
+            <h3>☀️ Tiempo y clima</h3>
+            <label class="inv-slider-lab" for="inv-hora">Hora del día: <b id="inv-hora-t"></b></label>
+            <input type="range" id="inv-hora" min="0" max="24" step="0.5" value="10">
+            <div class="inv-fila-botones"><button class="btn chico" id="inv-ciclo">▶ Ver pasar un día</button></div>
+            <div class="segmentado inv-estaciones" id="inv-est">
+              <button data-e="verano">☀️ Verano</button><button data-e="otono">🍂 Otoño</button><button data-e="invierno">❄️ Invierno</button><button data-e="primavera">🌸 Primavera</button>
+            </div>
+            <div class="inv-tiempo" id="inv-tiempo"></div>
+          </div>
+        </div>
       </div>
 
       <div class="panel inv-grafico-panel">
@@ -176,11 +239,24 @@ const Invernadero = (function () {
     const marcarVelocidad = () => raiz.querySelectorAll('#inv-vel button').forEach(b => b.classList.toggle('activo', +b.dataset.f === velocidad));
     raiz.querySelectorAll('#inv-vel button').forEach(b => b.addEventListener('click', () => { velocidad = +b.dataset.f; marcarVelocidad(); }));
     marcarVelocidad();
-    raiz.querySelector('#inv-reiniciar').addEventListener('click', reiniciar);
+    raiz.querySelector('#inv-reiniciar').addEventListener('click', () => { salirFuturo(); reiniciar(); });
+    const renov = raiz.querySelector('#inv-renov');
+    renov.addEventListener('input', () => { renovable = +renov.value / 100; pintarMatriz(); dibujarFondo(); });
+    raiz.querySelectorAll('.inv-esc').forEach(b => b.addEventListener('click', () => iniciarFuturo(b.dataset.esc)));
+    const horaS = raiz.querySelector('#inv-hora');
+    horaS.addEventListener('input', () => { hora = +horaS.value; pintarTiempo(true); });
+    raiz.querySelector('#inv-ciclo').addEventListener('click', () => {
+      cicloDia = !cicloDia;
+      raiz.querySelector('#inv-ciclo').textContent = cicloDia ? '⏸ Detener el día' : '▶ Ver pasar un día';
+    });
+    raiz.querySelectorAll('#inv-est button').forEach(b => b.addEventListener('click', () => { estacion = b.dataset.e; muestras = []; dibujarFondo(); pintarTiempo(true); }));
     grafico.addEventListener('pointermove', mostrarTooltip);
     grafico.addEventListener('pointerleave', () => { raiz.querySelector('#inv-tooltip').hidden = true; dibujarGrafico(); });
 
     reiniciar();
+    pintarMatriz();
+    pintarImpactos();
+    pintarTiempo();
     window.addEventListener('resize', ajustarCanvas);
     ajustarCanvas();
     activo = true;
@@ -202,19 +278,131 @@ const Invernadero = (function () {
     dibujarGrafico();
   }
 
+  // ---------- Futuro, matriz, impactos, tiempo y clima ----------
+  function iniciarFuturo(clave) {
+    const datos = simularFuturo(clave, renovable);
+    const fantasmas = {};
+    ['altas', 'medias', 'netzero'].forEach(k => { fantasmas[k] = k === clave ? datos : simularFuturo(k); });
+    if (clave === 'plan') fantasmas.plan = datos;
+    futuro = { clave, datos, fantasmas, i: 0, fin: false };
+    const d = datos[0];
+    anio = d.anio; ppm = Math.round(d.ppm); ch4 = Math.round(d.ch4); T = d.T; aerosol = 0; renovable = d.r;
+    historial = [{ anio, T, ppm, ch4 }];
+    acumulado = 0;
+    if (pausado) raiz.querySelector('#inv-pausa').click();
+    raiz.querySelector('#inv-slider').value = ppm;
+    raiz.querySelector('#inv-slider-ch4').value = ch4;
+    raiz.querySelectorAll('.inv-esc').forEach(b => b.classList.toggle('activo', b.dataset.esc === clave));
+    raiz.querySelector('#inv-renov').disabled = true;
+    actualizarLecturas(); pintarMatriz(); dibujarFondo(); dibujarGrafico();
+  }
+
+  function salirFuturo() {
+    if (!futuro) return;
+    futuro = null;
+    renovable = +raiz.querySelector('#inv-renov').value / 100;
+    raiz.querySelector('#inv-renov').disabled = false;
+    raiz.querySelectorAll('.inv-esc').forEach(b => b.classList.remove('activo'));
+    pintarMatriz(); pintarImpactos(); dibujarFondo();
+  }
+
+  // Avanza un año del escenario elegido (los valores ya están calculados).
+  function pasoFuturo() {
+    if (futuro.i >= futuro.datos.length - 1) { futuro.fin = true; return; }
+    const d = futuro.datos[++futuro.i];
+    anio = d.anio; ppm = Math.round(d.ppm); ch4 = Math.round(d.ch4); T = d.T; renovable = d.r;
+    raiz.querySelector('#inv-slider').value = ppm;
+    raiz.querySelector('#inv-slider-ch4').value = ch4;
+    historial.push({ anio, T, ppm, ch4 });
+    if (futuro.i >= futuro.datos.length - 1) futuro.fin = true;
+  }
+
+  function pintarMatriz() {
+    const r = renovable, E = futuro ? futuro.datos[futuro.i].E : emisiones(1, r);
+    const pct = Math.round(r * 100), sube = 0.61 * E / 7.8 - 0.0045 * (ppm - 280);
+    raiz.querySelector('#inv-renov-t').textContent = pct + ' %';
+    if (!futuro) raiz.querySelector('#inv-renov').value = pct;
+    raiz.querySelector('#inv-matriz').innerHTML = `
+      <div class="inv-matriz-barra"><span class="fosil" style="width:${100 - pct}%">${100 - pct >= 15 ? `🛢️ ${100 - pct} %` : ''}</span><span class="renov" style="width:${pct}%">${pct >= 15 ? `☀️💨 ${pct} %` : ''}</span></div>
+      <p class="inv-emis">🏭 Emisiones: <b>${E.toFixed(0).replace('-', '−')} mil millones de toneladas de CO₂ por año</b></p>
+      <p class="inv-ayuda">${futuro ? `Año ${anio}: la energía renovable es el ${pct} % del total.` : `Con esta matriz, el CO₂ del aire ${sube > 0.05 ? `<b>subiría unos ${sube.toFixed(1).replace('.', ',')} ppm por año</b>` : sube < -0.05 ? `<b>bajaría unos ${Math.abs(sube).toFixed(1).replace('.', ',')} ppm por año</b>` : '<b>casi no cambiaría</b>'}. Probalo con «Mi plan».`}</p>`;
+  }
+
+  function termometro(dT) {
+    const h = 150, y = v => 170 - Math.max(0, Math.min(5.5, v)) / 5.5 * h;
+    return `<svg viewBox="0 0 96 210" class="inv-termo" role="img" aria-label="Termómetro: ${dT.toFixed(1)} grados más que antes de la industria">
+      <defs><linearGradient id="inv-tg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#40c057"/><stop offset="0.3" stop-color="#fab005"/><stop offset="0.6" stop-color="#fd7e14"/><stop offset="1" stop-color="#e03131"/></linearGradient></defs>
+      <rect x="30" y="12" width="22" height="168" rx="11" fill="#e9ecef" stroke="#adb5bd" stroke-width="2"/>
+      <rect x="35" y="${y(dT)}" width="12" height="${180 - y(dT)}" rx="6" fill="url(#inv-tg)"/>
+      <circle cx="41" cy="186" r="17" fill="${dT > 3 ? '#e03131' : dT > 2 ? '#fd7e14' : dT > 1.5 ? '#fab005' : '#40c057'}" stroke="#adb5bd" stroke-width="2"/>
+      <ellipse cx="35" cy="180" rx="4" ry="6" fill="#fff" opacity="0.5"/>
+      ${[0, 1, 1.5, 2, 3, 4, 5].map(v => `<path d="M52,${y(v)} h7" stroke="#868e96" stroke-width="1.5"/><text x="62" y="${y(v) + 4}" class="inv-termo-t ${v === 1.5 || v === 2 ? 'paris' : ''}">${v === 0 ? '0' : '+' + String(v).replace('.', ',')}</text>`).join('')}
+    </svg>`;
+  }
+
+  function pintarImpactos() {
+    const cont = raiz.querySelector('#inv-impactos');
+    if (!futuro) {
+      cont.innerHTML = `<h3>🌡️ Termómetro de impactos</h3>
+        <p class="inv-ayuda">Cuando elijas un camino hacia el futuro, acá vas a ver qué pasaría con el nivel del mar, los glaciares y las especies.</p>
+        <div class="inv-impacto-vacio">${termometro(Math.max(0, T - T_BASE))}<p>Hoy la Tierra está unos <b>1,2 °C</b> más caliente que antes de la industria.<br><br>El <b>Acuerdo de París</b> busca que no pase de <b>+1,5 °C</b> (y nunca de +2 °C).</p></div>`;
+      return;
+    }
+    const dT = T - T_BASE, im = impactos(dT), e = ESCENARIOS[futuro.clave];
+    const fila = (ico, n, v, max, u) => `<div class="inv-imp"><span>${ico} ${n}</span><div class="inv-aporte-barra mas"><i style="width:${Math.min(100, v / max * 100)}%"></i></div><b>${v} ${u}</b></div>`;
+    const finales = Object.entries(futuro.fantasmas).map(([k, d]) => { const t = d[d.length - 1].T - T_BASE, x = impactos(t); return `<tr class="${k === futuro.clave ? 'activo' : ''}"><td>${ESCENARIOS[k].n}</td><td>+${t.toFixed(1).replace('.', ',')} °C</td><td>${x.mar} cm</td><td>${x.especies} %</td></tr>`; }).join('');
+    cont.innerHTML = `<h3>🌡️ Termómetro de impactos · ${futuro.fin ? 'en 2100' : `año ${anio}`}</h3>
+      <p class="inv-ayuda" style="color:${e.color}"><b>${e.n}</b></p>
+      <div class="inv-impacto">${termometro(dT)}
+        <div><p class="inv-imp-temp">+${dT.toFixed(1).replace('.', ',')} °C</p><p class="inv-ayuda">más que antes de la industria</p>
+        ${fila('🌊', 'Suba del mar', im.mar, 100, 'cm')}${fila('🏔️', 'Glaciares perdidos', im.glaciares, 70, '%')}${fila('🐸', 'Especies en riesgo', im.especies, 55, '%')}</div></div>
+      ${futuro.fin ? `<table class="inv-comp"><thead><tr><th>Camino</th><th>2100</th><th>Mar</th><th>Especies</th></tr></thead><tbody>${finales}</tbody></table>
+        <p class="inv-ayuda">Lo que hagamos en las próximas décadas decide cuál de estos futuros vivimos.</p>
+        <button class="btn chico" id="inv-salir">↩ Volver al presente</button>` : ''}`;
+    cont.querySelector('#inv-salir')?.addEventListener('click', () => { salirFuturo(); reiniciar(); });
+  }
+
+  const OFFSET_EST = { verano: 7, otono: 0, invierno: -7, primavera: 0 };
+  const NOMBRE_EST = { verano: '☀️ verano', otono: '🍂 otoño', invierno: '❄️ invierno', primavera: '🌸 primavera' };
+  const tAhora = () => T + OFFSET_EST[estacion] + 5 * Math.cos(2 * Math.PI * (hora - 15) / 24);
+  const fmtHora = h => `${String(Math.floor(h) % 24).padStart(2, '0')}:${h % 1 >= 0.5 ? '30' : '00'}`;
+
+  function pintarTiempo(forzar) {
+    raiz.querySelector('#inv-hora-t').textContent = fmtHora(hora) + (luzDelDia() > 0.05 ? ' ☀️' : ' 🌙');
+    raiz.querySelector('#inv-hora').value = hora;
+    raiz.querySelectorAll('#inv-est button').forEach(b => b.classList.toggle('activo', b.dataset.e === estacion));
+    const ahora = tAhora();
+    // Gráfico chiquito: la temperatura de cada momento (tiempo) contra el promedio (clima).
+    const n = muestras.length, lo = T - 14, hi = T + 14;
+    const y = v => 70 - (v - lo) / (hi - lo) * 64;
+    const linea = muestras.map((v, i) => `${(4 + i / Math.max(1, 119) * 252).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    raiz.querySelector('#inv-tiempo').innerHTML = `
+      <div class="inv-lecturas"><div><span class="inv-num">${ahora.toFixed(1).replace('.', ',')} °C</span><span class="inv-lab">Tiempo: ahora (${NOMBRE_EST[estacion]}, ${fmtHora(hora)})</span></div>
+        <div><span class="inv-num">${T.toFixed(1).replace('.', ',')} °C</span><span class="inv-lab">Clima: promedio de muchos años</span></div></div>
+      <svg viewBox="0 0 260 76" class="inv-mini" aria-label="Temperatura de cada momento comparada con el promedio">
+        <rect width="260" height="76" rx="8" class="inv-mini-fondo"/>
+        <line x1="4" x2="256" y1="${y(T)}" y2="${y(T)}" class="inv-mini-clima"/><text x="252" y="${y(T) - 4}" text-anchor="end" class="inv-mini-t">clima (promedio)</text>
+        ${n > 1 ? `<polyline points="${linea}" class="inv-mini-tiempo"/>` : `<text x="130" y="44" text-anchor="middle" class="inv-mini-t">Tocá «Ver pasar un día»</text>`}
+      </svg>
+      <p class="inv-ayuda">El <b>tiempo</b> cambia de hora en hora y de una estación a otra: una noche de invierno puede ser muy fría. El <b>clima</b> es el <b>promedio de muchos años</b>. El calentamiento global sube ese promedio aunque haya días fríos.</p>`;
+  }
+
   function cambiarCH4(v) {
+    salirFuturo();
     ch4 = Math.max(CH4_MIN, Math.min(CH4_MAX, Math.round(v)));
     raiz.querySelector('#inv-slider-ch4').value = ch4;
     actualizarLecturas();
   }
 
   function erupcion() {
+    salirFuturo();
     aerosol = Math.min(1.5, aerosol + 1);
     dibujarFondo();
     actualizarLecturas();
   }
 
   function cambiarCO2(v) {
+    salirFuturo();
     ppm = Math.max(CO2_MIN, Math.min(CO2_MAX, Math.round(v)));
     raiz.querySelector('#inv-slider').value = ppm;
     actualizarLecturas();
@@ -269,16 +457,21 @@ const Invernadero = (function () {
     const { sombra, dosTonos, ojo, pino, pajaro, vaca, fabrica } = Arte;
     // Con mucho calor el pasto y los árboles se secan.
     const seco = anomalia > 3.2 ? 2 : anomalia > 2 ? 1 : 0;
-    const [hojaC, hojaO, hojaB] = [['#2fd186', '#1a9a61', '#9df5c8'], ['#a8d65a', '#7fae3a', '#e4f7a8'], ['#e0b44f', '#b98a30', '#fbe3a0']][seco];
+    // …y cambian con la estación: hojas naranjas en otoño, nieve en invierno, flores en primavera.
+    let [hojaC, hojaO, hojaB] = [['#2fd186', '#1a9a61', '#9df5c8'], ['#a8d65a', '#7fae3a', '#e4f7a8'], ['#e0b44f', '#b98a30', '#fbe3a0']][seco];
+    if (estacion === 'otono' && seco < 2) [hojaC, hojaO, hojaB] = ['#ffa94d', '#e8590c', '#ffd8a8'];
+    if (estacion === 'invierno') [hojaC, hojaO, hojaB] = ['#8fbfa4', '#5f8f74', '#ffffff'];
     const arbol = (x, h) => {
       if (x < costaD + 6) return '';
       const y = superficie(x), r = h * 0.36;
       return `<g>${sombra(x + 2, y + 1, r * 1.2)}
         ${dosTonos(`<path d="M${x - 1.6},${y + 1} L${x - 1},${y - h * 0.5} L${x + 1},${y - h * 0.5} L${x + 1.6},${y + 1} Z" fill="FILL"/>`, '#7a543f', '#5a3c30', { x })}
         ${dosTonos(`<rect x="${x - r}" y="${y - h}" width="${r * 2}" height="${h * 0.62}" rx="${r}" fill="FILL"/><circle cx="${x - r * 0.75}" cy="${y - h * 0.45}" r="${r * 0.5}" fill="FILL"/><circle cx="${x + r * 0.7}" cy="${y - h * 0.46}" r="${r * 0.55}" fill="FILL"/>`, hojaC, hojaO, { x: x + r * 0.15 })}
-        <path d="M${x - r * 0.62},${y - h * 0.72} a${r * 0.75},${r * 0.75} 0 0 1 ${r * 0.5},${-r * 0.42}" stroke="${hojaB}" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.7"/></g>`;
+        <path d="M${x - r * 0.62},${y - h * 0.72} a${r * 0.75},${r * 0.75} 0 0 1 ${r * 0.5},${-r * 0.42}" stroke="${hojaB}" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.7"/>
+        ${estacion === 'invierno' ? `<path d="M${x - r},${y - h * 0.62} a${r},${r} 0 0 1 ${r * 2},0 Z" fill="#f8f9ff"/>` : ''}
+        ${estacion === 'primavera' && seco < 2 ? [[-0.5, -0.8], [0.4, -0.6], [-0.1, -0.45], [0.6, -0.85]].map(([dx, dy]) => `<circle cx="${(x + dx * r).toFixed(1)}" cy="${(y + dy * h).toFixed(1)}" r="1.4" fill="#ff8fc7"/>`).join('') : ''}</g>`;
     };
-    const edificio = (x, w, h, c) => {
+    const edificio = (x, w, h, c, panel) => {
       const yb = superficie(x + w / 2) + 3, y0 = yb - h - 3;
       let ventanas = '';
       for (let yy = y0 + 4; yy < yb - 6; yy += 6) for (let xx = x + 2.5; xx < x + w - 4; xx += 4.5) {
@@ -286,7 +479,8 @@ const Invernadero = (function () {
       }
       return `${sombra(x + w / 2 + 2, yb - 2, w * 0.7)}<rect x="${x}" y="${y0}" width="${w}" height="${h + 3}" rx="1.5" fill="${c}"/>
         <rect x="${x + w - 3.5}" y="${y0}" width="3.5" height="${h + 3}" fill="#000" opacity="0.18"/>
-        <rect x="${x - 0.8}" y="${y0 - 1.6}" width="${w + 1.6}" height="2.4" rx="1.2" fill="#9aa6ff"/>${ventanas}`;
+        <rect x="${x - 0.8}" y="${y0 - 1.6}" width="${w + 1.6}" height="2.4" rx="1.2" fill="#9aa6ff"/>${ventanas}
+        ${panel ? `<path d="M${x + 1},${y0 - 1.5} L${x + w - 1},${y0 - 6} L${x + w - 1},${y0 - 4} L${x + 1},${y0 + 0.5} Z" fill="#3b5bdb" stroke="#a5d8ff" stroke-width="0.6"/>` : ''}`;
     };
     // Oso polar sobre un témpano que se achica al derretirse (o nadando si ya no queda hielo).
     const tx = 158, ty = superficie(tx) - Math.max(0, subida) * 0.2;
@@ -357,7 +551,6 @@ const Invernadero = (function () {
       const zonas = banda(costaI, C0I, 22) + banda(C0D, costaD, 22);
       inundacion += `<path d="${zonas}" fill="#74c0fc" opacity="0.55"/>
         ${[C0I, C0D].map(x => `<path d="M${x},${(superficie(x) - 14).toFixed(1)} V${(superficie(x) + 16).toFixed(1)}" stroke="#ffd166" stroke-width="1.6" stroke-dasharray="3 3"/>`).join('')}
-        ${costaD - C0D > 45 ? `<text x="${((C0D + costaD) / 2).toFixed(1)}" y="${(superficie((C0D + costaD) / 2) + 34).toFixed(1)}" text-anchor="middle" class="kz-rotulo chico">ZONA INUNDADA</text>` : ''}
         ${Array.from({ length: Math.floor((costaD - C0D) / 18) }, (_, k) => { const x = C0D + 9 + k * 18; return `<g opacity="0.55"><rect x="${x - 1.2}" y="${(superficie(x) - 1).toFixed(1)}" width="2.4" height="8" fill="#6e4529"/><circle cx="${x}" cy="${(superficie(x) + 1).toFixed(1)}" r="4" fill="#2f9e44"/></g>`; }).join('')}`;
     }
     // Arena en la orilla actual de cada lado.
@@ -366,14 +559,6 @@ const Invernadero = (function () {
     const olas = [];
     for (let x = costaI + 2; x <= costaD - 2; x += 6) olas.push(`${x.toFixed(1)},${(superficie(x) - 1.2 + Math.sin(x * 0.45) * 1.2).toFixed(1)}`);
     inundacion += `<path d="M${olas.join(' L')}" stroke="#d0ebff" stroke-width="1.6" fill="none" opacity="0.85" stroke-linejoin="round"/>`;
-
-    // Regla de marea en el mar: muestra hasta dónde llega el agua.
-    const rx = 196, base = superficie(rx);
-    const regla = `<g>
-      <rect x="${rx - 2}" y="${base - 34}" width="4" height="44" rx="1.5" fill="#f1f3ff"/>
-      ${Array.from({ length: 8 }, (_, i) => `<line x1="${rx + 2}" x2="${rx + (i % 2 ? 5 : 8)}" y1="${base + 6 - i * 5}" y2="${base + 6 - i * 5}" stroke="#f1f3ff" stroke-width="1.2"/>`).join('')}
-      <path d="M${rx - 9},${(base - subida).toFixed(1)} l6,-3.5 v7 Z" fill="#ffd166"/>
-      <text x="${rx + 9}" y="${base - 27}" class="kz-rotulo chico">NIVEL DEL MAR</text></g>`;
 
     raiz.querySelector('#inv-fondo').innerHTML = `
       <defs>
@@ -392,9 +577,8 @@ const Invernadero = (function () {
       </defs>
       <rect width="${W}" height="${H}" fill="url(#kz-espacio)"/>
       <g>${ESTRELLAS.map((e, i) => `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="${e.r}" fill="${['#fff', '#cfe3ff', '#ffd9f0'][i % 3]}" ${e.tit ? 'class="kz-titila"' : 'opacity="0.7"'}/>`).join('')}</g>
-      <g class="kz-sol-latido"><circle cx="${SOL.x}" cy="${SOL.y}" r="130" fill="url(#kz-sol)" opacity="0.5"/></g>
-      <circle cx="${SOL.x}" cy="${SOL.y}" r="58" fill="url(#kz-sol)"/>
-      <circle cx="${SOL.x}" cy="${SOL.y}" r="30" fill="#fff3c4"/>
+      <g id="kz-solg"><g class="kz-sol-latido"><circle r="130" fill="url(#kz-sol)" opacity="0.5"/></g>
+        <circle r="58" fill="url(#kz-sol)"/><circle r="30" fill="#fff3c4"/></g>
       <g transform="translate(${DX} 0)">
       ${sinAtmosfera ? '' : `<circle cx="${PX}" cy="${PY}" r="${PR + ATM + 40}" fill="url(#kz-halo)"/>
         ${[60, 110].map(d => `<circle cx="${PX}" cy="${PY}" r="${PR + d}" fill="none" stroke="${atm}" stroke-opacity="0.12" stroke-width="1.5"/>`).join('')}`}
@@ -405,6 +589,7 @@ const Invernadero = (function () {
         <path d="M${curva(-220, costaI)} L${costaI},${sx(costaI) + 4} C${costaI + 16},${sx(costaI) + 28} ${costaI - 18},${sx(costaI) + 52} ${costaI + 6},${H} L-220,${H} Z" fill="url(#kz-tierra)"/>
         <path d="M${curva(costaD, 820)} L820,${H} L${costaD + 14},${H} C${costaD + 2},${H - 30} ${costaD + 26},${sx(costaD) + 48} ${costaD - 4},${sx(costaD) + 20} Z" fill="url(#kz-tierra)"/>
         <path d="M-220,${sx(-220) + 40} C200,${sx(200) + 30} 400,${sx(400) + 30} 820,${sx(820) + 40} L820,${H} L-220,${H} Z" fill="#0a0d2e" opacity="0.28"/>
+        ${estacion === 'invierno' ? `<path d="${banda(-220, costaI - 12, 6)}${banda(costaD + 12, 820, 6)}" fill="#f1f3ff" opacity="0.92"/>` : ''}
       </g>
       <circle cx="${PX}" cy="${PY}" r="${PR}" fill="none" stroke="${sinAtmosfera ? '#6c7ae0' : atm}" stroke-width="2.5" opacity="0.9"/>
       ${[[150, 58, 1], [455, 70, 0.8], [300, 92, 0.6], [-40, 60, 0.7], [620, 66, 0.75]].map(([x, alto, e], i) => `<g class="kz-nube" style="animation-delay:${-i * 3}s">
@@ -417,18 +602,45 @@ const Invernadero = (function () {
       ${[[-56, 0.3], [600, 0.32]].map(([x, e]) => molino(x, e)).join('')}
       ${volcan()}
       ${seco < 2 ? [[276, 20], [440, 22], [468, 18]].map(([x, h]) => pino(x, superficie(x) + 1, h)).join('') : [276, 440, 468].map(x => arbol(x, 16)).join('')}
-      <g>${edificio(330, 14, 26, '#5a67d8')}${edificio(346, 11, 38, '#7382f5')}${edificio(360, 16, 20, '#5a67d8')}${edificio(378, 12, 30, '#6c7ae0')}</g>
+      <g>${[[330, 14, 26, '#5a67d8'], [346, 11, 38, '#7382f5'], [360, 16, 20, '#5a67d8'], [378, 12, 30, '#6c7ae0']].map(([x, w, h, c], k) => edificio(x, w, h, c, k < Math.round(renovable * 4))).join('')}</g>
       <g transform="translate(386 ${superficie(404) + 1}) scale(0.3)">${fabrica(0, 0)}</g>
-      <g class="kz-humo">${[0, 1, 2].map(i => `<circle cx="410" cy="${superficie(404) - 36}" r="${5 + i * 2}" fill="${anomalia > 2 ? '#8d86b5' : '#b8bff5'}" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      <g class="kz-humo" opacity="${(1 - renovable).toFixed(2)}">${renovable >= 0.95 ? '' : [0, 1, 2].map(i => `<circle cx="410" cy="${superficie(404) - 36}" r="${5 + i * 2}" fill="${anomalia > 2 ? '#8d86b5' : '#b8bff5'}" style="animation-delay:${i * 0.9}s"/>`).join('')}</g>
+      ${[190, 226, 132, 208].slice(0, Math.round(renovable * 4)).filter(x => x > costaI + 8 && x < costaD - 8).map(x => `<rect x="${x - 4}" y="${(superficie(x) - 2).toFixed(1)}" width="8" height="4" rx="1" fill="#ced4da"/>${molino(x, 0.24)}`).join('')}
       <g transform="translate(424 ${superficie(424) - 6}) scale(0.19)">${vaca(0, 0)}</g>
       ${pajaro(250, superficie(250) - 58, 0.55, 0)}${pajaro(270, superficie(270) - 70, 0.45, -1.5)}
       ${inundacion}
       ${tempano}
-      ${regla}
       </g>
+      <rect id="kz-noche" width="${W}" height="${H}" fill="#030418" opacity="0" pointer-events="none"/>
+      <g id="kz-luces" opacity="0" transform="translate(${DX} 0)">${[[337, 26], [351, 38], [368, 20], [384, 30], [396, 14]].map(([x, h]) => `<circle cx="${x}" cy="${(superficie(x) - h / 2).toFixed(1)}" r="${(h * 0.55).toFixed(1)}" fill="url(#kz-sol)" opacity="0.55"/>`).join('')}
+        ${[[330, 14, 26], [346, 11, 38], [360, 16, 20], [378, 12, 30]].map(([x, w, h]) => { const yb = superficie(x + w / 2) + 3; let v = ''; for (let yy = yb - h; yy < yb - 6; yy += 6) for (let xx = x + 2.5; xx < x + w - 4; xx += 4.5) if ((Math.round(xx * 7 + yy * 3)) % 3) v += `<rect x="${xx.toFixed(1)}" y="${yy.toFixed(1)}" width="2" height="2.6" fill="#ffe066"/>`; return v; }).join('')}</g>
+      <g id="kz-luna" opacity="0"><circle cx="${W - 170}" cy="70" r="40" fill="url(#kz-brillo)"/><circle cx="${W - 170}" cy="70" r="20" fill="#f1f3ff"/>
+        <circle cx="${W - 176}" cy="64" r="4" fill="#d0d5f0"/><circle cx="${W - 162}" cy="77" r="3" fill="#d0d5f0"/></g>
       ${sinAtmosfera ? '' : `<text x="${W - 120}" y="${superficie(W - 320) - 140}" text-anchor="end" class="kz-rotulo">ATMÓSFERA</text>`}
       <text x="${W - 14}" y="26" text-anchor="end" class="kz-rotulo">ESPACIO</text>
       <rect width="${W}" height="${H}" fill="url(#kz-vineta)" pointer-events="none"/>`;
+    aplicarCielo();
+  }
+
+  // Altura del sol según la estación (en invierno va más bajo) y luz del día (0 de noche, 1 al mediodía).
+  const ALTURA_EST = { verano: 1, primavera: 0.85, otono: 0.85, invierno: 0.62 };
+  function luzDelDia() {
+    const th = Math.PI * (hora - 6) / 12;
+    return th > 0 && th < Math.PI ? Math.sin(th) * (0.55 + 0.45 * ALTURA_EST[estacion]) : 0;
+  }
+  function aplicarCielo() {
+    const th = Math.PI * (hora - 6) / 12, alto = ALTURA_EST[estacion];
+    SOL.x = 500 - 470 * Math.cos(th);
+    SOL.y = 380 - 340 * alto * Math.sin(th);
+    const luz = luzDelDia(), noche = Math.max(0, Math.min(1, 1 - luz * 2.2));
+    const f = raiz.querySelector('#inv-fondo');
+    const sol = f.querySelector('#kz-solg');
+    if (!sol) return;
+    sol.setAttribute('transform', `translate(${SOL.x.toFixed(1)} ${SOL.y.toFixed(1)}) scale(${(0.75 + 0.25 * alto).toFixed(2)})`);
+    sol.setAttribute('opacity', th > 0 && th < Math.PI ? 1 : 0);
+    f.querySelector('#kz-noche').setAttribute('opacity', (0.62 * noche).toFixed(2));
+    f.querySelector('#kz-luces').setAttribute('opacity', noche.toFixed(2));
+    f.querySelector('#kz-luna').setAttribute('opacity', noche.toFixed(2));
   }
 
   function bucle(t) {
@@ -436,6 +648,11 @@ const Invernadero = (function () {
     const dt = Math.min(0.05, (t - (ultimo || t)) / 1000);
     ultimo = t;
     if (!raiz.hidden && raiz.offsetParent !== null) {
+      if (cicloDia) {
+        hora = (hora + dt * 3) % 24; // un día en 8 segundos
+        if (!muestras.length || Math.abs(hora - (muestras.ultimaHora ?? -9)) >= 0.2) { muestras.push(tAhora()); muestras.ultimaHora = hora; if (muestras.length > 120) muestras.shift(); pintarTiempo(); }
+      }
+      aplicarCielo();
       if (!pausado) avanzar(dt * velocidad);
       animarParticulas(dt * velocidad * 0.65);
     }
@@ -447,6 +664,12 @@ const Invernadero = (function () {
     let cambio = false;
     while (acumulado >= MS_POR_ANIO) {
       acumulado -= MS_POR_ANIO;
+      if (futuro) {
+        if (futuro.fin) { acumulado = 0; break; }
+        pasoFuturo();
+        cambio = true;
+        continue;
+      }
       anio++;
       T += (tEquilibrio() - T) / TAU;
       aerosol = aerosol < 0.03 ? 0 : aerosol * Math.exp(-1 / 3); // la ceniza va cayendo en pocos años
@@ -458,6 +681,8 @@ const Invernadero = (function () {
       actualizarLecturas();
       dibujarGrafico();
       dibujarFondo();
+      if (futuro) { pintarMatriz(); pintarImpactos(); }
+      pintarTiempo();
     }
   }
 
@@ -487,7 +712,7 @@ const Invernadero = (function () {
     });
 
     // Rayos de sol: salen del Sol hacia un punto al azar de la superficie.
-    if (Math.random() < dt * 5) {
+    if (Math.random() < dt * 5 * luzDelDia()) {
       // Algunos rayos van a parar al hielo o a una nube, y se reflejan (albedo).
       let destinoX = 230 + Math.random() * 600, destinoY = superficie(destinoX), refleja = null;
       const r = Math.random(), hielo = Math.min(1.3, estadoHielo(T - T_BASE).hielo);
@@ -710,10 +935,11 @@ const Invernadero = (function () {
   const G = { x0: 50, x1: 984, y0: 14, y1: 220 };
 
   function escalas() {
-    const valores = historial.map(h => h.T).concat([T_BASE]);
+    let valores = historial.map(h => h.T).concat([T_BASE]);
+    if (futuro) Object.values(futuro.fantasmas).forEach(d => { valores = valores.concat(d.map(x => x.T), [T_BASE + 2]); });
     let min = Math.floor(Math.min(...valores) - 1), max = Math.ceil(Math.max(...valores) + 1);
     if (max - min < 6) { const m = (max + min) / 2; min = Math.floor(m - 3); max = Math.ceil(m + 3); }
-    const a0 = Math.max(ANIO_INICIAL, anio - VENTANA), a1 = Math.max(a0 + VENTANA, anio);
+    const a0 = futuro ? 2025 : Math.max(ANIO_INICIAL, anio - VENTANA), a1 = futuro ? 2100 : Math.max(a0 + VENTANA, anio);
     return {
       min, max, a0, a1,
       x: a => G.x0 + (a - a0) / (a1 - a0) * (G.x1 - G.x0),
@@ -733,10 +959,21 @@ const Invernadero = (function () {
       svg += `<text x="${s.x(a)}" y="${G.y1 + 20}" text-anchor="middle" class="g-eje">${a}</text>`;
     }
     svg += `<line x1="${G.x0}" x2="${G.x1}" y1="${s.y(T_BASE)}" y2="${s.y(T_BASE)}" class="g-referencia"/>`;
+    if (futuro) {
+      // Límites del Acuerdo de París y los caminos posibles (punteados).
+      [[1.5, '+1,5 °C (meta de París)'], [2, '+2 °C (límite de París)']].forEach(([d, t]) => {
+        svg += `<line x1="${G.x0}" x2="${G.x1}" y1="${s.y(T_BASE + d)}" y2="${s.y(T_BASE + d)}" class="g-paris"/><text x="${G.x0 + 6}" y="${s.y(T_BASE + d) - 4}" class="g-paris-t">${t}</text>`;
+      });
+      Object.entries(futuro.fantasmas).forEach(([k, d]) => {
+        const e = ESCENARIOS[k], fin = d[d.length - 1];
+        svg += `<polyline points="${d.map(x => `${s.x(x.anio).toFixed(1)},${s.y(x.T).toFixed(1)}`).join(' ')}" fill="none" stroke="${e.color}" stroke-width="2" stroke-dasharray="5 5" opacity="${k === futuro.clave ? 0.5 : 0.75}"/>
+          <text x="${G.x1 - 4}" y="${s.y(fin.T) - 6}" text-anchor="end" class="g-esc" fill="${e.color}">${e.n.replace(/^\S+ /, '')} +${(fin.T - T_BASE).toFixed(1).replace('.', ',')} °C</text>`;
+      });
+    }
     const pts = historial.map(h => `${s.x(h.anio).toFixed(1)},${s.y(h.T).toFixed(1)}`);
     if (pts.length > 1) {
       svg += `<path d="M${G.x0 + (s.x(historial[0].anio) - G.x0)},${G.y1} L${pts.join(' L')} L${s.x(historial[historial.length - 1].anio)},${G.y1} Z" class="g-area"/>`;
-      svg += `<polyline points="${pts.join(' ')}" class="g-linea"/>`;
+      svg += `<polyline points="${pts.join(' ')}" class="g-linea"${futuro ? ` style="stroke:${ESCENARIOS[futuro.clave].color}"` : ''}/>`;
     }
     historial.forEach((h, k) => { if (h.volcan && !(historial[k - 1] || {}).volcan) svg += `<text x="${s.x(h.anio)}" y="${G.y0 + 12}" text-anchor="middle" font-size="14">🌋</text>`; });
     const ult = historial[historial.length - 1];
