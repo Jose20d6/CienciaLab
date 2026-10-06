@@ -1,12 +1,14 @@
 // Navegación entre módulos (usa el # de la URL para poder compartir un enlace directo, p. ej. index.html#tabla).
 (function () {
-  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos', 'niveles', 'invernadero', 'celula', 'ciclos', 'biomoleculas', 'alimentacion', 'nutricion', 'mediciones', 'mru', 'electricidad'];
+  const vistas = ['inicio', 'transformaciones', 'laboratorio', 'balanceo', 'tabla', 'atomos', 'mezclas', 'estados', 'niveles', 'invernadero', 'celula', 'ciclos', 'biomoleculas', 'alimentacion', 'nutricion', 'mediciones', 'mru', 'electricidad'];
   const modulos = {
     transformaciones: Transformaciones,
     laboratorio: Laboratorio,
     balanceo: Balanceo,
     tabla: TablaPeriodica,
     atomos: Atomos,
+    mezclas: Mezclas,
+    estados: Estados,
     niveles: Niveles,
     invernadero: Invernadero,
     celula: Celula,

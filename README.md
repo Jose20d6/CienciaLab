@@ -13,6 +13,8 @@ Hecha por **Avila del Cali Jose**.
 | ⚖️ **Balanceo de ecuaciones** | Ecuaciones químicas / Ley de Lavoisier | Ajustan coeficientes con una balanza visual y una tabla de conteo de átomos. Tiene 3 niveles y pistas. |
 | 🧩 **Tabla periódica** | Tabla periódica | Exploran los 118 elementos coloreados por familia, por tipo (metal/no metal) o por estado. Cada ficha muestra protones, neutrones, configuración electrónica y modelo de Bohr (hasta Z = 20). Incluye un **desafío** de 10 preguntas con récord. |
 | ⚛️ **Átomos y moléculas** | Estructura de la materia | Arman átomos con protones, neutrones y electrones (hasta Z = 20) y ven qué elemento, isótopo o ion formaron, si el núcleo es estable y su notación con número másico y atómico. Luego unen átomos (H, C, N, O, S, Cl) con enlaces simples, dobles o triples respetando cuántos enlaces forma cada uno. Ambos modos tienen misiones. |
+| 🥣 **Mezclas homogéneas y heterogéneas** | Sistemas materiales | **Al microscopio:** 15 mezclas (agua con sal, aire, bronce, agua y aceite, granito, ensalada de frutas…) vistas a simple vista y con una lupa que muestra sus partículas, con fases, componentes y método de separación. **¿Homogénea o heterogénea?:** clasifican mezclas y la lupa revela cómo son por dentro. **¿Cómo la separo?:** eligen entre filtración, decantación, imantación, tamización, tría, evaporación y destilación. |
+| 🧊 **Estados de la materia** | Cambios de estado | **Calentar y enfriar:** un recipiente con moléculas de agua que vibran, se deslizan o vuelan según la temperatura, con termómetro y curva de calentamiento (mesetas de fusión y ebullición). **Los cambios de estado:** mapa con los seis cambios y si absorben o liberan calor. **¿Qué cambio es?:** situaciones cotidianas. |
 | 🔭 **Niveles de organización** | La materia y la vida | **Viaje con zoom:** acercan una lupa desde la biosfera hasta las partículas subatómicas, siguiendo a un carpincho de los Esteros del Iberá, con el tamaño de cada nivel y si tiene vida o no. **Ordenar:** acomodan los niveles del más pequeño al más grande (6 o los 14). **¿Qué nivel es?:** reconocen a qué nivel pertenecen ejemplos cotidianos. |
 | 🌍 **Efecto invernadero** | Cambio climático | Suben o bajan el CO₂ (con un deslizador, momentos históricos o acciones humanas) y ven la radiación solar y el calor en la atmósfera, la temperatura media año a año en un gráfico y sus consecuencias. Modelo simplificado: +3 °C por cada duplicación del CO₂. Además: **metano** (con sus fuentes), **efecto albedo** (el hielo refleja la luz y al derretirse la Tierra se calienta más) y **erupciones volcánicas** que enfrían unos años, con el aporte de cada efecto a la temperatura. También: **matriz energética** (fósil/renovable, con emisiones por año, molinos, paneles y humo de la fábrica), **escenarios hasta 2100** (emisiones altas, medias, cero neto o un plan propio) con un **termómetro de impactos** (nivel del mar, glaciares, especies) y **tiempo y clima** (hora del día con día y noche, y estaciones). |
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla, juegan a "¿Dónde está?" y siguen **rutas en la célula** (la insulina desde el núcleo hasta afuera, la glucosa hasta la mitocondria, una bacteria hasta el lisosoma, la energía del Sol y el agua hasta la vacuola). |
@@ -33,7 +35,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
 - El botón **🌙/☀️** cambia entre modo claro y oscuro (por defecto sigue la configuración del dispositivo).
 - En las actividades con preguntas, cada ronda trae preguntas distintas y no se repiten las de la ronda anterior.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#nutricion`, `#mediciones`, `#mru` o `#electricidad`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#mezclas`, `#estados`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#nutricion`, `#mediciones`, `#mru` o `#electricidad`.
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -49,6 +51,8 @@ js/laboratorio.js     Reactivos y reacciones (fáciles de ampliar)
 js/balanceo.js        Lista de ecuaciones por nivel
 js/tabla.js
 js/atomos.js          Átomos y moléculas (misiones y moléculas conocidas)
+js/mezclas.js         Mezclas homogéneas y heterogéneas
+js/estados.js         Estados de la materia y cambios de estado
 js/niveles.js         Niveles de organización de la materia
 js/invernadero.js     Simulación del efecto invernadero
 js/celula.js          Orgánulos de las células animal y vegetal

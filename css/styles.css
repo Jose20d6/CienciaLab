@@ -1208,6 +1208,52 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .md-tabla { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .md-tabla td { border: 1px solid var(--linea); padding: 0.3rem 0.45rem; }
 
+/* ---------- Química: mezclas ---------- */
+#mz-svg, #es-svg { display: block; width: 100%; height: auto; }
+.mz-rotulo { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; fill: #c9ccf5; }
+.mz-fase { font-size: 11px; font-weight: 800; fill: #ffd166; }
+.mz-metodo { font-size: 13px; font-weight: 800; fill: #12143a; }
+.mz-medalla { font-size: 44px; font-weight: 900; fill: #ffe8cc; opacity: 0.85; }
+.mz-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.6rem 0; text-align: center; }
+.mz-datos div { background: var(--bg); border-radius: 10px; padding: 0.4rem; }
+.mz-datos b { display: block; font-size: 1.5rem; }
+.mz-datos span { font-size: 0.8rem; color: var(--suave); }
+.mz-ley { display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; font-size: 0.86rem; }
+.mz-ley span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.mz-ley svg { background: #1f2256; border-radius: 8px; }
+
+/* ---------- Química: estados de la materia ---------- */
+.es-temp { font-size: 40px; font-weight: 900; fill: #fff; }
+.es-fase { font-size: 15px; font-weight: 800; letter-spacing: 0.06em; fill: #ffd166; }
+.es-sub { font-size: 12px; font-weight: 700; fill: #c9ccf5; }
+.es-marca { font-size: 11px; font-weight: 700; fill: #c9ccf5; }
+.es-marca.clave { fill: #ffd166; }
+.es-empezar { color: #c9ccf5; font-weight: 700; font-size: 0.9rem; }
+.es-curva-caja { margin-top: 0.4rem; }
+.es-curva { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; }
+.es-curva-fondo { fill: #12143a; }
+.es-grilla { stroke: #2a2e6e; }
+.es-eje { font-size: 10px; font-weight: 700; fill: #9aa0d8; }
+.es-linea { fill: none; stroke: #3a3e85; stroke-width: 4; stroke-linejoin: round; }
+.es-linea.hecha { stroke: #ffd166; }
+.es-punto { fill: #ff6b6b; stroke: #fff; stroke-width: 2; }
+.es-tramo { font-size: 10px; font-weight: 700; fill: #9aa0d8; }
+.es-tramo.activo { fill: #ffd166; }
+.es-tabla { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.4rem 0; }
+.es-tabla th, .es-tabla td { text-align: left; padding: 0.3rem 0.4rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.es-tabla th { color: var(--suave); width: 38%; }
+.es-cambio { cursor: pointer; transition: opacity 0.3s; }
+.es-cambio:hover .es-trazo { stroke-width: 7; }
+.es-cambio.off { opacity: 0.3; }
+.es-cambio.sel .es-trazo { stroke-width: 8; filter: drop-shadow(0 0 6px rgba(255, 209, 102, 0.9)); }
+.es-cambio.mal { opacity: 0.6; }
+.es-cambio.mal rect { stroke: #ff6b6b; stroke-dasharray: 4 3; }
+.es-cambio-t { font-size: 12.5px; font-weight: 800; fill: #fff; }
+.es-nodo { font-size: 12px; font-weight: 900; fill: #12143a; letter-spacing: 0.04em; }
+.es-ley { font-size: 11px; font-weight: 700; fill: #e9ebff; }
+.es-flujo { font-size: 1.05rem; }
+.nv-sello.calor { background: var(--mal-suave); color: var(--mal); }
+
 /* ---------- Física: MRU ---------- */
 #mr-calle, #mr-graf { display: block; width: 100%; height: auto; }
 #mr-graf { margin-top: 0.5rem; }
