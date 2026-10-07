@@ -70,7 +70,7 @@ const Estados = (function () {
       p.fase = i < nSol ? 'solido' : i >= N - nGas ? 'gas' : 'liquido';
       if (p.fase === 'solido') {
         const k = kSol++, fila = Math.floor(k / COLS), col = k % COLS;
-        const bx = B.x0 + 32 + col * 28 + (fila % 2) * 8, by = sup - 14 - fila * 25;
+        const bx = B.x0 + 36 + col * 25 + (fila % 2) * 6, by = sup - 14 - fila * 25;
         const amp = 1 + (est.T - T_MIN) / 40 * 1.6, t = performance.now() / 1000;
         p.x += (bx + Math.sin(t * 9 + i) * amp - p.x) * Math.min(1, dt * 8);
         p.y += (by + Math.cos(t * 8 + i * 1.3) * amp - p.y) * Math.min(1, dt * 8);
@@ -113,8 +113,7 @@ const Estados = (function () {
       <path d="M${x0 + r},${y0} L${x0 + r + d},${y0 - d} H${x1 + d - r} L${x1 - r},${y0} Z" fill="#e7f5ff" opacity="0.55"/>
       <path d="M${x1},${y0 + r} L${x1 + d},${y0 - d + r} V${y1 - d - r * 0.3} L${x1},${y1 - r * 0.3} Z" fill="#74c0fc" opacity="0.45"/>
       <rect x="${x0}" y="${y0}" width="${w}" height="${alto}" rx="${r}" fill="#a5d8ff" opacity="0.32" stroke="#e7f5ff" stroke-width="2.5"/>
-      <path d="M${x0 + 10},${y0 + alto - 14} V${y0 + 14} Q${x0 + 10},${y0 + 8} ${x0 + 18},${y0 + 8}" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
-      <path d="M${x0 + w * 0.55},${y0 + alto * 0.3} l14,10 l-6,12" stroke="#fff" stroke-width="1.6" fill="none" opacity="0.45"/>
+      <path d="M${x0 + 6},${y0 + 22} Q${x0 + 6},${y0 + 6} ${x0 + 24},${y0 + 6}" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
       ${gotas}</g>`;
   }
 
@@ -131,7 +130,7 @@ const Estados = (function () {
       ${cuboHielo(info.hielo, est)}
       <rect x="${B.x0}" y="${B.y0}" width="${B.x1 - B.x0}" height="${B.y1 - B.y0}" rx="16" fill="none" stroke="#e7f5ff" stroke-width="4"/>
       <rect x="${B.x0 - 8}" y="${B.y0 - 14}" width="${B.x1 - B.x0 + 16}" height="16" rx="6" fill="#868e96"/>
-      <path d="M${B.x0 + 14},${B.y0 + 16} V${B.y1 - 20}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.25"/>
+      <path d="M${B.x0 + 12},${B.y0 + 18} V${B.y0 + 90}" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
       <rect x="${B.x0 - 20}" y="${B.y1 + 8}" width="${B.x1 - B.x0 + 40}" height="16" rx="5" fill="#495057"/>
       ${fuego ? [-60, 0, 60].map((d, i) => llama((B.x0 + B.x1) / 2 + d, B.y1 + 62, 0.7 + 0.15 * Math.sin(performance.now() / 120 + i))).join('') : ''}
       ${frio ? [-60, 0, 60].map(d => `<g transform="translate(${(B.x0 + B.x1) / 2 + d} ${B.y1 + 48})"><rect x="-16" y="-12" width="32" height="24" rx="5" fill="#d0ebff" stroke="#74c0fc" stroke-width="2"/><path d="M-8,0 h16 M0,-8 v16 M-6,-6 l12,12 M6,-6 l-12,12" stroke="#4dabf7" stroke-width="2"/></g>`).join('') : ''}
