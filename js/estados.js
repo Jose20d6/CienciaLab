@@ -190,7 +190,10 @@ const Estados = (function () {
   function cajaEstado(k) {
     const [x, y] = NODOS[k], P = PROPIEDADES[k];
     let ps = '';
-    if (k === 'solido') for (let f = 0; f < 3; f++) for (let c = 0; c < 5; c++) ps += molecula(x - 52 + c * 26 + (f % 2) * 6, y + 26 - f * 22, 0.4);
+    if (k === 'solido') {
+      ps += cuboHielo({ x0: x - 66, x1: x + 54, y0: y - 52, y1: y + 40 }, { fase: 'solido' }).replace('stroke-width="2.5"', 'stroke-width="2"');
+      for (let f = 0; f < 3; f++) for (let c = 0; c < 5; c++) ps += molecula(x - 50 + c * 24 + (f % 2) * 6, y + 26 - f * 26, 0.4);
+    }
     if (k === 'liquido') [[-50, 26], [-24, 30], [2, 24], [28, 30], [52, 24], [-40, 6], [-12, 8], [16, 4], [44, 8], [-26, -14], [6, -12], [34, -16]].forEach(([dx, dy], i) => { ps += molecula(x + dx, y + dy, i * 1.3); });
     if (k === 'gas') [[-55, 20], [10, -12], [50, 28], [-20, -30], [40, -32], [-48, -20]].forEach(([dx, dy], i) => { ps += molecula(x + dx, y + dy, i * 1.9); });
     return `<g><rect x="${x - 82}" y="${y - 58}" width="164" height="112" rx="16" fill="#1f2256" stroke="#3a3e85" stroke-width="2"/>
