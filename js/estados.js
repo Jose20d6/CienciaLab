@@ -91,7 +91,31 @@ const Estados = (function () {
       if (p.y > B.y1 - 10) { p.y = B.y1 - 10; p.vy = -Math.abs(p.vy); }
       if (p.y < top) { if (p.fase === 'liquido') p.y += (top - p.y) * Math.min(1, dt * 6); p.vy = Math.abs(p.vy); }
     });
-    return { sup, nLiq };
+    // Contorno del bloque de hielo: rodea las partículas sólidas (se achica a medida que se funde).
+    let hielo = null;
+    const sol = parts.filter(p => p.fase === 'solido');
+    if (sol.length) {
+      const xs = sol.map(p => p.x), ys = sol.map(p => p.y);
+      hielo = { x0: Math.min(...xs) - 14, x1: Math.max(...xs) + 14, y0: Math.min(...ys) - 14, y1: Math.max(...ys) + 14, n: sol.length };
+    }
+    return { sup, nLiq, hielo };
+  }
+
+  // Cubo de hielo con volumen: cara de frente, cara de arriba y costado en perspectiva.
+  // Al fundirse se achica, se redondea y gotea.
+  function cuboHielo(h, est) {
+    if (!h) return '';
+    const derr = est.fase === 'fusion' ? est.f : 0;
+    const d = 16 * (1 - derr * 0.6), r = 6 + derr * 18;
+    const { x0, x1, y0, y1 } = h, w = x1 - x0, alto = y1 - y0;
+    const gotas = derr > 0 ? [0.2, 0.55, 0.85].map((u, i) => { const x = x0 + u * w, t = (performance.now() / 900 + i * 0.37) % 1; return `<path d="M${x},${y1 + 2 + t * 18} q-4,6 0,9 q4,-3 0,-9 Z" fill="#a5d8ff" opacity="${1 - t}"/>`; }).join('') : '';
+    return `<g class="es-hielo">
+      <path d="M${x0 + r},${y0} L${x0 + r + d},${y0 - d} H${x1 + d - r} L${x1 - r},${y0} Z" fill="#e7f5ff" opacity="0.55"/>
+      <path d="M${x1},${y0 + r} L${x1 + d},${y0 - d + r} V${y1 - d - r * 0.3} L${x1},${y1 - r * 0.3} Z" fill="#74c0fc" opacity="0.45"/>
+      <rect x="${x0}" y="${y0}" width="${w}" height="${alto}" rx="${r}" fill="#a5d8ff" opacity="0.32" stroke="#e7f5ff" stroke-width="2.5"/>
+      <path d="M${x0 + 10},${y0 + alto - 14} V${y0 + 14} Q${x0 + 10},${y0 + 8} ${x0 + 18},${y0 + 8}" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <path d="M${x0 + w * 0.55},${y0 + alto * 0.3} l14,10 l-6,12" stroke="#fff" stroke-width="1.6" fill="none" opacity="0.45"/>
+      ${gotas}</g>`;
   }
 
   function escenaSim(est, info) {
@@ -104,6 +128,7 @@ const Estados = (function () {
       <rect width="${W}" height="${H}" rx="14" fill="url(#es-fondo)"/>${estrellas(24, W, H)}
       <ellipse cx="${(B.x0 + B.x1) / 2 + 6}" cy="${B.y1 + 32}" rx="170" ry="10" fill="#05061a" opacity="0.45"/>
       ${info.nLiq ? `<rect x="${B.x0 + 4}" y="${info.sup}" width="${B.x1 - B.x0 - 8}" height="${B.y1 - info.sup - 4}" rx="10" fill="#4dabf7" opacity="0.22"/><path d="M${B.x0 + 4},${info.sup} H${B.x1 - 4}" stroke="#a5d8ff" stroke-width="2" opacity="0.6"/>` : ''}
+      ${cuboHielo(info.hielo, est)}
       <rect x="${B.x0}" y="${B.y0}" width="${B.x1 - B.x0}" height="${B.y1 - B.y0}" rx="16" fill="none" stroke="#e7f5ff" stroke-width="4"/>
       <rect x="${B.x0 - 8}" y="${B.y0 - 14}" width="${B.x1 - B.x0 + 16}" height="16" rx="6" fill="#868e96"/>
       <path d="M${B.x0 + 14},${B.y0 + 16} V${B.y1 - 20}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.25"/>
