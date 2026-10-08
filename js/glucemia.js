@@ -31,22 +31,27 @@ const Glucemia = (function () {
     return s;
   }
 
+  const absorcion = (amp, tp, t) => t > 0 ? amp * (t / tp) * Math.exp(1 - t / tp) : 0;
+
   // Modelo compartimental simplificado (inspirado en el "modelo mínimo" de Bergman): absorción intestinal,
   // secreción de insulina y glucagón, captación de glucosa por las células, glucógeno del hígado y pérdida renal.
   function pasoGlucemia(s, dt, tipo) {
-    s.Ra = s.comida && s.t > 0 ? s.amp * (s.t / s.tp) * Math.exp(1 - s.t / s.tp) : 0;
-    const secrecion = tipo === 1 ? 0 : 0.035 * Math.max(0, s.G - 92) * (tipo === 2 ? 0.8 : 1);
+    // Absorción intestinal: una comida (s.comida) o varias a lo largo del día (s.comidas, en el desafío).
+    s.Ra = s.comidas ? s.comidas.reduce((a, c) => a + absorcion(c.amp, c.tp, s.t - c.t0), 0) : s.comida ? absorcion(s.amp, s.tp, s.t) : 0;
+    const secrecion = tipo === 1 ? 0 : 0.035 * Math.max(0, s.G - 92) * (tipo === 2 ? 0.8 : 1) * (s.fSecrecion || 1);
     s.I += (secrecion + s.iny * 0.08 - 0.08 * s.I) * dt;
     s.iny -= 0.08 * s.iny * dt;
     const resistencia = tipo === 2 ? 0.15 : 1;
     s.X += 0.035 * (s.I * resistencia * 0.0035 - s.X) * dt;
     s.Gc += ((s.G < 88 ? 0.05 * (88 - s.G) : 0) - 0.08 * s.Gc) * dt;
-    s.liberacion = s.glucogeno > 0 ? 1.5 * s.Gc : 0;
-    const ejercicio = s.t < s.ejHasta ? 0.9 : 0;
-    s.captacion = s.X * s.G + ejercicio;
+    s.liberacion = s.glucogeno > 0 ? 1.5 * (s.fGlucagon ?? 1) * s.Gc : 0;
+    const ejercicio = s.t < s.ejHasta && s.t >= (s.ejDesde || 0) ? (s.ejFuerza || 0.9) : 0;
+    // En el desafío, la insulina sigue actuando aunque la glucemia baje: así una dosis de más produce hipoglucemia.
+    const porInsulina = s.X * (s.lineal ? 0.5 * s.G + 55 : s.G);
+    s.captacion = porInsulina + ejercicio;
     s.renal = s.G > 180 ? 0.004 * (s.G - 180) : 0;
-    s.G += (s.Ra - 0.006 * (s.G - 90) - s.X * s.G + s.liberacion + (tipo ? 0 : 0.002 * (90 - s.G)) - s.renal - ejercicio) * dt;
-    s.glucogeno = Math.max(0, Math.min(100, s.glucogeno + (s.X * s.G * 0.3 - s.liberacion * 0.8) * dt * 0.08));
+    s.G += (s.Ra - 0.006 * (s.G - 90) - porInsulina + s.liberacion + (tipo ? 0 : 0.002 * (90 - s.G)) - s.renal - ejercicio) * dt;
+    s.glucogeno = Math.max(0, Math.min(100, s.glucogeno + (porInsulina * 0.3 - s.liberacion * 0.8) * dt * 0.08));
     s.t += dt;
     s.max = Math.max(s.max, s.G);
   }
@@ -135,6 +140,8 @@ const Glucemia = (function () {
       </div>
       <div class="segmentado" id="gl-pestanas">
         <button data-p="sim" class="activo">📈 Simulador</button>
+        <button data-p="plato">🍽️ Armar el plato</button>
+        <button data-p="desafio">🏆 Desafío del día</button>
         <button data-p="aprender">📚 Para aprender</button>
       </div>
       <div id="gl-sim">
@@ -185,6 +192,8 @@ const Glucemia = (function () {
           </aside>
         </div>
       </div>
+      <div id="gl-plato" hidden></div>
+      <div id="gl-desafio" hidden></div>
       <div id="gl-aprender" hidden>
         <div class="gl-fichas">${FICHAS.map(f => `<article class="panel gl-ficha-card${f.ancho ? ' ancho' : ''}" id="gl-f-${f.id}"><h3>${f.t}</h3>${f.html.replace(/<table/g, '<div class="gl-tabla"><table').replace(/<\/table>/g, '</table></div>')}</article>`).join('')}</div>
         <p class="bm-ayuda">El simulador es un modelo simplificado: las curvas reales cambian según la persona, la porción, la cocción y lo que se come junto.</p>
@@ -247,8 +256,10 @@ const Glucemia = (function () {
   function cambiarPestana(p) {
     pestana = p;
     raiz.querySelectorAll('#gl-pestanas button').forEach(b => b.classList.toggle('activo', b.dataset.p === p));
-    raiz.querySelector('#gl-sim').hidden = p !== 'sim';
-    raiz.querySelector('#gl-aprender').hidden = p !== 'aprender';
+    ['sim', 'plato', 'desafio', 'aprender'].forEach(k => { raiz.querySelector('#gl-' + k).hidden = k !== p; });
+    // Las actividades extra se arman la primera vez que se abren.
+    const cont = raiz.querySelector('#gl-' + p);
+    if ((p === 'plato' || p === 'desafio') && !cont.dataset.listo) { cont.dataset.listo = '1'; GluExtra[p](cont); }
   }
 
   function pintarControlesGlu() {
@@ -652,5 +663,5 @@ const Glucemia = (function () {
         ${glu.corriendo ? `<text x="168" y="84" text-anchor="end" class="bm-letra mini" fill="#9aa3ff">minuto ${Math.floor(s.t)}</text>` : ''}</g>`;
   }
 
-  return { iniciar };
+  return { iniciar, modelo: { COMIDAS, COLORES_CURVA, nuevaSimulacion, pasoGlucemia, areaBajoCurva, cara } };
 })();

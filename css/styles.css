@@ -1075,6 +1075,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .gl-acciones { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
 .gl-col .bm-diario { max-height: 290px; margin: 0; }
 .gl-graficos { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1rem; margin-top: 1rem; align-items: start; }
+.gl-graficos > *, .gl-plato > * { min-width: 0; }
 .gl-graficos .bm-graf-cab { margin-top: 0; }
 .gl-res p { margin: 0 0 0.6rem; }
 .gl-fichas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
@@ -1088,6 +1089,58 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .gl-ficha-card.destacada { animation: gl-destello 1.8s ease; }
 @keyframes gl-destello { 0%, 45% { box-shadow: 0 0 0 4px var(--primario); } 100% { box-shadow: 0 0 0 0 transparent; } }
 .gl-ficha { border: 0; background: none; color: var(--primario); font-weight: 700; padding: 0; font-size: 0.8rem; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+/* Armar el plato */
+.gl-plato { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.gl-plato-escena { padding: 0.6rem; }
+#gp-escena, #gp-graf, #gd-escena, #gd-graf { width: 100%; height: auto; display: block; border-radius: 12px; }
+.gl-plato-ctrl h3 { display: flex; align-items: center; gap: 0.45rem; margin: 0.9rem 0 0.5rem; font-size: 1rem; }
+.gl-plato-ctrl h3:first-child { margin-top: 0; }
+.gl-plato-ctrl h3 small { font-weight: 400; }
+.gl-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.gl-chips button { display: inline-flex; align-items: center; gap: 0.35rem; border: 2px solid var(--linea); background: var(--bg); color: inherit; border-radius: 999px; padding: 0.3rem 0.7rem; font-weight: 600; font-size: 0.88rem; }
+.gl-chips button span { font-size: 1.1rem; }
+.gl-chips button small { color: var(--suave); font-weight: 400; font-size: 0.72rem; }
+.gl-chips button:hover { border-color: var(--primario); }
+.gl-chips button.activo { border-color: var(--primario); background: var(--primario-suave); }
+.gl-orden { margin-top: 0.6rem; }
+.gl-orden:has(input:disabled) { opacity: 0.5; }
+.gp-pieza { transform-box: fill-box; transform-origin: center; }
+.gp-nuevo { animation: gp-aparece 0.45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes gp-aparece { from { transform: scale(0.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.gp-orden-num { font-size: 13px; font-weight: 800; fill: #12143a; }
+.gp-pista { font-size: 14px; font-weight: 700; fill: #c9ccf5; }
+.gp-veredicto { font-size: 0.92rem; }
+.gl-res h4 { margin: 0.8rem 0 0.4rem; font-size: 0.92rem; }
+.gp-efectos { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.gp-efectos li { display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.3rem; background: var(--bg); border-radius: 8px; padding: 0.35rem 0.5rem; font-size: 0.84rem; }
+.gp-efectos p { margin: 0 !important; }
+/* Desafío del día */
+.gd-regla { background: var(--primario-suave); border-radius: 10px; padding: 0.45rem 0.6rem; }
+#gd-dias { margin-bottom: 0.6rem; flex-wrap: wrap; }
+.gd-reloj { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.6rem; }
+#gd-hora { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+#gd-estado { font-weight: 800; font-size: 0.85rem; text-align: right; }
+.gd-botones { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.6rem; }
+.gd-alerta { animation: gd-latido 0.9s ease-in-out infinite; border-color: #ff6b6b !important; }
+@keyframes gd-latido { 50% { box-shadow: 0 0 0 5px rgba(255, 107, 107, 0.35); } }
+.gd-decision { background: #12143a; color: #e9ebff; border-radius: 12px; padding: 0.75rem 0.9rem; margin-bottom: 0.6rem; border: 2px solid #ffd166; }
+.gd-decision h4 { margin: 0.3rem 0; font-size: 1rem; }
+.gd-decision p { margin: 0.35rem 0; font-size: 0.9rem; }
+.gd-decision .bm-suave { color: #c9ccf5; }
+.gd-unidades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; margin-top: 0.4rem; }
+.gd-unidades button, .gd-opciones button { border: 2px solid #3a3e85; background: #1f2256; color: #fff; border-radius: 8px; padding: 0.4rem 0; font-weight: 800; font-size: 1rem; }
+.gd-unidades button:hover, .gd-opciones button:hover { border-color: #ffd166; color: #ffd166; }
+.gd-opciones { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.4rem; }
+.gd-opciones button { font-size: 0.9rem; padding: 0.5rem 0.6rem; text-align: left; }
+#gd-panel .bm-diario { max-height: 240px; }
+.gd-tabla { margin: 0.6rem 0; }
+.gd-consejos { padding-left: 1.1rem; font-size: 0.86rem; margin: 0.4rem 0 0.8rem; }
+.gd-hora-eje { font-size: 10px; font-weight: 700; fill: #fff; opacity: 0.7; }
+.gd-nombre { font-size: 9px; font-weight: 800; letter-spacing: 0.14em; fill: #fff; }
+.gd-reloj-svg { font-size: 15px; font-weight: 800; fill: #e9ebff; font-variant-numeric: tabular-nums; }
+.gd-cartel { font-size: 14px; font-weight: 700; fill: #ffe8a3; }
+.gd-dosis { font-size: 11px; font-weight: 800; fill: #7fd3ff; }
+@media (max-width: 900px) { .gl-plato { grid-template-columns: 1fr; } }
 @media (max-width: 1000px) { .gl-controles { grid-template-columns: 1fr 1fr; } .gl-controles .gl-col:last-child { grid-column: 1 / -1; } .gl-graficos { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .gl-controles, .gl-fichas { grid-template-columns: 1fr; } .gl-personas { flex-direction: row; flex-wrap: wrap; } .gl-personas button { flex: 1 1 8rem; } }
 .bm-fuentes li { margin-bottom: 0.35rem; font-size: 0.8rem; }
