@@ -1057,6 +1057,39 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .bm-tabla-concepto { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.3rem 0; }
 .bm-tabla-concepto th, .bm-tabla-concepto td { border-bottom: 1px solid var(--linea); padding: 0.3rem; text-align: left; vertical-align: top; }
 .bm-tabla-concepto th { background: var(--bg); }
+
+/* Glucemia y diabetes: escena a todo el ancho, controles en tres columnas y gráficos con el resultado al costado */
+.gl-escena { padding: 0.6rem; }
+.gl-refs { font-size: 0.74rem; margin-top: 0.35rem; gap: 0.2rem 0.9rem; opacity: 0.85; }
+.gl-controles { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.1fr) minmax(0, 1.3fr); gap: 1rem; margin-top: 1rem; align-items: stretch; }
+.gl-col h3, .gl-res h3 { display: flex; align-items: center; gap: 0.45rem; margin: 0 0 0.6rem; font-size: 1rem; }
+.gl-col h3 small { font-weight: 400; }
+.gl-num { width: 1.5rem; height: 1.5rem; flex: none; border-radius: 50%; background: var(--primario); color: #fff; display: inline-grid; place-items: center; font-size: 0.85rem; }
+.gl-personas { display: flex; flex-direction: column; gap: 0.35rem; }
+.gl-personas button { display: flex; align-items: center; gap: 0.5rem; border: 2px solid var(--linea); background: var(--bg); color: inherit; border-radius: 10px; padding: 0.45rem 0.6rem; font-weight: 600; text-align: left; font-size: 0.9rem; }
+.gl-personas button span { font-size: 1.15rem; }
+.gl-personas button:hover:not(:disabled) { border-color: var(--primario); }
+.gl-personas button.activo { border-color: var(--primario); background: var(--primario-suave); }
+.gl-personas button:disabled:not(.activo) { opacity: 0.45; }
+#gl-persona-txt { margin: 0.6rem 0 0; font-size: 0.84rem; }
+.gl-acciones { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+.gl-col .bm-diario { max-height: 290px; margin: 0; }
+.gl-graficos { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1rem; margin-top: 1rem; align-items: start; }
+.gl-graficos .bm-graf-cab { margin-top: 0; }
+.gl-res p { margin: 0 0 0.6rem; }
+.gl-fichas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.gl-ficha-card { font-size: 0.92rem; min-width: 0; }
+.gl-tabla { overflow-x: auto; }
+.gl-tabla .bm-tabla-concepto { min-width: 420px; }
+.gl-res .bm-glu-datos { grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); }
+.gl-ficha-card.ancho { grid-column: 1 / -1; }
+.gl-ficha-card h3 { margin: 0 0 0.5rem; }
+.gl-ficha-card ul { padding-left: 1.1rem; }
+.gl-ficha-card.destacada { animation: gl-destello 1.8s ease; }
+@keyframes gl-destello { 0%, 45% { box-shadow: 0 0 0 4px var(--primario); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.gl-ficha { border: 0; background: none; color: var(--primario); font-weight: 700; padding: 0; font-size: 0.8rem; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+@media (max-width: 1000px) { .gl-controles { grid-template-columns: 1fr 1fr; } .gl-controles .gl-col:last-child { grid-column: 1 / -1; } .gl-graficos { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .gl-controles, .gl-fichas { grid-template-columns: 1fr; } .gl-personas { flex-direction: row; flex-wrap: wrap; } .gl-personas button { flex: 1 1 8rem; } }
 .bm-fuentes li { margin-bottom: 0.35rem; font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) { .bm-pieza, .bm-ribosoma { transition: none; } .bm-gota, .bm-llama, .bm-hueco.actual { animation: none; } }
 
