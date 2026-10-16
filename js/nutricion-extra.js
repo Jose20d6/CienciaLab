@@ -1,4 +1,4 @@
-// Sistemas de la nutrición (2.º año): "Completar el esquema" y "La ciudad" (analogías).
+// Sistemas de la nutrición (2.º año): "Completar el esquema" y "El archipiélago de las islas SIN" (analogía).
 // Lo usa nutricion.js; cada actividad dibuja su escena en el contenedor que recibe.
 const NutriExtra = (function () {
   const { dosTonos, ojo } = Arte;
@@ -225,185 +225,269 @@ const NutriExtra = (function () {
     revisar();
   }
 
-  // ========== 6. La ciudad (analogías) ==========
-  const CW = 760, CH = 450;
-  const LUGARES = {
-    digestivo: { n: 'Planta procesadora de alimentos', pill: [118, 172], desc: 'Recibe la materia prima, la separa en partes pequeñas y útiles, y tira los restos que no sirven.', expl: 'Como el <b>sistema digestivo</b>: transforma los alimentos en <b>nutrientes</b> y elimina lo que no se absorbe como materia fecal.' },
-    respiratorio: { n: 'Torres de ventilación', pill: [268, 84], desc: 'Hacen entrar aire fresco a la ciudad y sacan el aire viciado.', expl: 'Como el <b>sistema respiratorio</b>: toma el <b>oxígeno</b> del aire y elimina el <b>dióxido de carbono</b>.' },
-    celula: { n: 'Casas y fábricas', pill: [428, 150], desc: 'Es donde se vive y se trabaja: usan la mercadería y la energía para producir, y generan basura.', expl: 'Como las <b>células</b>: usan los nutrientes y el oxígeno para obtener <b>energía</b> y crecer, y producen <b>desechos</b>.' },
-    excretor: { n: 'Planta de tratamiento de residuos', pill: [638, 164], desc: 'Recibe la basura y el agua sucia, los filtra y saca de la ciudad lo que no sirve.', expl: 'Como el <b>sistema excretor</b>: los <b>riñones</b> filtran la sangre y eliminan los desechos con la <b>orina</b>.' },
-    circulatorio: { n: 'Rutas y camiones de reparto', pill: [380, 424], desc: 'Recorren toda la ciudad: llevan mercadería a cada casa y fábrica, y se llevan la basura.', expl: 'Como el <b>sistema circulatorio</b>: la sangre, impulsada por el corazón, lleva nutrientes y oxígeno a todas las células y recoge sus desechos. ¡Conecta a todos!' },
+  // ========== 6. El archipiélago de las islas SIN (analogía) ==========
+  const CW = 760, CH = 460;
+  const TEXTO_SIN = [
+    'Se trata de un grupo de islas de distintos tamaños ubicadas muy cerca unas de otras, conformando un archipiélago. En cada una de las islas hay casas, en general agrupadas por sectores y estos se comunican entre sí a través de pequeñas rutas. Debido a que están bastante alejadas del continente, todas las islas aportan al funcionamiento general del conjunto: alimentación, producción, reciclaje, etc.',
+    'Las islas se comunican mediante barcos que navegan por caminos acuáticos.',
+    'Cada una de las islas se especializa en una función distinta aprovechando las características de su terreno: la isla Huerta se encarga de recolectar frutas y verduras, la isla Granja se ocupa de la cría de animales y la elaboración de todos los productos derivados, y así las diferentes islas proveen a las otras de aquello que les falta y a cambio reciben lo que necesitan.',
+    'La organización del transporte entre las islas garantiza que cada casa reciba todo lo que requiere y que los desechos sean recolectados. Para ello, se utilizan barcos que navegan por caminos acuáticos y transportan productos alimenticios y materiales de descarte.',
+    'Cada casa descarta los materiales inservibles, pero algunos de ellos pueden ser reciclados. Para seleccionar lo que sirve y lo que no, los desechos llegan a una isla donde funciona una planta de reciclaje, que se encarga de separar los residuos, reciclarlos y descartar lo que verdaderamente no sirve. Aquellos productos reutilizables los envía nuevamente a las islas.',
+  ];
+  // En qué se parece cada parte del archipiélago al cuerpo.
+  const CUERPO = {
+    organismo: ['El organismo (todo el cuerpo)', 'Organismo', 'celula'],
+    organo: ['Un órgano', 'Órgano', 'celula'],
+    tejido: ['Los tejidos', 'Tejidos', 'celula'],
+    celula: ['Las células', 'Células', 'celula'],
+    sangre: ['La sangre', 'Sangre', 'circulatorio'],
+    vasos: ['Los vasos sanguíneos', 'Vasos sanguíneos', 'circulatorio'],
+    digestivo: ['El sistema digestivo', 'Sistema digestivo', 'digestivo'],
+    rinon: ['Los riñones (sistema excretor)', 'Riñones', 'excretor'],
+    reabs: ['Las sustancias útiles que se reabsorben', 'Reabsorción', 'excretor'],
+    orina: ['La orina', 'Orina', 'excretor'],
+    respiratorio: ['El sistema respiratorio', 'Sistema respiratorio', 'respiratorio'],
   };
-  const LETRA = { digestivo: 'A', respiratorio: 'B', celula: 'C', excretor: 'D', circulatorio: 'E' };
+  const PARTES = {
+    archi: { l: 'A', n: 'El archipiélago', pill: [150, 27], ok: 'organismo', otras: ['organo', 'tejido', 'digestivo'],
+      cita: 'Se trata de un grupo de islas de distintos tamaños ubicadas muy cerca unas de otras, conformando un archipiélago.',
+      expl: 'El archipiélago es el <b>organismo</b>: todas sus partes trabajan juntas y ninguna isla podría funcionar sola.' },
+    isla: { l: 'B', n: 'Cada isla', pill: [392, 336], ok: 'organo', otras: ['celula', 'organismo', 'tejido'],
+      cita: 'Todas las islas aportan al funcionamiento general del conjunto: alimentación, producción, reciclaje, etc.',
+      expl: 'Cada isla es como un <b>órgano</b>: está formada por varios sectores (tejidos) y cumple una función para todo el cuerpo.' },
+    casas: { l: 'C', n: 'Las casas', pill: [300, 162], ok: 'celula', otras: ['tejido', 'organo', 'sangre'],
+      cita: 'En cada una de las islas hay casas…',
+      expl: 'Las casas son las <b>células</b>, las unidades más pequeñas del cuerpo. Cada una necesita recibir nutrientes y oxígeno, y produce desechos.' },
+    sectores: { l: 'D', n: 'Los sectores de casas', pill: [482, 166], ok: 'tejido', otras: ['celula', 'organo', 'vasos'],
+      cita: '…en general agrupadas por sectores y estos se comunican entre sí a través de pequeñas rutas.',
+      expl: 'Un grupo de células parecidas que trabajan juntas forma un <b>tejido</b>. Varios tejidos forman un órgano.' },
+    barcos: { l: 'E', n: 'Los barcos', pill: [255, 433], ok: 'sangre', otras: ['vasos', 'digestivo', 'rinon'],
+      cita: 'Se utilizan barcos que navegan por caminos acuáticos y transportan productos alimenticios y materiales de descarte.',
+      expl: 'Los barcos son la <b>sangre</b>: lleva los nutrientes y el oxígeno a cada célula y recoge sus desechos.' },
+    caminos: { l: 'F', n: 'Los caminos acuáticos', pill: [395, 58], ok: 'vasos', otras: ['sangre', 'tejido', 'respiratorio'],
+      cita: 'Las islas se comunican mediante barcos que navegan por caminos acuáticos.',
+      expl: 'Los caminos son los <b>vasos sanguíneos</b> (arterias, venas y capilares). Con la sangre y el corazón forman el <b>sistema circulatorio</b>, que conecta a todos.' },
+    huerta: { l: 'G', n: 'Las islas Huerta y Granja', pill: [128, 222], ok: 'digestivo', otras: ['respiratorio', 'rinon', 'celula'],
+      cita: 'La isla Huerta se encarga de recolectar frutas y verduras, la isla Granja se ocupa de la cría de animales y la elaboración de todos los productos derivados…',
+      expl: 'Son como el <b>sistema digestivo</b>: incorpora los alimentos y los transforma en <b>nutrientes</b> que la sangre reparte a todas las células.' },
+    planta: { l: 'H', n: 'La planta de reciclaje', pill: [640, 420], ok: 'rinon', otras: ['digestivo', 'respiratorio', 'vasos'],
+      cita: 'Los desechos llegan a una isla donde funciona una planta de reciclaje, que se encarga de separar los residuos, reciclarlos y descartar lo que verdaderamente no sirve.',
+      expl: 'Es como los <b>riñones</b> (sistema excretor): filtran la sangre, separan los desechos y los eliminan con la <b>orina</b>.' },
+    vuelve: { l: 'I', n: 'Lo que vuelve a las islas', pill: [560, 245], ok: 'reabs', otras: ['orina', 'sangre', 'digestivo'],
+      cita: 'Aquellos productos reutilizables los envía nuevamente a las islas.',
+      expl: 'En los riñones, el agua, la glucosa y las sales que todavía sirven se <b>reabsorben</b> y vuelven a la sangre. Lo que verdaderamente no sirve sale con la <b>orina</b>.' },
+    vientos: { l: 'J', n: 'La isla de los Vientos', pill: [640, 178], ok: 'respiratorio', otras: ['digestivo', 'vasos', 'rinon'], extra: true,
+      cita: 'Esta isla no aparece en el texto: la agregamos para completar los sistemas de la nutrición. Sus molinos toman aire fresco, que los barcos reparten, y se llevan el aire usado.',
+      expl: 'Es como el <b>sistema respiratorio</b>: incorpora el <b>oxígeno</b> del aire y elimina el <b>dióxido de carbono</b>.' },
+  };
   const CASOS = [
-    { id: 'corte', t: '🚧 Hay un <b>corte de rutas</b> y los camiones no pueden pasar.', ok: 'circulatorio', e: 'Es como cuando una arteria se tapa: la sangre no llega y las células se quedan sin nutrientes ni oxígeno.' },
-    { id: 'paro', t: '🗑️ Hay un <b>paro de recolectores</b> y la basura se acumula en las calles.', ok: 'excretor', e: 'Es como cuando los riñones no funcionan: los desechos se acumulan en la sangre y se vuelven tóxicos.' },
-    { id: 'venti', t: '🌫️ Se rompen los <b>ventiladores</b> y el aire se vuelve pesado y lleno de humo.', ok: 'respiratorio', e: 'Sin sistema respiratorio no entra oxígeno ni sale el dióxido de carbono: las células no pueden obtener energía.' },
-    { id: 'materia', t: '📦 A la planta procesadora <b>no le llega materia prima</b>.', ok: 'digestivo', e: 'Es como pasar mucho tiempo sin comer: no hay nutrientes para repartir a las células.' },
-    { id: 'trabajo', t: '🏭 En las casas y fábricas <b>se trabaja, se usa energía y se produce basura</b>.', ok: 'celula', e: 'Las células usan nutrientes y oxígeno para obtener energía, y al hacerlo producen desechos.' },
-    { id: 'llevar', t: '🚚 Los camiones <b>llevan la basura</b> de las casas hasta la planta de tratamiento.', ok: 'circulatorio', e: 'La sangre recoge los desechos de las células y los lleva hasta los riñones y los pulmones.' },
-    { id: 'separa', t: '♻️ La planta procesadora <b>separa lo que sirve</b> y tira los restos.', ok: 'digestivo', e: 'El digestivo absorbe los nutrientes y elimina lo que no se aprovecha como materia fecal.' },
-    { id: 'filtra', t: '💧 La planta de tratamiento <b>filtra el agua sucia</b> y devuelve agua limpia a la ciudad.', ok: 'excretor', e: 'Los riñones filtran la sangre: separan los desechos y devuelven la sangre limpia.' },
-    { id: 'fresco', t: '🌬️ Entra <b>aire fresco</b> a la ciudad y sale el aire usado.', ok: 'respiratorio', e: 'Inspiramos aire con oxígeno y espiramos aire con dióxido de carbono.' },
+    { id: 'tormenta', t: '⛈️ Hay una <b>tormenta</b> y los barcos no pueden navegar.', ok: 'circulatorio', e: 'Si la sangre no circula, las células se quedan sin nutrientes ni oxígeno, y nadie retira sus desechos.' },
+    { id: 'tronco', t: '🪵 Un <b>tronco bloquea un camino acuático</b> y un sector de casas no recibe nada.', ok: 'circulatorio', e: 'Es como una arteria tapada: las células de esa zona se quedan sin oxígeno. Así ocurre, por ejemplo, un infarto.' },
+    { id: 'rota', t: '🏭 La <b>planta de reciclaje se rompe</b> y los desechos se acumulan en las islas.', ok: 'excretor', e: 'Si los riñones no funcionan, los desechos se acumulan en la sangre y se vuelven tóxicos.' },
+    { id: 'reusa', t: '♻️ La planta <b>devuelve a las islas</b> los productos que todavía sirven.', ok: 'excretor', e: 'Los riñones reabsorben el agua, la glucosa y las sales útiles, y las devuelven a la sangre.' },
+    { id: 'sequia', t: '🌵 Una <b>sequía</b> arruina la cosecha de la isla Huerta.', ok: 'digestivo', e: 'Sin alimentos no hay nutrientes para repartir: es como pasar mucho tiempo sin comer.' },
+    { id: 'queso', t: '🧀 La isla Granja <b>transforma la leche en queso y manteca</b> antes de repartirla.', ok: 'digestivo', e: 'El sistema digestivo transforma los alimentos en nutrientes pequeños que pueden pasar a la sangre.' },
+    { id: 'casa', t: '🏠 Cada casa <b>usa lo que recibe</b> para vivir y descarta materiales inservibles.', ok: 'celula', e: 'Las células usan los nutrientes y el oxígeno para obtener energía, y al hacerlo producen desechos.' },
+    { id: 'retiran', t: '🛥️ Los barcos <b>recogen los descartes</b> de las casas y los llevan a la planta.', ok: 'circulatorio', e: 'La sangre recoge los desechos de las células y los lleva hasta los riñones (y el dióxido de carbono, hasta los pulmones).' },
+    { id: 'molinos', t: '🌬️ Los <b>molinos de la isla de los Vientos</b> dejan de girar.', ok: 'respiratorio', e: 'Sin el sistema respiratorio no entra oxígeno ni sale el dióxido de carbono: las células no pueden obtener energía.' },
   ];
   const RONDA = 5;
   let ciu = null;
 
-  function ciudadFija() {
-    const ventana = (x, y, w = 9, h = 11, luz = true) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${luz ? '#ffe28a' : '#3a3f8f'}"/>`;
-    const edificio = (x, y, w, h, c1, c2, extra = '') => `<rect x="${x + 5}" y="${y + 6}" width="${w}" height="${h}" rx="4" fill="#05061a" opacity="0.35"/>${dosTonos(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="FILL"/>`, c1, c2, { x: x + w * 0.62 })}${extra}`;
-    // A: planta procesadora (digestivo)
-    const planta = `<g class="nx-lugar" data-l="digestivo"><rect x="14" y="160" width="200" height="190" fill="transparent"/>
-      ${edificio(40, 234, 150, 106, '#ff8fab', '#e0607f')}
-      ${[0, 1, 2, 3].map(i => dosTonos(`<path d="M${40 + i * 37.5},234 L${40 + i * 37.5},212 L${77.5 + i * 37.5},234 Z" fill="FILL"/>`, '#ffb3c6', '#e0607f', { x: 70 + i * 37.5 })).join('')}
-      <rect x="150" y="186" width="16" height="48" fill="#b83a5e"/><rect x="146" y="182" width="24" height="8" rx="3" fill="#e0607f"/>
-      ${[0, 1, 2].map(i => `<circle cx="${158 + i * 8}" cy="${170 - i * 16}" r="${7 + i * 3}" fill="#e9ebff" opacity="${0.55 - i * 0.14}"/>`).join('')}
-      ${[56, 80, 104].map(x => ventana(x, 252)).join('')}${[56, 80].map(x => ventana(x, 272, 9, 11, false)).join('')}
-      ${carita(146, 266, 4)}${brillo('M46,246 V300', 3)}
-      <rect x="10" y="318" width="96" height="8" rx="4" fill="#3a3e85"/>${[18, 38, 58, 78, 98].map(x => `<circle cx="${x}" cy="326" r="4" fill="#1f2256" stroke="#6b70c9" stroke-width="1.5"/>`).join('')}
-      ${Alimentacion.alimento('pan', 30, 306, 0.6)}${Alimentacion.alimento('manzana', 62, 307, 0.55)}${Alimentacion.alimento('zanahoria', 92, 306, 0.5)}
-      <rect x="112" y="296" width="30" height="44" rx="3" fill="#8f2d4b"/>
-      ${[[196, 330], [206, 318], [196, 306]].map(([x, y]) => `<polygon points="${[-90, -30, 30, 90, 150, 210].map(a => `${(x + 6 * Math.cos(a * Math.PI / 180)).toFixed(1)},${(y + 6 * Math.sin(a * Math.PI / 180)).toFixed(1)}`).join(' ')}" fill="#ffd166" stroke="#c98a00" stroke-width="1"/>`).join('')}</g>`;
-    // B: torres de ventilación (respiratorio)
-    const torre = (x) => `${edificio(x, 120, 36, 220, '#7fd3ff', '#48a6d9')}${[150, 190, 230, 270, 310].map(y => `<rect x="${x + 6}" y="${y}" width="24" height="4" rx="2" fill="#2f86b8" opacity="0.6"/>`).join('')}
-      <g transform="translate(${x + 18} 110)"><circle r="24" fill="#05061a" opacity="0.3" transform="translate(3 4)"/><circle r="24" fill="#dff3ff" stroke="#48a6d9" stroke-width="4"/>
-        <g>${[0, 120, 240].map(a => `<path d="M0,0 C6,-8 6,-18 0,-20 C-6,-18 -4,-8 0,0 Z" fill="#48a6d9" transform="rotate(${a})"/>`).join('')}
-          <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${x > 250 ? 2.4 : 3}s" repeatCount="indefinite"/></g>
-        <circle r="4" fill="#1f5f86"/></g>`;
-    const torres = `<g class="nx-lugar" data-l="respiratorio"><rect x="216" y="76" width="112" height="274" fill="transparent"/>
-      ${[0, 1, 2].map(i => `<path d="M${196 + i * 4},${150 + i * 18} q10,-6 20,0 t20,0" stroke="#bfe8ff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>`).join('')}
-      ${torre(226)}${torre(278)}${carita(262, 214, 3.6)}
-      ${[0, 1].map(i => `<path d="M${320 + i * 6},${140 + i * 20} q10,-6 20,0 t20,0" stroke="#8f96b8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>`).join('')}</g>`;
-    // C: casas y fábricas (células)
-    const casa = (x, y, w, h, c1, c2, techo, cara) => `${edificio(x, y, w, h, c1, c2)}${dosTonos(`<path d="M${x - 6},${y} L${x + w / 2},${y - techo} L${x + w + 6},${y} Z" fill="FILL"/>`, '#ff7b54', '#e0563a', { x: x + w / 2 })}
-      ${ventana(x + 8, y + 14)}${ventana(x + w - 17, y + 14)}<rect x="${x + w / 2 - 7}" y="${y + h - 22}" width="14" height="22" rx="3" fill="#2b1d5c"/>${cara ? carita(x + w / 2, y + 40, 3.2) : ''}`;
-    const casas = `<g class="nx-lugar" data-l="celula"><rect x="336" y="140" width="184" height="210" fill="transparent"/>
-      ${edificio(420, 196, 90, 144, '#8b6cf0', '#6a4ce0', `${[430, 452, 474, 494].flatMap(x => [214, 238, 262].map((y, j) => ventana(x, y, 9, 12, (x + j) % 3 !== 0))).join('')}
-        <g transform="translate(466 300)"><circle r="14" fill="#ffd166"/>${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<rect x="-3" y="-18" width="6" height="8" rx="1" fill="#ffd166" transform="rotate(${a})"/>`).join('')}<circle r="6" fill="#6a4ce0"/>
-          <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite" additive="sum"/></g>`)}
-      ${casa(344, 260, 58, 80, '#b197fc', '#8b6cf0', 26, true)}${casa(396, 290, 44, 50, '#d0bfff', '#b197fc', 18, false)}
-</g>`;
-    // D: planta de tratamiento (excretor)
-    const tanque = (x, y) => `<g>${dosTonos(`<rect x="${x - 26}" y="${y}" width="52" height="${340 - y}" rx="6" fill="FILL"/>`, '#ffd166', '#f0a830', { x: x + 8 })}
-      <ellipse cx="${x}" cy="${y}" rx="26" ry="8" fill="#7fd3ff"/><ellipse cx="${x - 6}" cy="${y - 2}" rx="10" ry="3" fill="#dff3ff" opacity="0.8"/>${brillo(`M${x - 20},${y + 10} V${y + 50}`, 3)}</g>`;
-    const planta2 = `<g class="nx-lugar" data-l="excretor"><rect x="536" y="150" width="210" height="200" fill="transparent"/>
-      ${edificio(600, 232, 110, 108, '#ffd166', '#f0a830')}${ventana(614, 250)}${ventana(638, 250)}${ventana(686, 250, 9, 11, false)}
-      ${carita(662, 290, 4)}${tanque(566, 262)}${tanque(726, 280)}
-      <path d="M592,300 H600 M710,310 H700" stroke="#b37a00" stroke-width="6"/>
-      <g transform="translate(628 180)"><path d="M-12,-8 A14,14 0 1 1 -4,12" stroke="#2fb67c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-8,14 L-2,8 L-10,6 Z" fill="#2fb67c"/></g>
-      ${[[572, 334, '#4c6ef5'], [590, 334, '#2fb67c']].map(([x, y, c]) => `<rect x="${x - 7}" y="${y - 18}" width="14" height="18" rx="2" fill="${c}"/><rect x="${x - 8}" y="${y - 21}" width="16" height="4" rx="2" fill="#1f2256"/>`).join('')}</g>`;
-    // E: rutas y camiones (circulatorio)
-    const camion = (color, caja, dir) => `<g transform="scale(${dir} 1)"><rect x="-26" y="-18" width="34" height="22" rx="3" fill="${caja}"/><rect x="-24" y="-16" width="30" height="4" rx="2" fill="#fff" opacity="0.35"/>
-      ${dosTonos('<rect x="8" y="-14" width="18" height="18" rx="4" fill="FILL"/>', color, '#05061a', { y: 0 })}<rect x="16" y="-11" width="8" height="7" rx="2" fill="#dff3ff"/>
-      <circle cx="-16" cy="5" r="5" fill="#15163d"/><circle cx="16" cy="5" r="5" fill="#15163d"/><circle cx="-16" cy="5" r="2" fill="#8f96b8"/><circle cx="16" cy="5" r="2" fill="#8f96b8"/></g>`;
-    const rutas = `<g class="nx-lugar" data-l="circulatorio"><rect x="0" y="346" width="${CW}" height="62" fill="transparent"/>
-      <rect x="0" y="352" width="${CW}" height="50" fill="#2b2d42"/><rect x="0" y="348" width="${CW}" height="5" fill="#4a4f7a"/><rect x="0" y="401" width="${CW}" height="5" fill="#4a4f7a"/>
-      <path d="M0,377 H${CW}" stroke="#ffd166" stroke-width="3" stroke-dasharray="18 14"/>
-      ${[[150, '#ff6b6b', '#ffd166', 1, 11, 0], [150, '#ff6b6b', '#ff9f9f', 1, 11, -5.5], [150, '#5b7cfa', '#8f96b8', -1, 13, -3]].map(([, c, caja, dir, dur, beg]) => `<g>${camion(c, caja, dir)}<animateMotion dur="${dur}s" begin="${beg}s" repeatCount="indefinite" path="${dir > 0 ? `M-60,370 H${CW + 60}` : `M${CW + 60},394 H-60`}"/></g>`).join('')}</g>`;
-    return `<defs>
-        <linearGradient id="nx-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15174a"/><stop offset="0.75" stop-color="#3a3290"/><stop offset="1" stop-color="#6a3f8f"/></linearGradient>
-        <radialGradient id="nx-luna" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff3c4" stop-opacity="0.5"/><stop offset="1" stop-color="#fff3c4" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="${CW}" height="${CH}" rx="14" fill="url(#nx-cielo)"/>${estrellas(34, CW, 240)}
-      <circle cx="690" cy="62" r="46" fill="url(#nx-luna)"/><circle cx="690" cy="62" r="20" fill="#fff3c4"/><circle cx="684" cy="56" r="4" fill="#f0dc9c"/>
-      <path d="M0,300 C80,270 160,290 240,276 C330,260 420,290 520,272 C610,258 690,280 760,268 V350 H0 Z" fill="#2a2b72"/>
-      ${[[20, 240, 30, 70], [330, 250, 24, 60], [520, 230, 30, 90], [700, 250, 40, 60]].map(([x, y, w, h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h + 60}" fill="#23246a"/>${[0, 1, 2].map(i => `<rect x="${x + 6}" y="${y + 10 + i * 18}" width="5" height="7" fill="#ffe28a" opacity="0.4"/>`).join('')}`).join('')}
-      <rect x="0" y="336" width="${CW}" height="${CH - 336}" fill="#1c3f4f"/><rect x="0" y="406" width="${CW}" height="${CH - 406}" fill="#173543"/>
-      ${[[118, 340], [268, 340], [428, 340], [648, 340]].map(([x]) => `<rect x="${x - 10}" y="336" width="20" height="16" fill="#3a3d5c"/>`).join('')}
-      ${rutas}${planta}${torres}${casas}${planta2}`;
+  // Contorno irregular de una isla (siempre el mismo para la misma posición).
+  function contorno(cx, cy, rx, ry) {
+    const p = Array.from({ length: 22 }, (_, i) => {
+      const a = i / 22 * Math.PI * 2, k = 1 + 0.07 * Math.sin(3 * a + cx) + 0.05 * Math.sin(5 * a + cy);
+      return [cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k];
+    });
+    const m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    let d = `M${m(p[21], p[0]).map(v => v.toFixed(1)).join(',')}`;
+    p.forEach((q, i) => { const n = m(q, p[(i + 1) % 22]); d += ` Q${q[0].toFixed(1)},${q[1].toFixed(1)} ${n[0].toFixed(1)},${n[1].toFixed(1)}`; });
+    return d + ' Z';
+  }
+  const isla = (cx, cy, rx, ry, pasto = ['#5fd38d', '#3fb46f']) => `
+    <path d="${contorno(cx, cy, rx + 14, ry + 12)}" fill="#5cc8ff" opacity="0.16"/>
+    <path d="${contorno(cx + 6, cy + 10, rx, ry)}" fill="#05061a" opacity="0.32"/>
+    ${dosTonos(`<path d="${contorno(cx, cy, rx, ry)}" fill="FILL"/>`, '#ffe8a3', '#efc56a', { y: cy + ry * 0.45 })}
+    ${dosTonos(`<path d="${contorno(cx, cy - 5, rx - 13, ry - 13)}" fill="FILL"/>`, pasto[0], pasto[1], { y: cy + ry * 0.3 })}
+    ${brillo(`M${cx - rx * 0.6},${cy - ry * 0.55} q${rx * 0.3},${-ry * 0.3} ${rx * 0.6},${-ry * 0.32}`, 3)}`;
+  const rotulo = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" class="nx-isla-rot">${t}</text>`;
+  const casita = (x, y, techo, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})">
+    <rect x="-9" y="-2" width="20" height="16" rx="2" fill="#05061a" opacity="0.3" transform="translate(2 2)"/>
+    ${dosTonos('<rect x="-10" y="-4" width="20" height="16" rx="2" fill="FILL"/>', '#f4f1ff', '#d4d0f5', { x: 3 })}
+    ${dosTonos('<path d="M-13,-3 L0,-15 L13,-3 Z" fill="FILL"/>', techo, Arte.tono(techo, -0.2), { x: 0 })}
+    <rect x="-6" y="0" width="5" height="5" rx="1" fill="#ffe28a"/><rect x="2" y="3" width="5" height="9" rx="1" fill="#2b1d5c"/></g>`;
+  // Rutas acuáticas: [id, recorrido].
+  const RUTAS = {
+    huerta: 'M200,138 C245,160 265,185 292,205',
+    granja: 'M198,318 C240,305 265,290 292,272',
+    planta: 'M488,282 C525,305 545,318 568,324',
+    vuelta: 'M560,302 C540,285 520,270 498,262',
+    vientos: 'M572,126 C535,140 512,160 480,186',
+    arriba: 'M215,92 C320,40 470,38 568,80',
+    abajo: 'M205,368 C320,425 470,428 565,372',
+  };
+  const barco = (carga, casco = ['#ff6b6b', '#d63c3c']) => {
+    const cajas = {
+      comida: '<rect x="-12" y="-13" width="9" height="8" rx="1.5" fill="#ff9f43"/><rect x="-2" y="-13" width="9" height="8" rx="1.5" fill="#51cf66"/><rect x="-7" y="-20" width="9" height="7" rx="1.5" fill="#ffd166"/>',
+      desecho: '<path d="M-12,-5 C-14,-14 -4,-16 -4,-9 C-2,-15 8,-13 6,-5 Z" fill="#868e96"/><path d="M-6,-14 l2,-3 l2,3" stroke="#495057" stroke-width="1.5" fill="none"/>',
+      aire: '<circle cx="-4" cy="-11" r="6.5" fill="#dff3ff" stroke="#48a6d9" stroke-width="1.5"/><text x="-4" y="-8.5" text-anchor="middle" class="nx-o2">O₂</text>',
+      recicla: '<rect x="-12" y="-14" width="14" height="10" rx="2" fill="#2fb67c"/><path d="M-8,-9 a3,3 0 1 1 4,2" stroke="#fff" stroke-width="1.5" fill="none"/>',
+    }[carga];
+    return `<g>${dosTonos('<path d="M-17,-4 L17,-4 L12,7 L-13,7 Z" fill="FILL"/>', casco[0], casco[1], { y: 2 })}<rect x="6" y="-11" width="8" height="7" rx="2" fill="#f4f1ff"/>${cajas}
+      <path d="M-20,9 q5,3 10,0 t10,0 t10,0 t10,0" stroke="#dff3ff" stroke-width="1.5" fill="none" opacity="0.6"/></g>`;
+  };
+  const navegar = (ruta, carga, dur, beg, atras, casco) => `<g>${barco(carga, casco)}<animateMotion dur="${dur}s" begin="${beg}s" repeatCount="indefinite" rotate="${atras ? 'auto-reverse' : 'auto'}" path="${RUTAS[ruta]}" ${atras ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}/></g>`;
+
+  function islasFija() {
+    const olas = Array.from({ length: 34 }, (_, i) => { const x = (i * 131.7) % CW, y = 20 + (i * 67.3) % (CH - 30); return `<path d="M${x.toFixed(0)},${y.toFixed(0)} q6,-4 12,0 t12,0" stroke="#7fb4ff" stroke-width="1.6" fill="none" opacity="${0.12 + (i % 3) * 0.06}"/>`; }).join('');
+    // F: caminos acuáticos
+    const caminos = `<g class="nx-lugar" data-l="caminos">${Object.entries(RUTAS).filter(([k]) => k !== 'vuelta').map(([, d]) => `<path d="${d}" stroke="#5cc8ff" stroke-width="18" opacity="0.2" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#5cc8ff" stroke-width="26" opacity="0" fill="none"/><path d="${d}" stroke="#bfe8ff" stroke-width="2" stroke-dasharray="6 8" opacity="0.55" fill="none"/>`).join('')}</g>`;
+    // G: islas Huerta y Granja
+    const fila = (x, y) => `<path d="M${x},${y} h70" stroke="#8a5a35" stroke-width="7" stroke-linecap="round"/>${[0, 1, 2, 3, 4, 5].map(i => `<circle cx="${x + 4 + i * 12.5}" cy="${y - 4}" r="5" fill="${i % 2 ? '#40c057' : '#69db7c'}"/>`).join('')}`;
+    const arbol = (x, y) => `<g>${Arte.sombra(x + 4, y + 16, 14)}<rect x="${x - 2.5}" y="${y}" width="5" height="16" rx="2" fill="#7a4a2a"/>${dosTonos(`<circle cx="${x}" cy="${y - 4}" r="14" fill="FILL"/>`, '#2fb67c', '#1f8f5e', { x: x + 4 })}${[[-6, -8], [5, -2], [-2, 4], [7, -12]].map(([a, b]) => `<circle cx="${x + a}" cy="${y - 4 + b}" r="2.6" fill="#ff922b"/>`).join('')}</g>`;
+    const huerta = `<g class="nx-lugar" data-l="huerta">
+      ${fila(78, 102)}${fila(84, 122)}${fila(90, 142)}${arbol(176, 108)}${arbol(62, 132)}
+      <g transform="translate(166 146)"><path d="M-10,-2 h20 l-3,11 h-14 Z" fill="#c98a3d"/><circle cx="-4" cy="-4" r="4" fill="#ff6b6b"/><circle cx="4" cy="-5" r="4" fill="#ffd43b"/></g>
+      ${rotulo(128, 72, 'ISLA HUERTA')}
+      <g transform="translate(0 0)">
+        <g transform="translate(150 320)">${dosTonos('<rect x="-26" y="-22" width="52" height="34" rx="3" fill="FILL"/>', '#e8590c', '#c2410c', { x: 10 })}${dosTonos('<path d="M-31,-21 L0,-42 L31,-21 Z" fill="FILL"/>', '#a52a2a', '#7f1d1d', { x: 0 })}
+          <rect x="-9" y="-10" width="18" height="22" fill="#fff4e6"/><path d="M-9,-10 L9,12 M9,-10 L-9,12" stroke="#e8590c" stroke-width="2.5"/>${carita(0, -27, 2.6)}</g>
+        <g transform="translate(196 322)">${dosTonos('<rect x="-9" y="-36" width="18" height="48" rx="9" fill="FILL"/>', '#ced4da', '#adb5bd', { x: 2 })}<rect x="-9" y="-36" width="18" height="10" rx="5" fill="#868e96"/></g>
+        <g transform="translate(86 336) scale(0.36)">${Arte.vaca(0, 0)}</g>
+        <path d="M58,360 h60 M58,352 h60" stroke="#e9d8a6" stroke-width="2.5"/>${[60, 75, 90, 105, 118].map(x => `<line x1="${x}" x2="${x}" y1="346" y2="364" stroke="#e9d8a6" stroke-width="3"/>`).join('')}
+        ${rotulo(124, 280, 'ISLA GRANJA')}</g></g>`;
+    // B / C / D: isla de las casas
+    const SECT = [[322, 212, '#ff7b54'], [448, 210, '#5b7cfa'], [388, 290, '#b197fc']];
+    const rutitas = `<path d="M322,212 L448,210 M322,212 L388,290 M448,210 L388,290" stroke="#f1e3c0" stroke-width="5" stroke-linecap="round" opacity="0.85"/>`;
+    const sectores = `<g class="nx-lugar" data-l="sectores">${SECT.map(([x, y, c]) => `<ellipse cx="${x}" cy="${y}" rx="52" ry="34" fill="${c}" opacity="0.16"/><ellipse cx="${x}" cy="${y}" rx="52" ry="34" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="5 4" opacity="0.9"/>`).join('')}${rutitas}</g>`;
+    const casas = `<g class="nx-lugar" data-l="casas">${SECT.map(([x, y, c]) => [[-26, -6], [0, -14], [24, -4], [-6, 12], [20, 16]].map(([a, b], i) => casita(x + a, y + b, c, i === 1 ? 1.1 : 0.95)).join('')).join('')}${carita(322, 192, 2.2)}</g>`;
+    // H / I: planta de reciclaje
+    const planta = `<g class="nx-lugar" data-l="planta">
+      <g transform="translate(640 330)">${dosTonos('<rect x="-40" y="-30" width="80" height="48" rx="6" fill="FILL"/>', '#ffd166', '#f0a830', { x: 14 })}
+        <rect x="-30" y="-18" width="10" height="10" rx="2" fill="#ffe28a"/><rect x="-14" y="-18" width="10" height="10" rx="2" fill="#3a3f8f"/>
+        <rect x="22" y="-52" width="12" height="24" fill="#b37a00"/>${[0, 1].map(i => `<circle cx="${28 + i * 6}" cy="${-60 - i * 12}" r="${6 + i * 3}" fill="#e9ebff" opacity="${0.5 - i * 0.15}"/>`).join('')}
+        <g transform="translate(6 -6)"><path d="M-10,-6 A11,11 0 1 1 -3,9" stroke="#2fb67c" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M-7,11 L-1,6 L-9,4 Z" fill="#2fb67c"/></g>
+        ${carita(-22, 6, 2.6)}
+        ${[[-56, 12, '#4c6ef5'], [-44, 14, '#2fb67c'], [50, 12, '#868e96']].map(([x, y, c]) => `<rect x="${x - 6}" y="${y - 14}" width="12" height="14" rx="2" fill="${c}"/><rect x="${x - 7}" y="${y - 17}" width="14" height="4" rx="2" fill="#1f2256"/>`).join('')}</g>
+      ${rotulo(640, 284, 'PLANTA DE RECICLAJE')}</g>`;
+    // J: isla de los Vientos (extra)
+    const molino = (x, y, dur) => `<g>${Arte.sombra(x + 3, y + 2, 10)}<path d="M${x - 3},${y} L${x - 1.5},${y - 38} L${x + 1.5},${y - 38} L${x + 3},${y} Z" fill="#f4f1ff"/>
+      <g transform="translate(${x} ${y - 38})"><g>${[0, 120, 240].map(a => `<path d="M0,0 C3,-6 3,-18 0,-22 C-3,-18 -2,-6 0,0 Z" fill="#dff3ff" transform="rotate(${a})"/>`).join('')}<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${dur}s" repeatCount="indefinite"/></g><circle r="3" fill="#48a6d9"/></g></g>`;
+    const vientos = `<g class="nx-lugar" data-l="vientos">${molino(612, 120, 3)}${molino(648, 112, 2.4)}${molino(684, 124, 3.4)}
+      ${[0, 1, 2].map(i => `<path d="M${566 + i * 8},${70 + i * 12} q12,-7 24,0 t24,0" stroke="#bfe8ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>`).join('')}
+      ${rotulo(648, 62, 'ISLA DE LOS VIENTOS')}</g>`;
+    // A: el archipiélago (cartel y rosa de los vientos)
+    const archi = `<g class="nx-lugar" data-l="archi"><rect x="14" y="12" width="96" height="30" fill="transparent"/>
+      <g transform="translate(40 410)"><circle r="24" fill="#12143a" opacity="0.6"/>${[0, 90, 180, 270].map(a => `<path d="M0,-20 L5,0 L0,4 L-5,0 Z" fill="${a ? '#c9ccf5' : '#ffd166'}" transform="rotate(${a})"/>`).join('')}<text y="-26" text-anchor="middle" class="nx-isla-rot">N</text></g>
+      <path d="M8,10 h${CW - 16} v${CH - 20} h${-(CW - 16)} Z" stroke="#ffd166" stroke-width="3" fill="none" opacity="0.35" stroke-dasharray="2 10" stroke-linecap="round"/></g>`;
+    // E / I: barcos (los verdes llevan lo reutilizable de vuelta)
+    const barcos = `<g class="nx-lugar" data-l="barcos">
+      ${navegar('huerta', 'comida', 7, 0)}${navegar('granja', 'comida', 7.5, -3)}${navegar('planta', 'desecho', 6, -1)}
+      ${navegar('vientos', 'aire', 6.5, -2)}${navegar('vientos', 'desecho', 6.5, -5, true)}${navegar('arriba', 'comida', 14, -4)}${navegar('abajo', 'desecho', 15, -9, true)}</g>`;
+    const vuelve = `<g class="nx-lugar" data-l="vuelve"><path d="${RUTAS.vuelta}" stroke="#2fb67c" stroke-width="4" fill="none" stroke-dasharray="7 6" opacity="0.8"/><path d="M500,256 l-4,8 l9,1 Z" fill="#2fb67c"/>
+      ${navegar('vuelta', 'recicla', 5, -1, false, ['#51cf66', '#2f9e44'])}</g>`;
+    return `<defs><radialGradient id="nx-mar" cx="0.5" cy="0.45" r="0.8"><stop offset="0" stop-color="#1f4fa0"/><stop offset="1" stop-color="#0c1640"/></radialGradient></defs>
+      <rect width="${CW}" height="${CH}" rx="14" fill="url(#nx-mar)"/>${olas}${archi}
+      ${caminos}
+      <g class="nx-lugar" data-l="isla">${isla(128, 118, 92, 58)}${isla(126, 330, 90, 56, ['#8ce99a', '#5fd38d'])}${isla(386, 246, 140, 100)}${isla(642, 328, 92, 58, ['#b2c79a', '#94ab7c'])}${isla(646, 112, 82, 50, ['#9be3b0', '#6fcf8f'])}</g>
+      ${sectores}${casas}${huerta}${planta}${vientos}${barcos}${vuelve}`;
   }
 
-  function ciudad(cont) {
-    ciu = { hechos: {}, sel: null, error: null, etapa: 'unir', casos: [], i: 0, aciertos: 0, resp: null };
+  function islas(cont) {
+    ciu = { hechos: {}, sel: null, error: null, etapa: 'unir', casos: [], i: 0, aciertos: 0, resp: null, texto: true };
     cont.innerHTML = `<div class="nu-grid">
-        <div class="panel nu-escena"><div class="nx-scroll"><svg id="nx-csvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="Una ciudad que funciona como el cuerpo"><g id="nx-cfijo"></g><g id="nx-cpills"></g></svg></div>
-          <p class="nu-ayuda-esc">👆 Tocá cada lugar de la ciudad (A, B, C, D y E) y elegí a qué parte del cuerpo se parece.</p></div>
+        <div class="panel nu-escena"><div class="nx-scroll"><svg id="nx-csvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="El archipiélago de las islas SIN"><g id="nx-cfijo"></g><g id="nx-cpills"></g></svg></div>
+          <p class="nu-ayuda-esc">👆 Tocá cada parte del archipiélago (de la A a la J) y elegí qué representa en el cuerpo.</p></div>
         <aside class="panel nu-info" id="nx-cinfo"></aside>
       </div>`;
     ciu.cont = cont;
-    cont.querySelector('#nx-cfijo').innerHTML = ciudadFija();
+    cont.querySelector('#nx-cfijo').innerHTML = islasFija();
     cont.querySelector('#nx-csvg').addEventListener('click', e => {
       const g = e.target.closest('[data-l]');
       if (!g || ciu.etapa !== 'unir') return;
       ciu.sel = g.dataset.l;
       ciu.error = null;
-      pintarCiudad();
+      pintarIslas();
     });
-    pintarCiudad();
+    pintarIslas();
   }
 
-  function pintarCiudad() {
+  const opciones = id => { const P = PARTES[id]; return [P.ok, ...P.otras].sort((a, b) => ((a.charCodeAt(1) * 7 + id.length) % 11) - ((b.charCodeAt(1) * 7 + id.length) % 11)); };
+
+  function pintarIslas() {
     const c = ciu.cont, svg = c.querySelector('#nx-csvg');
-    const marcado = ciu.etapa === 'unir' ? ciu.sel : (ciu.resp ? ciu.casos[ciu.i].ok : null);
+    const marcado = ciu.etapa === 'unir' ? ciu.sel : null;
     svg.classList.toggle('con-sel', !!marcado);
     svg.querySelectorAll('.nx-lugar').forEach(g => g.classList.toggle('sel', g.dataset.l === marcado));
-    c.querySelector('#nx-cpills').innerHTML = Object.entries(LUGARES).map(([k, L]) => {
-      const [x, y] = L.pill, hecho = ciu.hechos[k], t = hecho ? NOMBRE[k] : '?', w = hecho ? t.length * 7.3 + 38 : 52;
-      return `<g class="nx-pill ${hecho ? 'hecho' : ''}${ciu.sel === k && ciu.etapa === 'unir' ? ' activo' : ''}" data-l="${k}">
-        <rect x="${x - w / 2}" y="${y - 13}" width="${w}" height="26" rx="13" fill="${hecho ? COL[k][0] : '#12143a'}"/>
-        <circle cx="${x - w / 2 + 13}" cy="${y}" r="10" fill="#12143a" stroke="${hecho ? '#12143a' : '#ffd166'}" stroke-width="2"/><text x="${x - w / 2 + 13}" y="${y + 4}" text-anchor="middle" class="nx-letra">${LETRA[k]}</text>
+    const total = Object.keys(PARTES).length;
+    c.querySelector('#nx-cpills').innerHTML = Object.entries(PARTES).map(([k, P]) => {
+      const [x, y] = P.pill, hecho = ciu.hechos[k], t = hecho ? CUERPO[P.ok][1] : '?', w = hecho ? t.length * 7.3 + 38 : 52;
+      return `<g class="nx-pill clic ${hecho ? 'hecho' : ''}${ciu.sel === k && ciu.etapa === 'unir' ? ' activo' : ''}" data-l="${k}">
+        <rect x="${x - w / 2}" y="${y - 13}" width="${w}" height="26" rx="13" fill="${hecho ? COL[CUERPO[P.ok][2]][0] : '#12143a'}"/>
+        <circle cx="${x - w / 2 + 13}" cy="${y}" r="10" fill="#12143a" stroke="${hecho ? '#12143a' : '#ffd166'}" stroke-width="2"/><text x="${x - w / 2 + 13}" y="${y + 4}" text-anchor="middle" class="nx-letra">${P.l}</text>
         <text x="${x - w / 2 + 28}" y="${y + 4.5}" class="nx-pill-t">${t}</text></g>`;
     }).join('');
     const info = c.querySelector('#nx-cinfo');
     if (ciu.etapa === 'casos') return pintarCasos(info);
     const n = Object.keys(ciu.hechos).length;
     if (!ciu.sel) {
-      info.innerHTML = `<h2>🏙️ El cuerpo es como una ciudad</h2>
-        <p>En una ciudad hay lugares que hacen trabajos distintos, pero todos se necesitan. En el cuerpo pasa lo mismo con los sistemas.</p>
-        <p class="nu-ayuda">Tocá cada lugar de la ciudad y descubrí a qué sistema se parece.</p>
-        <div class="nx-progreso"><div style="width:${n / 5 * 100}%"></div></div><p class="nu-ayuda">${n} de 5 lugares descubiertos</p>
-        ${n === 5 ? `<div class="feedback ok"><p class="fb-titulo">🏆 ¡Descubriste toda la ciudad!</p><p>Ahora, a resolver situaciones: ¿qué pasa en el cuerpo cuando algo falla en la ciudad?</p></div><button class="btn primario" id="nx-casos">Seguir: situaciones en la ciudad →</button>` : ''}`;
+      info.innerHTML = `<h2>🏝️ El archipiélago de las islas SIN</h2>
+        <details class="nx-texto" ${ciu.texto ? 'open' : ''}><summary>📖 Leer el texto</summary>${TEXTO_SIN.map(p => `<p>${p}</p>`).join('')}</details>
+        <p class="nu-ayuda">El archipiélago funciona como nuestro cuerpo. Tocá cada parte de la escena y descubrí qué representa.</p>
+        <div class="nx-progreso"><div style="width:${n / total * 100}%"></div></div><p class="nu-ayuda">${n} de ${total} partes descubiertas</p>
+        ${n === total ? `<div class="feedback ok"><p class="fb-titulo">🏆 ¡Descubriste todo el archipiélago!</p><p>Ahora, a resolver situaciones: ¿qué pasa en el cuerpo cuando algo falla en las islas?</p></div><button class="btn primario" id="nx-casos">Seguir: situaciones en las islas →</button>` : ''}`;
+      info.querySelector('details').addEventListener('toggle', e => { ciu.texto = e.target.open; });
       info.querySelector('#nx-casos')?.addEventListener('click', empezarCasos);
       return;
     }
-    const L = LUGARES[ciu.sel];
+    const P = PARTES[ciu.sel];
+    const cab = `<h2><span class="nx-letra-h">${P.l}</span> ${P.n}</h2><blockquote class="nx-cita${P.extra ? ' extra' : ''}">${P.extra ? '' : '«'}${P.cita}${P.extra ? '' : '»'}</blockquote>`;
     if (ciu.hechos[ciu.sel]) {
-      info.innerHTML = `<h2><span class="nx-letra-h">${LETRA[ciu.sel]}</span> ${L.n}</h2><p>${L.desc}</p>
-        <div class="feedback ok"><p class="fb-titulo">✅ ${NOMBRE[ciu.sel]}</p><p>${L.expl}</p></div>
-        <button class="btn primario" id="nx-seguir">${n === 5 ? 'Terminar' : 'Elegir otro lugar'}</button>`;
-      info.querySelector('#nx-seguir').addEventListener('click', () => { ciu.sel = null; pintarCiudad(); });
+      info.innerHTML = `${cab}<div class="feedback ok"><p class="fb-titulo">✅ ${CUERPO[P.ok][0]}</p><p>${P.expl}</p></div>
+        <button class="btn primario" id="nx-seguir">${n === total ? 'Terminar' : 'Elegir otra parte'}</button>`;
+      info.querySelector('#nx-seguir').addEventListener('click', () => { ciu.sel = null; pintarIslas(); });
       return;
     }
-    info.innerHTML = `<h2><span class="nx-letra-h">${LETRA[ciu.sel]}</span> ${L.n}</h2><p>${L.desc}</p>
-      <p class="nu-pregunta">¿A qué parte del cuerpo se parece?</p>
-      <div class="nu-opciones">${Object.keys(NOMBRE).map(k => `<button class="btn-opcion" data-o="${k}">${NOMBRE[k]}</button>`).join('')}</div>
+    info.innerHTML = `${cab}<p class="nu-pregunta">¿Qué representa en el cuerpo?</p>
+      <div class="nu-opciones">${opciones(ciu.sel).map(k => `<button class="btn-opcion" data-o="${k}">${CUERPO[k][0]}</button>`).join('')}</div>
       ${ciu.error ? `<p class="nu-error">✖ ${ciu.error}</p>` : ''}`;
     info.querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => {
       const o = b.dataset.o;
-      if (o === ciu.sel) { ciu.hechos[o] = true; ciu.error = null; }
-      else ciu.error = `No es ${o === 'celula' ? 'la célula' : NOMBRE[o].toLowerCase()}. Volvé a leer qué hace este lugar y pensá qué sistema hace un trabajo parecido.`;
-      pintarCiudad();
+      if (o === P.ok) { ciu.hechos[ciu.sel] = true; ciu.error = null; }
+      else ciu.error = `No es ${CUERPO[o][0].charAt(0).toLowerCase() + CUERPO[o][0].slice(1)}. Volvé a leer la parte del texto y pensá qué cumple una función parecida en el cuerpo.`;
+      pintarIslas();
     }));
   }
 
   function empezarCasos() {
-    Object.assign(ciu, { etapa: 'casos', casos: Util.tomar('nu-ciudad', CASOS, RONDA, x => x.id), i: 0, aciertos: 0, resp: null, sel: null });
-    pintarCiudad();
+    Object.assign(ciu, { etapa: 'casos', casos: Util.tomar('nu-islas', CASOS, RONDA, x => x.id), i: 0, aciertos: 0, resp: null, sel: null });
+    pintarIslas();
   }
 
   function pintarCasos(info) {
     if (ciu.i >= ciu.casos.length) {
-      info.innerHTML = `<h2>🏙️ Situaciones en la ciudad</h2>
+      info.innerHTML = `<h2>🏝️ Situaciones en las islas</h2>
         <div class="feedback ${ciu.aciertos >= 4 ? 'ok' : 'mal'}"><p class="fb-titulo">${ciu.aciertos >= 4 ? '🏆' : '💪'} ${ciu.aciertos} de ${ciu.casos.length} correctas</p>
-        <p>Recordá: el <b>sistema circulatorio</b> es como las rutas de la ciudad. Si se corta, ningún otro lugar puede recibir ni sacar nada.</p></div>
-        <button class="btn primario" id="nx-otra">Otra ronda</button> <button class="btn" id="nx-volver">Volver a la ciudad</button>`;
+        <p>Recordá: los <b>barcos y los caminos acuáticos</b> (la sangre y los vasos sanguíneos) conectan todas las islas. Si se detienen, ninguna casa recibe ni descarta nada.</p></div>
+        <button class="btn primario" id="nx-otra">Otra ronda</button> <button class="btn" id="nx-volver">Volver al archipiélago</button>`;
       info.querySelector('#nx-otra').addEventListener('click', empezarCasos);
-      info.querySelector('#nx-volver').addEventListener('click', () => { ciu.etapa = 'unir'; ciu.sel = null; pintarCiudad(); });
+      info.querySelector('#nx-volver').addEventListener('click', () => { ciu.etapa = 'unir'; ciu.sel = null; pintarIslas(); });
       return;
     }
     const caso = ciu.casos[ciu.i];
-    info.innerHTML = `<h2>🏙️ Situación ${ciu.i + 1} de ${ciu.casos.length}</h2>
-      <p class="nx-caso">${caso.t}</p><p class="nu-pregunta">¿A qué parte del cuerpo se parece lo que pasa?</p>
+    info.innerHTML = `<h2>🏝️ Situación ${ciu.i + 1} de ${ciu.casos.length}</h2>
+      <p class="nx-caso">${caso.t}</p><p class="nu-pregunta">¿Qué parte del cuerpo estaría fallando o funcionando?</p>
       <div class="nu-opciones">${Object.keys(NOMBRE).map(k => `<button class="btn-opcion${ciu.resp ? (k === caso.ok ? ' correcta' : k === ciu.resp ? ' incorrecta' : '') : ''}" data-o="${k}" ${ciu.resp ? 'disabled' : ''}>${NOMBRE[k]}</button>`).join('')}</div>
       ${ciu.resp ? `<div class="feedback ${ciu.resp === caso.ok ? 'ok' : 'mal'}"><p class="fb-titulo">${ciu.resp === caso.ok ? '✅ ¡Bien!' : `✖ Era: ${NOMBRE[caso.ok]}`}</p><p>${caso.e}</p></div>
         <button class="btn primario" id="nx-sig">${ciu.i + 1 < ciu.casos.length ? 'Siguiente' : 'Ver resultado'}</button>` : ''}`;
     info.querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => {
       ciu.resp = b.dataset.o;
       if (ciu.resp === caso.ok) ciu.aciertos++;
-      pintarCiudad();
+      pintarIslas();
     }));
-    info.querySelector('#nx-sig')?.addEventListener('click', () => { ciu.i++; ciu.resp = null; pintarCiudad(); });
+    info.querySelector('#nx-sig')?.addEventListener('click', () => { ciu.i++; ciu.resp = null; pintarIslas(); });
   }
 
-  return { esquema, ciudad };
+  return { esquema, islas };
 })();
