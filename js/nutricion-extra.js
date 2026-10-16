@@ -264,7 +264,7 @@ const NutriExtra = (function () {
     barcos: { l: 'E', n: 'Los barcos', pill: [255, 433], ok: 'sangre', otras: ['vasos', 'digestivo', 'rinon'],
       cita: 'Se utilizan barcos que navegan por caminos acuáticos y transportan productos alimenticios y materiales de descarte.',
       expl: 'Los barcos son la <b>sangre</b>: lleva los nutrientes y el oxígeno a cada célula y recoge sus desechos.' },
-    caminos: { l: 'F', n: 'Los caminos acuáticos', pill: [395, 58], ok: 'vasos', otras: ['sangre', 'tejido', 'respiratorio'],
+    caminos: { l: 'F', n: 'Los caminos acuáticos', pill: [450, 50], ok: 'vasos', otras: ['sangre', 'tejido', 'respiratorio'],
       cita: 'Las islas se comunican mediante barcos que navegan por caminos acuáticos.',
       expl: 'Los caminos son los <b>vasos sanguíneos</b> (arterias, venas y capilares). Con la sangre y el corazón forman el <b>sistema circulatorio</b>, que conecta a todos.' },
     huerta: { l: 'G', n: 'Las islas Huerta y Granja', pill: [128, 222], ok: 'digestivo', otras: ['respiratorio', 'rinon', 'celula'],
@@ -276,9 +276,6 @@ const NutriExtra = (function () {
     vuelve: { l: 'I', n: 'Lo que vuelve a las islas', pill: [560, 245], ok: 'reabs', otras: ['orina', 'sangre', 'digestivo'],
       cita: 'Aquellos productos reutilizables los envía nuevamente a las islas.',
       expl: 'En los riñones, el agua, la glucosa y las sales que todavía sirven se <b>reabsorben</b> y vuelven a la sangre. Lo que verdaderamente no sirve sale con la <b>orina</b>.' },
-    vientos: { l: 'J', n: 'La isla de los Vientos', pill: [640, 178], ok: 'respiratorio', otras: ['digestivo', 'vasos', 'rinon'], extra: true,
-      cita: 'Esta isla no aparece en el texto: la agregamos para completar los sistemas de la nutrición. Sus molinos toman aire fresco, que los barcos reparten, y se llevan el aire usado.',
-      expl: 'Es como el <b>sistema respiratorio</b>: incorpora el <b>oxígeno</b> del aire y elimina el <b>dióxido de carbono</b>.' },
   };
   const CASOS = [
     { id: 'tormenta', t: '⛈️ Hay una <b>tormenta</b> y los barcos no pueden navegar.', ok: 'circulatorio', e: 'Si la sangre no circula, las células se quedan sin nutrientes ni oxígeno, y nadie retira sus desechos.' },
@@ -289,7 +286,6 @@ const NutriExtra = (function () {
     { id: 'queso', t: '🧀 La isla Granja <b>transforma la leche en queso y manteca</b> antes de repartirla.', ok: 'digestivo', e: 'El sistema digestivo transforma los alimentos en nutrientes pequeños que pueden pasar a la sangre.' },
     { id: 'casa', t: '🏠 Cada casa <b>usa lo que recibe</b> para vivir y descarta materiales inservibles.', ok: 'celula', e: 'Las células usan los nutrientes y el oxígeno para obtener energía, y al hacerlo producen desechos.' },
     { id: 'retiran', t: '🛥️ Los barcos <b>recogen los descartes</b> de las casas y los llevan a la planta.', ok: 'circulatorio', e: 'La sangre recoge los desechos de las células y los lleva hasta los riñones (y el dióxido de carbono, hasta los pulmones).' },
-    { id: 'molinos', t: '🌬️ Los <b>molinos de la isla de los Vientos</b> dejan de girar.', ok: 'respiratorio', e: 'Sin el sistema respiratorio no entra oxígeno ni sale el dióxido de carbono: las células no pueden obtener energía.' },
   ];
   const RONDA = 5;
   let ciu = null;
@@ -323,8 +319,7 @@ const NutriExtra = (function () {
     granja: 'M198,318 C240,305 265,290 292,272',
     planta: 'M488,282 C525,305 545,318 568,324',
     vuelta: 'M560,302 C540,285 520,270 498,262',
-    vientos: 'M572,126 C535,140 512,160 480,186',
-    arriba: 'M215,92 C320,40 470,38 568,80',
+    arriba: 'M215,92 C380,24 660,40 664,266',
     abajo: 'M205,368 C320,425 470,428 565,372',
   };
   const barco = (carga, casco = ['#ff6b6b', '#d63c3c']) => {
@@ -346,8 +341,10 @@ const NutriExtra = (function () {
     // G: islas Huerta y Granja
     const fila = (x, y) => `<path d="M${x},${y} h70" stroke="#8a5a35" stroke-width="7" stroke-linecap="round"/>${[0, 1, 2, 3, 4, 5].map(i => `<circle cx="${x + 4 + i * 12.5}" cy="${y - 4}" r="5" fill="${i % 2 ? '#40c057' : '#69db7c'}"/>`).join('')}`;
     const arbol = (x, y) => `<g>${Arte.sombra(x + 4, y + 16, 14)}<rect x="${x - 2.5}" y="${y}" width="5" height="16" rx="2" fill="#7a4a2a"/>${dosTonos(`<circle cx="${x}" cy="${y - 4}" r="14" fill="FILL"/>`, '#2fb67c', '#1f8f5e', { x: x + 4 })}${[[-6, -8], [5, -2], [-2, 4], [7, -12]].map(([a, b]) => `<circle cx="${x + a}" cy="${y - 4 + b}" r="2.6" fill="#ff922b"/>`).join('')}</g>`;
+    const molino = (x, y, dur) => `<g>${Arte.sombra(x + 3, y + 2, 10)}<path d="M${x - 3},${y} L${x - 1.5},${y - 38} L${x + 1.5},${y - 38} L${x + 3},${y} Z" fill="#f4f1ff"/>
+      <g transform="translate(${x} ${y - 38})"><g>${[0, 120, 240].map(a => `<path d="M0,0 C3,-6 3,-18 0,-22 C-3,-18 -2,-6 0,0 Z" fill="#dff3ff" transform="rotate(${a})"/>`).join('')}<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${dur}s" repeatCount="indefinite"/></g><circle r="3" fill="#48a6d9"/></g></g>`;
     const huerta = `<g class="nx-lugar" data-l="huerta">
-      ${fila(78, 102)}${fila(84, 122)}${fila(90, 142)}${arbol(176, 108)}${arbol(62, 132)}
+      ${fila(78, 102)}${fila(84, 122)}${fila(90, 142)}${arbol(62, 132)}${molino(180, 112, 3)}${molino(204, 128, 2.4)}
       <g transform="translate(166 146)"><path d="M-10,-2 h20 l-3,11 h-14 Z" fill="#c98a3d"/><circle cx="-4" cy="-4" r="4" fill="#ff6b6b"/><circle cx="4" cy="-5" r="4" fill="#ffd43b"/></g>
       ${rotulo(128, 72, 'ISLA HUERTA')}
       <g transform="translate(0 0)">
@@ -371,12 +368,6 @@ const NutriExtra = (function () {
         ${carita(-22, 6, 2.6)}
         ${[[-56, 12, '#4c6ef5'], [-44, 14, '#2fb67c'], [50, 12, '#868e96']].map(([x, y, c]) => `<rect x="${x - 6}" y="${y - 14}" width="12" height="14" rx="2" fill="${c}"/><rect x="${x - 7}" y="${y - 17}" width="14" height="4" rx="2" fill="#1f2256"/>`).join('')}</g>
       ${rotulo(640, 284, 'PLANTA DE RECICLAJE')}</g>`;
-    // J: isla de los Vientos (extra)
-    const molino = (x, y, dur) => `<g>${Arte.sombra(x + 3, y + 2, 10)}<path d="M${x - 3},${y} L${x - 1.5},${y - 38} L${x + 1.5},${y - 38} L${x + 3},${y} Z" fill="#f4f1ff"/>
-      <g transform="translate(${x} ${y - 38})"><g>${[0, 120, 240].map(a => `<path d="M0,0 C3,-6 3,-18 0,-22 C-3,-18 -2,-6 0,0 Z" fill="#dff3ff" transform="rotate(${a})"/>`).join('')}<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${dur}s" repeatCount="indefinite"/></g><circle r="3" fill="#48a6d9"/></g></g>`;
-    const vientos = `<g class="nx-lugar" data-l="vientos">${molino(612, 120, 3)}${molino(648, 112, 2.4)}${molino(684, 124, 3.4)}
-      ${[0, 1, 2].map(i => `<path d="M${566 + i * 8},${70 + i * 12} q12,-7 24,0 t24,0" stroke="#bfe8ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>`).join('')}
-      ${rotulo(648, 62, 'ISLA DE LOS VIENTOS')}</g>`;
     // A: el archipiélago (cartel y rosa de los vientos)
     const archi = `<g class="nx-lugar" data-l="archi"><rect x="14" y="12" width="96" height="30" fill="transparent"/>
       <g transform="translate(40 410)"><circle r="24" fill="#12143a" opacity="0.6"/>${[0, 90, 180, 270].map(a => `<path d="M0,-20 L5,0 L0,4 L-5,0 Z" fill="${a ? '#c9ccf5' : '#ffd166'}" transform="rotate(${a})"/>`).join('')}<text y="-26" text-anchor="middle" class="nx-isla-rot">N</text></g>
@@ -384,21 +375,21 @@ const NutriExtra = (function () {
     // E / I: barcos (los verdes llevan lo reutilizable de vuelta)
     const barcos = `<g class="nx-lugar" data-l="barcos">
       ${navegar('huerta', 'comida', 7, 0)}${navegar('granja', 'comida', 7.5, -3)}${navegar('planta', 'desecho', 6, -1)}
-      ${navegar('vientos', 'aire', 6.5, -2)}${navegar('vientos', 'desecho', 6.5, -5, true)}${navegar('arriba', 'comida', 14, -4)}${navegar('abajo', 'desecho', 15, -9, true)}</g>`;
+      ${navegar('arriba', 'comida', 14, -4)}${navegar('arriba', 'desecho', 14, -11, true)}${navegar('abajo', 'desecho', 15, -9, true)}</g>`;
     const vuelve = `<g class="nx-lugar" data-l="vuelve"><path d="${RUTAS.vuelta}" stroke="#2fb67c" stroke-width="4" fill="none" stroke-dasharray="7 6" opacity="0.8"/><path d="M500,256 l-4,8 l9,1 Z" fill="#2fb67c"/>
       ${navegar('vuelta', 'recicla', 5, -1, false, ['#51cf66', '#2f9e44'])}</g>`;
     return `<defs><radialGradient id="nx-mar" cx="0.5" cy="0.45" r="0.8"><stop offset="0" stop-color="#1f4fa0"/><stop offset="1" stop-color="#0c1640"/></radialGradient></defs>
       <rect width="${CW}" height="${CH}" rx="14" fill="url(#nx-mar)"/>${olas}${archi}
       ${caminos}
-      <g class="nx-lugar" data-l="isla">${isla(128, 118, 92, 58)}${isla(126, 330, 90, 56, ['#8ce99a', '#5fd38d'])}${isla(386, 246, 140, 100)}${isla(642, 328, 92, 58, ['#b2c79a', '#94ab7c'])}${isla(646, 112, 82, 50, ['#9be3b0', '#6fcf8f'])}</g>
-      ${sectores}${casas}${huerta}${planta}${vientos}${barcos}${vuelve}`;
+      <g class="nx-lugar" data-l="isla">${isla(128, 118, 92, 58)}${isla(126, 330, 90, 56, ['#8ce99a', '#5fd38d'])}${isla(386, 246, 140, 100)}${isla(642, 328, 92, 58, ['#b2c79a', '#94ab7c'])}</g>
+      ${sectores}${casas}${huerta}${planta}${barcos}${vuelve}`;
   }
 
   function islas(cont) {
     ciu = { hechos: {}, sel: null, error: null, etapa: 'unir', casos: [], i: 0, aciertos: 0, resp: null, texto: true };
     cont.innerHTML = `<div class="nu-grid">
         <div class="panel nu-escena"><div class="nx-scroll"><svg id="nx-csvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="El archipiélago de las islas SIN"><g id="nx-cfijo"></g><g id="nx-cpills"></g></svg></div>
-          <p class="nu-ayuda-esc">👆 Tocá cada parte del archipiélago (de la A a la J) y elegí qué representa en el cuerpo.</p></div>
+          <p class="nu-ayuda-esc">👆 Tocá cada parte del archipiélago (de la A a la I) y elegí qué representa en el cuerpo.</p></div>
         <aside class="panel nu-info" id="nx-cinfo"></aside>
       </div>`;
     ciu.cont = cont;
