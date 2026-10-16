@@ -263,7 +263,7 @@ const NutriExtra = (function () {
       expl: 'Un grupo de células parecidas que trabajan juntas forma un <b>tejido</b>. Varios tejidos forman un órgano.' },
     barcos: { l: 'E', n: 'Los barcos', pill: [255, 433], ok: 'sangre', otras: ['vasos', 'digestivo', 'rinon'],
       cita: 'Se utilizan barcos que navegan por caminos acuáticos y transportan productos alimenticios y materiales de descarte.',
-      expl: 'Los barcos son la <b>sangre</b>: lleva los nutrientes y el oxígeno a cada célula y recoge sus desechos.' },
+      expl: 'Los barcos son la <b>sangre</b>: lleva los nutrientes y el oxígeno a cada célula y recoge sus desechos. El <b>oxígeno (O₂)</b> lo transportan los <b>glóbulos rojos</b>, unido a una proteína llamada <b>hemoglobina</b>. Los nutrientes y muchos desechos viajan disueltos en el <b>plasma</b>, la parte líquida de la sangre.' },
     caminos: { l: 'F', n: 'Los caminos acuáticos', pill: [450, 50], ok: 'vasos', otras: ['sangre', 'tejido', 'respiratorio'],
       cita: 'Las islas se comunican mediante barcos que navegan por caminos acuáticos.',
       expl: 'Los caminos son los <b>vasos sanguíneos</b> (arterias, venas y capilares). Con la sangre y el corazón forman el <b>sistema circulatorio</b>, que conecta a todos.' },
@@ -285,6 +285,7 @@ const NutriExtra = (function () {
     { id: 'sequia', t: '🌵 Una <b>sequía</b> arruina la cosecha de la isla Huerta.', ok: 'digestivo', e: 'Sin alimentos no hay nutrientes para repartir: es como pasar mucho tiempo sin comer.' },
     { id: 'queso', t: '🧀 La isla Granja <b>transforma la leche en queso y manteca</b> antes de repartirla.', ok: 'digestivo', e: 'El sistema digestivo transforma los alimentos en nutrientes pequeños que pueden pasar a la sangre.' },
     { id: 'casa', t: '🏠 Cada casa <b>usa lo que recibe</b> para vivir y descarta materiales inservibles.', ok: 'celula', e: 'Las células usan los nutrientes y el oxígeno para obtener energía, y al hacerlo producen desechos.' },
+    { id: 'oxigeno', t: '🫧 Algunos barcos rojos se especializan en <b>llevar aire fresco</b> a todas las casas.', ok: 'circulatorio', e: 'Son como los <b>glóbulos rojos</b>: transportan el <b>oxígeno (O₂)</b>, unido a la hemoglobina, desde los pulmones hasta todas las células.' },
     { id: 'retiran', t: '🛥️ Los barcos <b>recogen los descartes</b> de las casas y los llevan a la planta.', ok: 'circulatorio', e: 'La sangre recoge los desechos de las células y los lleva hasta los riñones (y el dióxido de carbono, hasta los pulmones).' },
   ];
   const RONDA = 5;
@@ -332,7 +333,9 @@ const NutriExtra = (function () {
     return `<g>${dosTonos('<path d="M-17,-4 L17,-4 L12,7 L-13,7 Z" fill="FILL"/>', casco[0], casco[1], { y: 2 })}<rect x="6" y="-11" width="8" height="7" rx="2" fill="#f4f1ff"/>${cajas}
       <path d="M-20,9 q5,3 10,0 t10,0 t10,0 t10,0" stroke="#dff3ff" stroke-width="1.5" fill="none" opacity="0.6"/></g>`;
   };
-  const navegar = (ruta, carga, dur, beg, atras, casco) => `<g>${barco(carga, casco)}<animateMotion dur="${dur}s" begin="${beg}s" repeatCount="indefinite" rotate="${atras ? 'auto-reverse' : 'auto'}" path="${RUTAS[ruta]}" ${atras ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}/></g>`;
+  // Los barcos navegan derechos (sin girar con el camino) y miran hacia donde avanzan.
+  const haciaDerecha = (ruta, atras) => { const x = RUTAS[ruta].match(/-?\d+(\.\d+)?/g).map(Number); return (x[x.length - 2] > x[0]) !== !!atras; };
+  const navegar = (ruta, carga, dur, beg, atras, casco) => `<g><g transform="scale(${haciaDerecha(ruta, atras) ? 1 : -1} 1)">${barco(carga, casco)}</g><animateMotion dur="${dur}s" begin="${beg}s" repeatCount="indefinite" path="${RUTAS[ruta]}" ${atras ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}/></g>`;
 
   function islasFija() {
     const olas = Array.from({ length: 34 }, (_, i) => { const x = (i * 131.7) % CW, y = 20 + (i * 67.3) % (CH - 30); return `<path d="M${x.toFixed(0)},${y.toFixed(0)} q6,-4 12,0 t12,0" stroke="#7fb4ff" stroke-width="1.6" fill="none" opacity="${0.12 + (i % 3) * 0.06}"/>`; }).join('');
@@ -374,7 +377,7 @@ const NutriExtra = (function () {
       <path d="M8,10 h${CW - 16} v${CH - 20} h${-(CW - 16)} Z" stroke="#ffd166" stroke-width="3" fill="none" opacity="0.35" stroke-dasharray="2 10" stroke-linecap="round"/></g>`;
     // E / I: barcos (los verdes llevan lo reutilizable de vuelta)
     const barcos = `<g class="nx-lugar" data-l="barcos">
-      ${navegar('huerta', 'comida', 7, 0)}${navegar('granja', 'comida', 7.5, -3)}${navegar('planta', 'desecho', 6, -1)}
+      ${navegar('huerta', 'comida', 7, 0)}${navegar('huerta', 'aire', 7, -3.5)}${navegar('granja', 'comida', 7.5, -3)}${navegar('abajo', 'aire', 15, -2)}${navegar('planta', 'desecho', 6, -1)}
       ${navegar('arriba', 'comida', 14, -4)}${navegar('arriba', 'desecho', 14, -11, true)}${navegar('abajo', 'desecho', 15, -9, true)}</g>`;
     const vuelve = `<g class="nx-lugar" data-l="vuelve"><path d="${RUTAS.vuelta}" stroke="#2fb67c" stroke-width="4" fill="none" stroke-dasharray="7 6" opacity="0.8"/><path d="M500,256 l-4,8 l9,1 Z" fill="#2fb67c"/>
       ${navegar('vuelta', 'recicla', 5, -1, false, ['#51cf66', '#2f9e44'])}</g>`;
