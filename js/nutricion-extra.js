@@ -242,8 +242,7 @@ const NutriExtra = (function () {
     respiratorio: ['El sistema respiratorio', 'Sistema respiratorio', 'respiratorio'],
     digestivo: ['El sistema digestivo', 'Sistema digestivo', 'digestivo'],
     excretor: ['El sistema excretor', 'Sistema excretor', 'excretor'],
-    arterias: ['La circulación: arterias', 'Arterias', 'circulatorio'],
-    venas: ['La circulación: venas', 'Venas', 'circulatorio'],
+    circulatorio: ['El sistema circulatorio', 'Sistema circulatorio', 'circulatorio'],
     capilares: ['La circulación: capilares', 'Capilares', 'circulatorio'],
     nutrientes: ['Los nutrientes y el oxígeno', 'Nutrientes y oxígeno', 'digestivo'],
     desechos: ['Los desechos metabólicos', 'Desechos metabólicos', 'excretor'],
@@ -255,45 +254,42 @@ const NutriExtra = (function () {
     isla: { l: 'B', n: 'Las islas', pill: [392, 338], ok: 'organos', otras: ['celula', 'organismo', 'capilares'],
       cita: 'Todas las islas aportan al funcionamiento general del conjunto: alimentación, producción, reciclaje, etc.',
       expl: 'Cada isla es como un <b>órgano</b> o un <b>tejido</b>: un grupo de células (casas) que cumple una función para todo el cuerpo.' },
-    huerta: { l: 'C', n: 'La isla Huerta', pill: [128, 196], ok: 'respiratorio', otras: ['digestivo', 'excretor', 'arterias'],
+    huerta: { l: 'C', n: 'La isla Huerta', pill: [128, 196], ok: 'respiratorio', otras: ['digestivo', 'excretor', 'circulatorio'],
       cita: 'La isla Huerta se encarga de recolectar frutas y verduras…',
       expl: 'En este modelo, la isla Huerta es el <b>sistema respiratorio</b>: como las plantas y el viento de sus molinos, aporta el <b>oxígeno</b> que necesitan todas las casas y recibe el <b>dióxido de carbono</b>.' },
     granja: { l: 'D', n: 'La isla Granja', pill: [140, 402], ok: 'digestivo', otras: ['respiratorio', 'excretor', 'organos'],
       cita: 'La isla Granja se ocupa de la cría de animales y la elaboración de todos los productos derivados…',
       expl: 'La isla Granja es el <b>sistema digestivo</b>: transforma los alimentos en <b>nutrientes</b> que los barcos reparten a todas las casas.' },
-    planta: { l: 'E', n: 'La isla de reciclaje', pill: [640, 420], ok: 'excretor', otras: ['digestivo', 'respiratorio', 'venas'],
+    planta: { l: 'E', n: 'La isla de reciclaje', pill: [640, 420], ok: 'excretor', otras: ['digestivo', 'respiratorio', 'circulatorio'],
       cita: 'Los desechos llegan a una isla donde funciona una planta de reciclaje, que se encarga de separar los residuos, reciclarlos y descartar lo que verdaderamente no sirve. Aquellos productos reutilizables los envía nuevamente a las islas.',
       expl: 'Es el <b>sistema excretor</b>: los riñones filtran la sangre, devuelven lo que todavía sirve (agua, glucosa, sales) y eliminan los desechos con la <b>orina</b>.' },
-    arterias: { l: 'F', n: 'Los barcos que llevan productos alimenticios', pill: [200, 236], ok: 'arterias', otras: ['venas', 'capilares', 'digestivo'],
-      cita: 'Se utilizan barcos que navegan por caminos acuáticos y transportan productos alimenticios…',
-      expl: 'Son las <b>arterias</b>: llevan la sangre desde el corazón hacia todo el cuerpo, cargada de nutrientes y oxígeno. El <b>oxígeno (O₂)</b> lo transportan los <b>glóbulos rojos</b>, unido a la hemoglobina. Por eso en la escena son barcos <b>rojos</b>.' },
-    venas: { l: 'G', n: 'Los barcos que llevan desechos', pill: [566, 250], ok: 'venas', otras: ['arterias', 'capilares', 'excretor'],
-      cita: '…y materiales de descarte.',
-      expl: 'Son las <b>venas</b>: llevan la sangre de vuelta al corazón con los desechos y el dióxido de carbono, que después se eliminan por los riñones y los pulmones. En los esquemas se pintan de <b>azul</b>, como estos barcos.' },
-    camionetas: { l: 'H', n: 'Las camionetas', pill: [482, 166], ok: 'capilares', otras: ['arterias', 'venas', 'celula'],
+    vias: { l: 'F', n: 'Las vías marinas', pill: [450, 50], ok: 'circulatorio', otras: ['capilares', 'respiratorio', 'excretor'],
+      cita: 'Las islas se comunican mediante barcos que navegan por caminos acuáticos. La organización del transporte entre las islas garantiza que cada casa reciba todo lo que requiere y que los desechos sean recolectados.',
+      expl: 'Las vías marinas, con los barcos que las recorren, son el <b>sistema circulatorio</b>: el corazón impulsa la sangre por los vasos sanguíneos (arterias, venas y capilares) y así llegan los nutrientes y el oxígeno a cada célula y se retiran sus desechos. El <b>oxígeno (O₂)</b> lo transportan los <b>glóbulos rojos</b>, unido a la hemoglobina.' },
+    camionetas: { l: 'G', n: 'Las camionetas', pill: [482, 166], ok: 'capilares', otras: ['circulatorio', 'organos', 'celula'],
       cita: 'Las casas están agrupadas por sectores y estos se comunican entre sí a través de pequeñas rutas. Por esas rutas andan las camionetas, que llegan hasta cada casa.',
       expl: 'Son los <b>capilares</b>: vasos finísimos que llegan hasta cada célula. Ahí se hace el intercambio: entregan nutrientes y oxígeno, y recogen los desechos.' },
-    casas: { l: 'I', n: 'Las casas', pill: [300, 162], ok: 'celula', otras: ['organos', 'organismo', 'capilares'],
+    casas: { l: 'H', n: 'Las casas', pill: [300, 162], ok: 'celula', otras: ['organos', 'organismo', 'capilares'],
       cita: 'En cada una de las islas hay casas…',
       expl: 'Las casas son las <b>células</b>, las unidades más pequeñas del cuerpo. Cada una necesita recibir nutrientes y oxígeno, y produce desechos.' },
-    productos: { l: 'J', n: 'Los productos alimenticios', pill: [276, 308], ok: 'nutrientes', otras: ['desechos', 'organos', 'arterias'],
+    productos: { l: 'I', n: 'Los productos alimenticios', pill: [276, 308], ok: 'nutrientes', otras: ['desechos', 'organos', 'circulatorio'],
       cita: 'La organización del transporte entre las islas garantiza que cada casa reciba todo lo que requiere…',
       expl: 'Los productos son los <b>nutrientes y el oxígeno</b>: lo que cada célula necesita para obtener energía, crecer y repararse.' },
-    inservibles: { l: 'K', n: 'Los materiales inservibles', pill: [522, 374], ok: 'desechos', otras: ['nutrientes', 'venas', 'excretor'],
+    inservibles: { l: 'J', n: 'Los materiales inservibles', pill: [522, 374], ok: 'desechos', otras: ['nutrientes', 'capilares', 'excretor'],
       cita: 'Cada casa descarta los materiales inservibles, pero algunos de ellos pueden ser reciclados.',
       expl: 'Son los <b>desechos metabólicos</b>: al usar los nutrientes y el oxígeno, las células producen desechos como el <b>dióxido de carbono</b> y la <b>urea</b>.' },
   };
   const CASOS = [
     { id: 'tormenta', t: '⛈️ Hay una <b>tormenta</b> y los barcos no pueden navegar.', ok: 'circulatorio', e: 'Si la sangre no circula, las células se quedan sin nutrientes ni oxígeno, y nadie retira sus desechos.' },
-    { id: 'tronco', t: '🪵 Un <b>tronco bloquea el camino</b> de los barcos rojos que van a la isla de las casas.', ok: 'circulatorio', e: 'Es como una arteria tapada: las células de esa zona se quedan sin oxígeno. Así ocurre, por ejemplo, un infarto.' },
+    { id: 'tronco', t: '🪵 Un <b>tronco bloquea la vía marina</b> que llega a la isla de las casas.', ok: 'circulatorio', e: 'Es como un vaso sanguíneo tapado: las células de esa zona se quedan sin oxígeno. Así ocurre, por ejemplo, un infarto.' },
     { id: 'camioneta', t: '🚐 Las <b>camionetas no pueden entrar</b> a un sector de casas.', ok: 'circulatorio', e: 'Sin capilares, la sangre no llega hasta las células: no reciben nutrientes ni oxígeno y sus desechos se acumulan.' },
     { id: 'rota', t: '🏭 La <b>planta de reciclaje se rompe</b> y los desechos se acumulan en las islas.', ok: 'excretor', e: 'Si los riñones no funcionan, los desechos se acumulan en la sangre y se vuelven tóxicos.' },
     { id: 'reusa', t: '♻️ La planta <b>devuelve a las islas</b> los productos que todavía sirven.', ok: 'excretor', e: 'Los riñones devuelven a la sangre el agua, la glucosa y las sales que todavía sirven.' },
     { id: 'molinos', t: '🌬️ Los <b>molinos de la isla Huerta</b> dejan de girar y no llega aire fresco.', ok: 'respiratorio', e: 'Sin el sistema respiratorio no entra oxígeno ni sale el dióxido de carbono: las células no pueden obtener energía.' },
     { id: 'queso', t: '🧀 La isla Granja <b>transforma la leche en queso y manteca</b> antes de repartirla.', ok: 'digestivo', e: 'El sistema digestivo transforma los alimentos en nutrientes pequeños que pueden pasar a la sangre.' },
     { id: 'casa', t: '🏠 Cada casa <b>usa lo que recibe</b> para vivir y descarta materiales inservibles.', ok: 'celula', e: 'Las células usan los nutrientes y el oxígeno para obtener energía, y al hacerlo producen desechos metabólicos.' },
-    { id: 'oxigeno', t: '🫧 Los barcos rojos llevan <b>aire fresco de la isla Huerta</b> a todas las casas.', ok: 'circulatorio', e: 'Son como los <b>glóbulos rojos</b> de las arterias: transportan el <b>oxígeno (O₂)</b>, unido a la hemoglobina, desde los pulmones hasta todas las células.' },
-    { id: 'retiran', t: '🛥️ Los barcos azules <b>recogen los descartes</b> de las casas y los llevan a la isla de reciclaje.', ok: 'circulatorio', e: 'Las venas llevan la sangre con los desechos de las células hacia los riñones (y el dióxido de carbono, hacia los pulmones).' },
+    { id: 'oxigeno', t: '🫧 Los barcos llevan <b>aire fresco de la isla Huerta</b> a todas las casas.', ok: 'circulatorio', e: 'En la sangre, los <b>glóbulos rojos</b> transportan el <b>oxígeno (O₂)</b>, unido a la hemoglobina, desde los pulmones hasta todas las células.' },
+    { id: 'retiran', t: '🛥️ Los barcos <b>recogen los descartes</b> de las casas y los llevan a la isla de reciclaje.', ok: 'circulatorio', e: 'La sangre recoge los desechos de las células y los lleva hacia los riñones (y el dióxido de carbono, hacia los pulmones).' },
   ];
   const RONDA = 5;
   let ciu = null;
@@ -346,7 +342,7 @@ const NutriExtra = (function () {
   function islasFija() {
     const olas = Array.from({ length: 34 }, (_, i) => { const x = (i * 131.7) % CW, y = 20 + (i * 67.3) % (CH - 30); return `<path d="M${x.toFixed(0)},${y.toFixed(0)} q6,-4 12,0 t12,0" stroke="#7fb4ff" stroke-width="1.6" fill="none" opacity="${0.12 + (i % 3) * 0.06}"/>`; }).join('');
     // Caminos acuáticos (decorado)
-    const caminos = `<g>${Object.values(RUTAS).map(d => `<path d="${d}" stroke="#5cc8ff" stroke-width="18" opacity="0.2" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#5cc8ff" stroke-width="26" opacity="0" fill="none"/><path d="${d}" stroke="#bfe8ff" stroke-width="2" stroke-dasharray="6 8" opacity="0.55" fill="none"/>`).join('')}</g>`;
+    const caminos = `<g class="nx-lugar" data-l="vias">${Object.values(RUTAS).map(d => `<path d="${d}" stroke="#5cc8ff" stroke-width="18" opacity="0.2" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#5cc8ff" stroke-width="26" opacity="0" fill="none"/><path d="${d}" stroke="#bfe8ff" stroke-width="2" stroke-dasharray="6 8" opacity="0.55" fill="none"/>`).join('')}</g>`;
     // G: islas Huerta y Granja
     const fila = (x, y) => `<path d="M${x},${y} h70" stroke="#8a5a35" stroke-width="7" stroke-linecap="round"/>${[0, 1, 2, 3, 4, 5].map(i => `<circle cx="${x + 4 + i * 12.5}" cy="${y - 4}" r="5" fill="${i % 2 ? '#40c057' : '#69db7c'}"/>`).join('')}`;
     const arbol = (x, y) => `<g>${Arte.sombra(x + 4, y + 16, 14)}<rect x="${x - 2.5}" y="${y}" width="5" height="16" rx="2" fill="#7a4a2a"/>${dosTonos(`<circle cx="${x}" cy="${y - 4}" r="14" fill="FILL"/>`, '#2fb67c', '#1f8f5e', { x: x + 4 })}${[[-6, -8], [5, -2], [-2, 4], [7, -12]].map(([a, b]) => `<circle cx="${x + a}" cy="${y - 4 + b}" r="2.6" fill="#ff922b"/>`).join('')}</g>`;
@@ -392,22 +388,21 @@ const NutriExtra = (function () {
     const archi = `<g class="nx-lugar" data-l="archi"><rect x="14" y="12" width="96" height="30" fill="transparent"/>
       <g transform="translate(40 410)"><circle r="24" fill="#12143a" opacity="0.6"/>${[0, 90, 180, 270].map(a => `<path d="M0,-20 L5,0 L0,4 L-5,0 Z" fill="${a ? '#c9ccf5' : '#ffd166'}" transform="rotate(${a})"/>`).join('')}<text y="-26" text-anchor="middle" class="nx-isla-rot">N</text></g>
       <path d="M8,10 h${CW - 16} v${CH - 20} h${-(CW - 16)} Z" stroke="#ffd166" stroke-width="3" fill="none" opacity="0.35" stroke-dasharray="2 10" stroke-linecap="round"/></g>`;
-    // Barcos rojos (arterias: productos y oxígeno) y azules (venas: desechos)
+    // Barcos que recorren las vías marinas (llevan productos y desechos)
     const AZUL = ['#5b7cfa', '#3b5bdb'];
-    const arterias = `<g class="nx-lugar" data-l="arterias">${navegar('huerta', 'aire', 7, 0)}${navegar('granja', 'comida', 7.5, -3)}${navegar('arriba', 'aire', 14, -4)}${navegar('abajo', 'comida', 15, -2)}</g>`;
-    const venas = `<g class="nx-lugar" data-l="venas">${navegar('huerta', 'desecho', 7, -3.5, true, AZUL)}${navegar('planta', 'desecho', 6, -1, false, AZUL)}${navegar('arriba', 'desecho', 14, -11, true, AZUL)}</g>`;
+    const barcos = `<g class="nx-lugar" data-l="vias">${navegar('huerta', 'aire', 7, 0)}${navegar('granja', 'comida', 7.5, -3)}${navegar('arriba', 'aire', 14, -4)}${navegar('abajo', 'comida', 15, -2)}${navegar('huerta', 'desecho', 7, -3.5, true, AZUL)}${navegar('planta', 'desecho', 6, -1, false, AZUL)}${navegar('arriba', 'desecho', 14, -11, true, AZUL)}</g>`;
     return `<defs><radialGradient id="nx-mar" cx="0.5" cy="0.45" r="0.8"><stop offset="0" stop-color="#1f4fa0"/><stop offset="1" stop-color="#0c1640"/></radialGradient></defs>
       <rect width="${CW}" height="${CH}" rx="14" fill="url(#nx-mar)"/>${olas}${archi}
       ${caminos}
       <g class="nx-lugar" data-l="isla">${isla(128, 118, 92, 58)}${isla(126, 330, 90, 56, ['#8ce99a', '#5fd38d'])}${isla(386, 246, 140, 100)}${isla(642, 328, 92, 58, ['#b2c79a', '#94ab7c'])}</g>
-      ${sectores}${camionetas}${casas}${productos}${inservibles}${huerta}${granja}${planta}${arterias}${venas}`;
+      ${sectores}${camionetas}${casas}${productos}${inservibles}${huerta}${granja}${planta}${barcos}`;
   }
 
   function islas(cont) {
     ciu = { hechos: {}, sel: null, error: null, etapa: 'unir', casos: [], i: 0, aciertos: 0, resp: null, texto: true };
     cont.innerHTML = `<div class="nu-grid">
         <div class="panel nu-escena"><div class="nx-scroll"><svg id="nx-csvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="El archipiélago de las islas SIN"><g id="nx-cfijo"></g><g id="nx-cpills"></g></svg></div>
-          <p class="nu-ayuda-esc">👆 Tocá cada parte del archipiélago (de la A a la K) y elegí qué representa en el cuerpo.</p></div>
+          <p class="nu-ayuda-esc">👆 Tocá cada parte del archipiélago (de la A a la J) y elegí qué representa en el cuerpo.</p></div>
         <aside class="panel nu-info" id="nx-cinfo"></aside>
       </div>`;
     ciu.cont = cont;
@@ -478,7 +473,7 @@ const NutriExtra = (function () {
     if (ciu.i >= ciu.casos.length) {
       info.innerHTML = `<h2>🏝️ Situaciones en las islas</h2>
         <div class="feedback ${ciu.aciertos >= 4 ? 'ok' : 'mal'}"><p class="fb-titulo">${ciu.aciertos >= 4 ? '🏆' : '💪'} ${ciu.aciertos} de ${ciu.casos.length} correctas</p>
-        <p>Recordá: los <b>barcos y los caminos acuáticos</b> (la sangre y los vasos sanguíneos) conectan todas las islas. Si se detienen, ninguna casa recibe ni descarta nada.</p></div>
+        <p>Recordá: las <b>vías marinas</b> (el sistema circulatorio) conectan todas las islas. Si se detienen, ninguna casa recibe ni descarta nada.</p></div>
         <button class="btn primario" id="nx-otra">Otra ronda</button> <button class="btn" id="nx-volver">Volver al archipiélago</button>`;
       info.querySelector('#nx-otra').addEventListener('click', empezarCasos);
       info.querySelector('#nx-volver').addEventListener('click', () => { ciu.etapa = 'unir'; ciu.sel = null; pintarIslas(); });
