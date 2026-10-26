@@ -64,13 +64,16 @@ const Estados = (function () {
     const filasLiq = Math.ceil(nLiq / 9), altoLiq = filasLiq * 25;
     const sup = B.y1 - altoLiq;
     const vel = 40 + Math.max(0, est.T) * 1.1, velGas = 170 + Math.max(0, est.T - 100) * 3;
+    // Las filas del hielo se cuentan desde arriba: la última fila es la que toca el agua.
+    // Así el agua se congela (y el hielo se funde) por la parte de abajo del cubo.
+    const filasSol = Math.ceil(nSol / COLS);
     let kSol = 0;
     parts.forEach((p, i) => {
       // Las primeras en pasar al gas son las de la superficie del líquido (las de índice más alto).
       p.fase = i < nSol ? 'solido' : i >= N - nGas ? 'gas' : 'liquido';
       if (p.fase === 'solido') {
         const k = kSol++, fila = Math.floor(k / COLS), col = k % COLS;
-        const bx = B.x0 + 36 + col * 25 + (fila % 2) * 6, by = sup - 14 - fila * 25;
+        const bx = B.x0 + 36 + col * 25 + (fila % 2) * 6, by = sup - 14 - (filasSol - 1 - fila) * 25;
         const amp = 1 + (est.T - T_MIN) / 40 * 1.6, t = performance.now() / 1000;
         p.x += (bx + Math.sin(t * 9 + i) * amp - p.x) * Math.min(1, dt * 8);
         p.y += (by + Math.cos(t * 8 + i * 1.3) * amp - p.y) * Math.min(1, dt * 8);
@@ -108,7 +111,7 @@ const Estados = (function () {
     const derr = est.fase === 'fusion' ? est.f : 0;
     const d = 16 * (1 - derr * 0.6), r = 6 + derr * 18;
     const { x0, x1, y0, y1 } = h, w = x1 - x0, alto = y1 - y0;
-    const gotas = derr > 0 ? [0.2, 0.55, 0.85].map((u, i) => { const x = x0 + u * w, t = (performance.now() / 900 + i * 0.37) % 1; return `<path d="M${x},${y1 + 2 + t * 18} q-4,6 0,9 q4,-3 0,-9 Z" fill="#a5d8ff" opacity="${1 - t}"/>`; }).join('') : '';
+    const gotas = derr > 0 && potencia > 0 ? [0.2, 0.55, 0.85].map((u, i) => { const x = x0 + u * w, t = (performance.now() / 900 + i * 0.37) % 1; return `<path d="M${x},${y1 + 2 + t * 18} q-4,6 0,9 q4,-3 0,-9 Z" fill="#a5d8ff" opacity="${1 - t}"/>`; }).join('') : '';
     return `<g class="es-hielo">
       <path d="M${x0 + r},${y0} L${x0 + r + d},${y0 - d} H${x1 + d - r} L${x1 - r},${y0} Z" fill="#e7f5ff" opacity="0.55"/>
       <path d="M${x1},${y0 + r} L${x1 + d},${y0 - d + r} V${y1 - d - r * 0.3} L${x1},${y1 - r * 0.3} Z" fill="#74c0fc" opacity="0.45"/>
