@@ -5,7 +5,10 @@
     "Sistemas materiales",
     "Materia y energía",
     "Cuerpos y materiales",
-    "Propiedades intensivas y extensivas"
+    "Propiedades intensivas y extensivas",
+    "Alimentación saludable",
+    "Sistemas de la nutrición",
+    "La célula"
   ],
   "preguntas": [
     {
@@ -950,6 +953,536 @@
       ],
       "correcta": 1,
       "explicacion": "Son propiedades intensivas organolépticas: se perciben con los sentidos. (¡En el laboratorio nunca se prueba ni se huele directamente!)"
+    },
+    {
+      "id": "ali-01",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Cuál es la principal función de los carbohidratos (como el pan, el arroz o los fideos)?",
+      "opciones": [
+        "Formar los músculos",
+        "Dar energía",
+        "Transportar el oxígeno",
+        "Formar los huesos"
+      ],
+      "correcta": 1,
+      "explicacion": "Los carbohidratos son la principal fuente de energía del cuerpo: los usamos para movernos, pensar y mantener la temperatura."
+    },
+    {
+      "id": "ali-02",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Qué diferencia hay entre un alimento y un nutriente?",
+      "opciones": [
+        "Son exactamente lo mismo",
+        "Los nutrientes solo están en las frutas y verduras",
+        "El alimento contiene nutrientes, que son las sustancias que el cuerpo aprovecha",
+        "Los alimentos no tienen nutrientes"
+      ],
+      "correcta": 2,
+      "explicacion": "Un alimento (por ejemplo, la leche) contiene varios nutrientes (proteínas, grasas, calcio, agua) que el cuerpo aprovecha."
+    },
+    {
+      "id": "ali-03",
+      "tema": "Alimentación saludable",
+      "enunciado": "Según el plato de las Guías Alimentarias para la Población Argentina, ¿qué grupo debería ocupar la mitad del plato?",
+      "opciones": [
+        "Carnes y huevos",
+        "Leche, yogur y queso",
+        "Verduras y frutas",
+        "Dulces y grasas"
+      ],
+      "correcta": 2,
+      "explicacion": "La mitad del plato corresponde a verduras y frutas, de distintos tipos y colores."
+    },
+    {
+      "id": "ali-04",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Qué nutrientes forman y reparan los tejidos, como los músculos y la piel?",
+      "opciones": [
+        "Las proteínas",
+        "Los carbohidratos",
+        "Las grasas",
+        "Las vitaminas"
+      ],
+      "correcta": 0,
+      "explicacion": "Las proteínas cumplen una función constructora (plástica): forman y reparan los tejidos. Abundan en carnes, huevos, lácteos y legumbres."
+    },
+    {
+      "id": "ali-05",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Por qué es importante comer alimentos con fibra, como las frutas, las verduras y los cereales integrales?",
+      "opciones": [
+        "Porque dan mucha energía",
+        "Porque ayudan al buen funcionamiento del intestino",
+        "Porque forman los huesos",
+        "Porque transportan el oxígeno"
+      ],
+      "correcta": 1,
+      "explicacion": "La fibra no se digiere, pero ayuda a que el intestino funcione bien y da sensación de saciedad."
+    },
+    {
+      "id": "ali-06",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Cuál es la mejor bebida para hidratarse todos los días?",
+      "opciones": [
+        "El agua",
+        "La gaseosa",
+        "El jugo en polvo",
+        "La bebida energizante"
+      ],
+      "correcta": 0,
+      "explicacion": "El agua hidrata sin aportar azúcar. Las Guías recomiendan tomar alrededor de 8 vasos de agua segura por día.",
+      "imagen": "bebidas"
+    },
+    {
+      "id": "ali-07",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Qué mineral, abundante en la leche y el queso, fortalece los huesos y los dientes?",
+      "opciones": [
+        "El hierro",
+        "El sodio",
+        "El calcio",
+        "El yodo"
+      ],
+      "correcta": 2,
+      "explicacion": "El calcio forma parte de los huesos y los dientes. Los lácteos son su principal fuente."
+    },
+    {
+      "id": "ali-08",
+      "tema": "Alimentación saludable",
+      "enunciado": "La falta de hierro puede producir anemia. ¿En qué alimentos abunda el hierro?",
+      "opciones": [
+        "En las carnes, las legumbres y las verduras de hoja verde",
+        "En las gaseosas",
+        "En las golosinas",
+        "En la manteca"
+      ],
+      "correcta": 0,
+      "explicacion": "El hierro forma parte de la hemoglobina de los glóbulos rojos, que transporta el oxígeno. Está en carnes, lentejas, porotos y espinaca."
+    },
+    {
+      "id": "ali-09",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Qué indican los octógonos negros en los envases de los alimentos?",
+      "opciones": [
+        "Que el producto es recomendable para todos los días",
+        "Que el producto tiene exceso de azúcares, grasas, sodio o calorías",
+        "Que el producto es orgánico",
+        "Que el producto está vencido"
+      ],
+      "correcta": 1,
+      "explicacion": "La Ley de Etiquetado Frontal obliga a advertir con octógonos negros los excesos de azúcares, sodio, grasas o calorías. Conviene elegir productos con menos octógonos.",
+      "imagen": "octogonos"
+    },
+    {
+      "id": "ali-10",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿En qué se diferencian la alimentación y la nutrición?",
+      "opciones": [
+        "Son la misma cosa",
+        "La alimentación es elegir y comer los alimentos (voluntaria); la nutrición es lo que hace el cuerpo para aprovechar los nutrientes (involuntaria)",
+        "La nutrición es voluntaria y la alimentación no",
+        "La alimentación solo la hacen los animales"
+      ],
+      "correcta": 1,
+      "explicacion": "Elegimos qué comer (alimentación), pero no controlamos la digestión, la absorción ni el transporte de los nutrientes (nutrición)."
+    },
+    {
+      "id": "ali-11",
+      "tema": "Alimentación saludable",
+      "enunciado": "Las grasas (lípidos) en el cuerpo sirven para…",
+      "opciones": [
+        "guardar energía de reserva y protegernos del frío",
+        "transportar el oxígeno",
+        "formar los dientes",
+        "nada, hay que evitarlas por completo"
+      ],
+      "correcta": 0,
+      "explicacion": "Las grasas son una reserva de energía y un aislante térmico. Hacen falta, pero en cantidades moderadas, y mejor las de aceites, frutas secas y semillas."
+    },
+    {
+      "id": "ali-12",
+      "tema": "Alimentación saludable",
+      "enunciado": "¿Cuál de estos desayunos es más completo?",
+      "opciones": [
+        "Una gaseosa y galletitas",
+        "Solo un café",
+        "Leche, pan integral y una fruta",
+        "Nada, para no perder tiempo"
+      ],
+      "correcta": 2,
+      "explicacion": "Un buen desayuno combina un lácteo, un cereal (mejor integral) y una fruta: aporta energía, proteínas, calcio, fibra y vitaminas."
+    },
+    {
+      "id": "nut-01",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿En qué órgano se absorbe la mayor parte de los nutrientes?",
+      "opciones": [
+        "En el estómago",
+        "En el intestino delgado",
+        "En el intestino grueso",
+        "En el esófago"
+      ],
+      "correcta": 1,
+      "explicacion": "En el intestino delgado los nutrientes atraviesan sus paredes (vellosidades) y pasan a la sangre."
+    },
+    {
+      "id": "nut-02",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Dónde pasa el oxígeno del aire a la sangre?",
+      "opciones": [
+        "En la tráquea",
+        "En el corazón",
+        "En los alvéolos pulmonares",
+        "En el estómago"
+      ],
+      "correcta": 2,
+      "explicacion": "Los alvéolos son bolsitas muy finas rodeadas de capilares: allí el oxígeno pasa a la sangre y el dióxido de carbono pasa al aire."
+    },
+    {
+      "id": "nut-03",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Qué células de la sangre transportan el oxígeno?",
+      "opciones": [
+        "Los glóbulos rojos",
+        "Los glóbulos blancos",
+        "Las plaquetas",
+        "Las neuronas"
+      ],
+      "correcta": 0,
+      "explicacion": "Los glóbulos rojos tienen hemoglobina, que se une al oxígeno y lo lleva a todas las células. Los glóbulos blancos defienden al cuerpo y las plaquetas ayudan a coagular.",
+      "imagen": "sangre"
+    },
+    {
+      "id": "nut-04",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Qué órganos filtran la sangre y forman la orina?",
+      "opciones": [
+        "Los pulmones",
+        "Los riñones",
+        "El hígado",
+        "El intestino"
+      ],
+      "correcta": 1,
+      "explicacion": "Los riñones filtran la sangre, separan los desechos (como la urea) y forman la orina."
+    },
+    {
+      "id": "nut-05",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "En el archipiélago de las islas SIN, ¿qué representa la isla de reciclaje?",
+      "opciones": [
+        "El sistema digestivo",
+        "El sistema circulatorio",
+        "El sistema respiratorio",
+        "El sistema excretor"
+      ],
+      "correcta": 3,
+      "explicacion": "Así como la isla de reciclaje separa lo que sirve de lo que no, el sistema excretor filtra la sangre y elimina los desechos.",
+      "imagen": "islas"
+    },
+    {
+      "id": "nut-06",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Por qué decimos que la nutrición es una función integrada?",
+      "opciones": [
+        "Porque la hace solo el sistema digestivo",
+        "Porque los sistemas digestivo, respiratorio, circulatorio y excretor trabajan juntos para que cada célula reciba nutrientes y oxígeno y elimine sus desechos",
+        "Porque ocurre solo cuando comemos",
+        "Porque no necesita del sistema circulatorio"
+      ],
+      "correcta": 1,
+      "explicacion": "Ningún sistema alcanza solo: el digestivo aporta nutrientes, el respiratorio oxígeno, el circulatorio reparte y el excretor elimina desechos."
+    },
+    {
+      "id": "nut-07",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Cuál es el orden correcto del recorrido de los alimentos?",
+      "opciones": [
+        "Boca → estómago → esófago → intestino grueso → intestino delgado",
+        "Boca → esófago → estómago → intestino delgado → intestino grueso",
+        "Esófago → boca → estómago → intestino delgado → intestino grueso",
+        "Boca → esófago → intestino delgado → estómago → intestino grueso"
+      ],
+      "correcta": 1,
+      "explicacion": "El alimento entra por la boca, baja por el esófago al estómago, sigue al intestino delgado (donde se absorben los nutrientes) y lo que no se aprovecha llega al intestino grueso."
+    },
+    {
+      "id": "nut-08",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "En la boca, los dientes trituran el alimento (digestión mecánica). ¿Qué empieza la digestión química?",
+      "opciones": [
+        "La saliva",
+        "La bilis",
+        "La orina",
+        "El jugo pancreático"
+      ],
+      "correcta": 0,
+      "explicacion": "La saliva tiene enzimas que empiezan a descomponer el almidón. Por eso el pan masticado mucho tiempo se vuelve dulce."
+    },
+    {
+      "id": "nut-09",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "Al inspirar (tomar aire), el diafragma…",
+      "opciones": [
+        "se relaja y sube, y el aire sale",
+        "se contrae y baja, y el aire entra a los pulmones",
+        "no se mueve",
+        "empuja el aire hacia el estómago"
+      ],
+      "correcta": 1,
+      "explicacion": "Al contraerse, el diafragma baja, la caja torácica se agranda y entra el aire. Al relajarse, sube y el aire sale (espiración)."
+    },
+    {
+      "id": "nut-10",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "Las arterias llevan la sangre…",
+      "opciones": [
+        "desde el corazón hacia el resto del cuerpo",
+        "desde el cuerpo hacia el corazón",
+        "solo hacia los pulmones",
+        "desde los riñones hacia el estómago"
+      ],
+      "correcta": 0,
+      "explicacion": "Las arterias salen del corazón; las venas vuelven al corazón. Los capilares, muy finos, conectan unas con otras y llegan a cada célula."
+    },
+    {
+      "id": "nut-11",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Cuál es la función del corazón?",
+      "opciones": [
+        "Filtrar la sangre",
+        "Fabricar el oxígeno",
+        "Bombear la sangre para que circule por todo el cuerpo",
+        "Digerir los alimentos"
+      ],
+      "correcta": 2,
+      "explicacion": "El corazón es un músculo que funciona como una bomba: con cada latido impulsa la sangre por los vasos sanguíneos.",
+      "imagen": "corazon"
+    },
+    {
+      "id": "nut-12",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "¿Qué desecho de las células se elimina principalmente con la orina?",
+      "opciones": [
+        "El oxígeno",
+        "La urea",
+        "La glucosa",
+        "El almidón"
+      ],
+      "correcta": 1,
+      "explicacion": "La urea se produce cuando las células usan las proteínas. La sangre la lleva a los riñones, que la eliminan con la orina."
+    },
+    {
+      "id": "nut-13",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "El dióxido de carbono que producen las células se elimina…",
+      "opciones": [
+        "por los riñones, con la orina",
+        "por el sistema respiratorio, al espirar",
+        "por el intestino grueso",
+        "por la piel, con el sudor únicamente"
+      ],
+      "correcta": 1,
+      "explicacion": "La sangre lleva el dióxido de carbono hasta los pulmones, y sale del cuerpo cuando espiramos."
+    },
+    {
+      "id": "nut-14",
+      "tema": "Sistemas de la nutrición",
+      "enunciado": "En el archipiélago de las islas SIN, ¿qué representan las casas?",
+      "opciones": [
+        "Los órganos",
+        "Las células",
+        "Los nutrientes",
+        "Los vasos sanguíneos"
+      ],
+      "correcta": 1,
+      "explicacion": "Cada casa es una célula: necesita recibir productos (nutrientes y oxígeno) y descarta materiales inservibles (desechos).",
+      "imagen": "islas"
+    },
+    {
+      "id": "cel-01",
+      "tema": "La célula",
+      "enunciado": "¿Qué dice la teoría celular?",
+      "opciones": [
+        "Que solo los animales tienen células",
+        "Que todos los seres vivos están formados por una o más células",
+        "Que las células se forman de la nada",
+        "Que los virus son células"
+      ],
+      "correcta": 1,
+      "explicacion": "La teoría celular dice que todos los seres vivos están formados por células, que la célula es la unidad básica de la vida y que toda célula proviene de otra célula."
+    },
+    {
+      "id": "cel-02",
+      "tema": "La célula",
+      "enunciado": "¿Qué estructuras tiene la célula vegetal y NO la célula animal?",
+      "opciones": [
+        "Núcleo y membrana plasmática",
+        "Mitocondrias y citoplasma",
+        "Pared celular y cloroplastos",
+        "Ninguna: son iguales"
+      ],
+      "correcta": 2,
+      "explicacion": "La pared celular le da rigidez a la célula vegetal y los cloroplastos le permiten hacer la fotosíntesis. Las dos tienen núcleo, membrana, citoplasma y mitocondrias."
+    },
+    {
+      "id": "cel-03",
+      "tema": "La célula",
+      "enunciado": "¿Qué organela obtiene la energía de los nutrientes (respiración celular)?",
+      "opciones": [
+        "La mitocondria",
+        "El cloroplasto",
+        "La vacuola",
+        "La pared celular"
+      ],
+      "correcta": 0,
+      "explicacion": "En las mitocondrias, la glucosa y el oxígeno se usan para obtener energía. Por eso las células necesitan nutrientes y oxígeno."
+    },
+    {
+      "id": "cel-04",
+      "tema": "La célula",
+      "enunciado": "Una bacteria es una célula…",
+      "opciones": [
+        "eucariota, con núcleo",
+        "procariota: no tiene núcleo y su material genético está suelto en el citoplasma",
+        "vegetal, con cloroplastos",
+        "animal, con mitocondrias"
+      ],
+      "correcta": 1,
+      "explicacion": "Las células procariotas (como las bacterias) no tienen núcleo. Las eucariotas (de animales, plantas y hongos) sí lo tienen."
+    },
+    {
+      "id": "cel-05",
+      "tema": "La célula",
+      "enunciado": "¿Qué instrumento se usa para observar células?",
+      "opciones": [
+        "El telescopio",
+        "El microscopio",
+        "El termómetro",
+        "El estetoscopio"
+      ],
+      "correcta": 1,
+      "explicacion": "La mayoría de las células son tan chicas que no se ven a simple vista: hace falta un microscopio.",
+      "imagen": "celulas-zoom"
+    },
+    {
+      "id": "cel-06",
+      "tema": "La célula",
+      "enunciado": "¿Qué función cumple la membrana plasmática?",
+      "opciones": [
+        "Controla qué sustancias entran y salen de la célula",
+        "Fabrica la energía",
+        "Hace la fotosíntesis",
+        "Guarda el material genético"
+      ],
+      "correcta": 0,
+      "explicacion": "La membrana plasmática rodea la célula y regula el paso de sustancias: deja entrar nutrientes y oxígeno y salir los desechos."
+    },
+    {
+      "id": "cel-07",
+      "tema": "La célula",
+      "enunciado": "¿Qué estructura contiene el material genético (ADN) y controla las actividades de la célula?",
+      "opciones": [
+        "La mitocondria",
+        "El citoplasma",
+        "El núcleo",
+        "La membrana plasmática"
+      ],
+      "correcta": 2,
+      "explicacion": "El núcleo guarda el ADN, que tiene la información para el funcionamiento de la célula y se transmite cuando la célula se divide.",
+      "imagen": "celula-animal"
+    },
+    {
+      "id": "cel-08",
+      "tema": "La célula",
+      "enunciado": "¿En qué estructuras de la célula vegetal ocurre la fotosíntesis?",
+      "opciones": [
+        "En los cloroplastos",
+        "En las mitocondrias",
+        "En el núcleo",
+        "En la vacuola"
+      ],
+      "correcta": 0,
+      "explicacion": "Los cloroplastos tienen clorofila, el pigmento verde que capta la luz del Sol para fabricar glucosa a partir de dióxido de carbono y agua.",
+      "imagen": "hoja"
+    },
+    {
+      "id": "cel-09",
+      "tema": "La célula",
+      "enunciado": "Un organismo unicelular…",
+      "opciones": [
+        "está formado por una sola célula, como una bacteria o una ameba",
+        "está formado por muchas células",
+        "no tiene células",
+        "es siempre un animal"
+      ],
+      "correcta": 0,
+      "explicacion": "Los unicelulares hacen todas sus funciones con una sola célula. Los pluricelulares, como nosotros, tienen muchas células especializadas."
+    },
+    {
+      "id": "cel-10",
+      "tema": "La célula",
+      "enunciado": "¿Cuál es el orden correcto de los niveles de organización, de menor a mayor?",
+      "opciones": [
+        "Tejido → célula → órgano → sistema → organismo",
+        "Célula → órgano → tejido → sistema → organismo",
+        "Célula → tejido → órgano → sistema de órganos → organismo",
+        "Organismo → sistema → órgano → tejido → célula"
+      ],
+      "correcta": 2,
+      "explicacion": "Las células parecidas forman tejidos, los tejidos forman órganos, los órganos forman sistemas y los sistemas forman el organismo."
+    },
+    {
+      "id": "cel-11",
+      "tema": "La célula",
+      "enunciado": "El ocular de un microscopio aumenta 10 veces (10×) y el objetivo 40×. ¿Cuál es el aumento total?",
+      "opciones": [
+        "50×",
+        "400×",
+        "4×",
+        "30×"
+      ],
+      "correcta": 1,
+      "explicacion": "El aumento total se calcula multiplicando: 10 × 40 = 400 veces.",
+      "imagen": "microscopio"
+    },
+    {
+      "id": "cel-12",
+      "tema": "La célula",
+      "enunciado": "¿Cómo se llama el medio gelatinoso que llena la célula y donde están las organelas?",
+      "opciones": [
+        "El citoplasma",
+        "El núcleo",
+        "La pared celular",
+        "La vacuola"
+      ],
+      "correcta": 0,
+      "explicacion": "El citoplasma está formado principalmente por agua y en él se encuentran las organelas."
+    },
+    {
+      "id": "cel-13",
+      "tema": "La célula",
+      "enunciado": "¿Para qué necesitan las células los nutrientes y el oxígeno?",
+      "opciones": [
+        "Para obtener energía, crecer y reparar sus partes",
+        "Solo para cambiar de color",
+        "Para fabricar oxígeno",
+        "No los necesitan"
+      ],
+      "correcta": 0,
+      "explicacion": "Con los nutrientes y el oxígeno las células obtienen energía (en las mitocondrias) y materiales para crecer. Por eso los sistemas de la nutrición trabajan para ellas."
+    },
+    {
+      "id": "cel-14",
+      "tema": "La célula",
+      "enunciado": "En las células vegetales, la vacuola grande sirve principalmente para…",
+      "opciones": [
+        "almacenar agua y otras sustancias",
+        "hacer la fotosíntesis",
+        "controlar la célula",
+        "obtener energía"
+      ],
+      "correcta": 0,
+      "explicacion": "La vacuola guarda agua y sustancias. Cuando está llena, la planta se mantiene firme; cuando se vacía, la planta se marchita."
     }
   ]
 }

@@ -85,6 +85,39 @@ const QuizDibujos = (function () {
       <rect x="${x - 28}" y="${PISO - 18}" width="34" height="12" rx="2" fill="#12143a"/>${extra}
       <rect x="${x - 38}" y="${PISO - 30}" width="76" height="6" rx="3" fill="#dbe4ff"/>`;
 
+  // Alimentos ilustrados del módulo Alimentación saludable.
+  const comida = (id, x, y, k = 1.5) => `${sombra(x + 2, PISO + 2, 16 * k)}${Alimentacion.alimento(id, x, y, k)}`;
+  // Órganos con cara (para Sistemas de la nutrición).
+  const ORGANO = {
+    estomago: (x, y) => `<g transform="translate(${x} ${y})">${dt('<path d="M-6,-40 C14,-46 36,-28 32,-4 C28,22 -2,32 -20,20 C-32,12 -24,0 -12,-2 C-2,-4 2,-14 -6,-22 C-12,-28 -14,-36 -6,-40 Z" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 12 })}<path d="M-8,-40 V-54" stroke="#e0607f" stroke-width="9" stroke-linecap="round"/>${brillo('M2,-34 q16,-2 22,12', 3)}${cara(10, -2, 3.2, 'feliz')}</g>`,
+    pulmones: (x, y) => `<g transform="translate(${x} ${y})"><path d="M0,-50 V-22 M0,-22 L-12,-12 M0,-22 L12,-12" stroke="#dbe4ff" stroke-width="6" stroke-linecap="round" fill="none"/>${[-1, 1].map(k => `<g transform="scale(${k} 1)">${dt('<path d="M-6,-24 C-6,-34 -16,-38 -24,-30 C-36,-18 -38,8 -34,24 C-30,34 -14,34 -8,24 C-4,16 -6,0 -6,-24 Z" fill="FILL"/>', '#ffa8c5', '#e06f97', { x: -20 })}</g>`).join('')}${cara(0, 4, 2.8, 'feliz')}</g>`,
+    corazon: (x, y, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})"><g><animateTransform attributeName="transform" type="scale" values="1;1.08;0.97;1.05;1" keyTimes="0;0.15;0.3;0.45;1" dur="1s" repeatCount="indefinite"/><path d="M-6,-30 V-44 M8,-30 C8,-40 18,-44 22,-46" stroke="#5c7cfa" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M2,-28 C2,-40 -10,-46 -14,-50" stroke="#ff6b6b" stroke-width="8" fill="none" stroke-linecap="round"/>${dt('<path d="M0,30 C-24,14 -34,0 -32,-12 C-30,-26 -14,-30 -2,-20 L0,-18 L2,-20 C14,-30 30,-26 32,-12 C34,0 24,14 0,30 Z" fill="FILL"/>', '#ff6b6b', '#d63c3c', { x: 6 })}${brillo('M-24,-12 a10,10 0 0 1 10,-8', 3)}${cara(0, -2, 3.4, 'feliz')}</g></g>`,
+    rinon: (x, y) => `<g transform="translate(${x} ${y})"><path d="M-4,8 C-16,16 -18,28 -20,42" stroke="#e8a0b0" stroke-width="5" fill="none" stroke-linecap="round"/>${dt('<path d="M-2,-34 C26,-38 38,-10 32,14 C26,36 0,40 -14,28 C-6,18 -4,4 -12,-6 C-20,-18 -16,-32 -2,-34 Z" fill="FILL"/>', '#e8707a', '#b94a55', { x: 14 })}${brillo('M-4,-26 a24,20 0 0 1 22,0', 3)}${cara(12, -2, 3, 'feliz')}</g>`,
+  };
+  // Célula animal (núcleo, mitocondrias y otras organelas) sin rótulos.
+  const celulaAnimal = (x, y, k = 1, cid = 'c') => `<g transform="translate(${x} ${y}) scale(${k})">
+      <path d="M-70,-6 C-72,-40 -36,-58 0,-56 C40,-58 74,-34 70,0 C68,36 36,56 0,54 C-38,56 -68,34 -70,-6 Z" fill="#b197fc" opacity="0.35"/>
+      <path d="M-70,-6 C-72,-40 -36,-58 0,-56 C40,-58 74,-34 70,0 C68,36 36,56 0,54 C-38,56 -68,34 -70,-6 Z" fill="none" stroke="#d0bfff" stroke-width="4"/>
+      ${dt('<circle cx="-6" cy="-4" r="20" fill="FILL"/>', '#7048e8', '#5f3dc4', { x: 0 })}<circle cx="-2" cy="-8" r="6" fill="#4c2fa8"/>${brillo('M-20,-12 a16,16 0 0 1 8,-10', 2.5)}
+      ${[[38, -18, 20], [-42, 24, -30], [30, 28, 40]].map(([mx, my, a]) => `<g transform="translate(${mx} ${my}) rotate(${a})">${dt('<ellipse rx="14" ry="7" fill="FILL"/>', '#ff922b', '#e8590c', { y: 0 })}<path d="M-9,0 q3,-4 6,0 t6,0 t6,0" stroke="#ffd8a8" stroke-width="1.5" fill="none"/></g>`).join('')}
+      ${[[-40, -26], [-26, 34], [48, 6], [6, 40], [-50, 0]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="2.5" fill="#eebefa"/>`).join('')}
+      <path d="M18,-38 q10,4 18,0 M16,-32 q10,4 18,0" stroke="#e599f7" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+  // Tejido visto con el microscopio (células genéricas, sin rótulos).
+  const vistaMicroscopio = (x, y, r, cid) => `<g><clipPath id="${cid}"><circle cx="${x}" cy="${y}" r="${r}"/></clipPath>
+      <circle cx="${x}" cy="${y}" r="${r}" fill="#e7f5ff"/>
+      <g clip-path="url(#${cid})">${Array.from({ length: 30 }, (_, i) => { const fx = i % 6, fy = Math.floor(i / 6); const cx = x - r + 14 + fx * 26 + (fy % 2) * 13, cy = y - r + 14 + fy * 24; return `<ellipse cx="${cx}" cy="${cy}" rx="12" ry="11" fill="#ffc9de" stroke="#e64980" stroke-width="1.5"/><circle cx="${cx + 2}" cy="${cy - 1}" r="3.5" fill="#862e9c"/>`; }).join('')}</g>
+      <circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#495057" stroke-width="8"/>${brillo(`M${x - r * 0.6},${y - r * 0.6} a${r * 0.8},${r * 0.8} 0 0 1 ${r * 0.5},${-r * 0.25}`, 4)}</g>`;
+  function microscopio(x, etiquetas) {
+    return `<g transform="translate(${x} ${PISO})">${sombra(4, 2, 44)}
+      ${dt('<rect x="-44" y="-12" width="88" height="12" rx="4" fill="FILL"/>', '#495057', '#343a40', { x: 12 })}
+      <path d="M22,-12 C54,-36 52,-92 18,-112" stroke="#5c636a" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <rect x="-40" y="-50" width="64" height="7" rx="2" fill="#868e96"/><circle cx="-10" cy="-30" r="6" fill="#ffe066"/>
+      ${dt('<rect x="-20" y="-118" width="20" height="54" rx="4" fill="FILL"/>', '#adb5bd', '#868e96', { x: -8 })}
+      <rect x="-18" y="-134" width="16" height="16" rx="3" fill="#343a40"/><rect x="-16" y="-66" width="12" height="12" rx="2" fill="#343a40"/>
+      <circle cx="38" cy="-62" r="9" fill="#868e96"/><circle cx="38" cy="-62" r="4" fill="#495057"/>
+      ${etiquetas ? `<path d="M-20,-128 H-60 M-16,-60 H-60" stroke="#ffd166" stroke-width="1.5" stroke-dasharray="3 3"/>${texto(-96, -124, 'ocular 10×', 13, '#ffd166', 'font-weight="800"')}${texto(-100, -56, 'objetivo 40×', 13, '#ffd166', 'font-weight="800"')}` : ''}</g>`;
+  }
+
   // ---------- Escenas de cada tema (cuando la pregunta no tiene dibujo propio) ----------
   const TEMAS = {
     'Normas de seguridad y material de laboratorio': () => `${mesada()}
@@ -125,6 +158,11 @@ const QuizDibujos = (function () {
       <g transform="translate(370 ${PISO})">${sombra(2, 2, 22)}${dt('<path d="M-22,-62 H22 L16,0 H-16 Z" fill="FILL"/>', '#ff8787', '#e03131', { x: 6 })}<ellipse cy="-62" rx="22" ry="5" fill="#ffc9c9"/>${texto(0, 18, 'PLÁSTICO', 9, '#c9ccf5', 'font-weight="800" letter-spacing="1"')}</g>
       <g transform="translate(490 ${PISO - 8}) rotate(-12)">${dt('<path d="M-60,-7 H44 L62,0 L44,7 H-60 Z" fill="FILL"/>', '#ffd43b', '#f08c00', { y: 0 })}<path d="M44,-7 L62,0 L44,7 Z" fill="#f4d6a0"/><path d="M56,-2 L62,0 L56,2 Z" fill="#343a40"/><rect x="-66" y="-7" width="8" height="14" rx="2" fill="#ff8fab"/></g>
       ${texto(490, PISO + 18, 'MADERA', 9, '#c9ccf5', 'font-weight="800" letter-spacing="1"')}`,
+    'Alimentación saludable': () => `${mesada()}${[['manzana', 70], ['pan', 150], ['leche', 230], ['pescado', 310], ['zanahoria', 390], ['huevo', 460], ['brocoli', 535]].map(([id, x]) => comida(id, x, PISO - 26)).join('')}`,
+    'Sistemas de la nutrición': () => `${mesada()}${ORGANO.estomago(120, PISO - 44)}${ORGANO.pulmones(250, PISO - 48)}${ORGANO.corazon(380, PISO - 46)}${ORGANO.rinon(500, PISO - 50)}`,
+    'La célula': () => `${mesada()}${microscopio(170, false)}
+      <path d="M170,${PISO - 134} L380,24 M170,${PISO - 118} L380,136" stroke="#c9ccf5" stroke-width="1.5" stroke-dasharray="4 5" opacity="0.5"/>
+      ${vistaMicroscopio(430, 80, 62, 'qzd-vm' + n)}`,
     'Propiedades intensivas y extensivas': () => `${mesada()}
       ${balanza(140, texto(117, PISO - 9, '250 g', 9, '#69db7c', 'font-weight="800"'))}
       ${hielo(140, PISO - 52, 1, 'feliz')}
@@ -270,6 +308,36 @@ const QuizDibujos = (function () {
       <path d="M300,26 l8,10 -8,10 8,10 -8,10 8,10" stroke="#ffd166" stroke-width="3" fill="none"/>${texto(300, 20, 'corte', 10, '#ffd166', 'font-weight="800"')}
       ${texto(175, PISO + 22, 'HIERRO', 10, '#c9ccf5', 'font-weight="800" letter-spacing="1"')}${texto(425, PISO + 22, 'HIERRO', 10, '#c9ccf5', 'font-weight="800" letter-spacing="1"')}`,
     'fuentes': () => `${mesada()}${[['🛢️', 'petróleo'], ['⛽', 'gas'], ['⛏️', 'carbón'], ['☀️', 'Sol']].map(([e, t], i) => `<g transform="translate(${120 + i * 120} 78)"><circle r="40" fill="#12143a" stroke="#4c52b8" stroke-width="3"/>${texto(0, 12, e, 34)}${texto(0, 66, t, 12, '#c9ccf5', 'font-weight="800"')}</g>`).join('')}`,
+    'bebidas': () => `${mesada()}${comida('agua', 110, PISO - 30, 2)}${comida('gaseosa', 240, PISO - 30, 2)}
+      <g transform="translate(370 ${PISO})">${sombra(2, 2, 22)}${dt('<rect x="-20" y="-64" width="40" height="64" rx="4" fill="FILL"/>', '#ffa94d', '#f76707', { x: 6 })}<path d="M8,-64 L14,-80" stroke="#f8f9fa" stroke-width="4" stroke-linecap="round"/>${texto(0, -24, 'JUGO', 10, '#fff', 'font-weight="900"')}${texto(0, -12, 'en polvo', 7, '#fff')}</g>
+      <g transform="translate(490 ${PISO})">${sombra(2, 2, 20)}${dt('<rect x="-18" y="-70" width="36" height="70" rx="8" fill="FILL"/>', '#212529', '#000000', { x: 6 })}<ellipse cy="-70" rx="18" ry="4" fill="#adb5bd"/><path d="M4,-58 L-8,-34 H2 L-4,-14 L10,-40 H0 Z" fill="#94d82d"/></g>`,
+    'octogonos': () => `${mesada()}<g transform="translate(220 ${PISO})">${sombra(4, 2, 60)}
+      ${dt('<rect x="-60" y="-124" width="120" height="124" rx="6" fill="FILL"/>', '#ffd43b', '#f59f00', { x: 34 })}
+      <rect x="-48" y="-112" width="72" height="22" rx="4" fill="#e03131"/>${texto(-12, -96, 'CEREAL', 12, '#fff', 'font-weight="900"')}
+      ${Alimentacion.alimento('galletita', -24, -52, 1)}${Alimentacion.alimento('galletita', 4, -40, 0.8)}
+      ${[0, 1, 2].map(i => `<g transform="translate(${40} ${-104 + i * 34})"><path d="M-7,-15 H7 L15,-7 V7 L7,15 H-7 L-15,7 V-7 Z" fill="#000" stroke="#fff" stroke-width="2"/><path d="M-8,-3 H8 M-8,3 H8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`).join('')}</g>
+      ${texto(430, 72, '¿Qué indican', 15, '#ffd166', 'font-weight="800"')}${texto(430, 94, 'los octógonos?', 15, '#ffd166', 'font-weight="800"')}`,
+    'sangre': () => `<rect width="${W}" height="${H}" fill="#2b0d1e"/><path d="M0,24 H${W} V146 H0 Z" fill="#8c1a41"/><path d="M0,34 H${W} V136 H0 Z" fill="#a51f4c"/><path d="M0,40 H${W}" stroke="#ff8fab" stroke-width="3" opacity="0.4"/>
+      <g class="qzd-fluye">${[[60, 70], [150, 100], [230, 62], [330, 108], [420, 70], [520, 104], [100, 118], [470, 52], [280, 86]].map(([x, y], i) => `<g transform="translate(${x} ${y}) rotate(${i * 40})"><ellipse rx="20" ry="13" fill="#ff5c7a"/><ellipse rx="10" ry="5" fill="#c9184a"/><path d="M-14,-6 a20,10 0 0 1 14,-6" stroke="#ffb3c1" stroke-width="2" fill="none"/></g>`).join('')}
+        <g transform="translate(380 84)">${dt('<path d="M-22,-4 C-26,-20 -8,-26 0,-22 C12,-28 26,-14 22,0 C28,14 12,26 0,22 C-12,28 -28,14 -22,-4 Z" fill="FILL"/>', '#f1f3ff', '#c5cae9', { x: 8 })}<path d="M-8,-6 q6,-8 12,0 q-6,8 -12,0" fill="#9775fa"/></g>
+        ${[[190, 74], [200, 120], [560, 78], [40, 100]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="3" fill="#ffd8a8"/>`).join('')}</g>`,
+    'islas': () => `<rect width="${W}" height="${H}" fill="#1f4fa0"/>${Array.from({ length: 16 }, (_, i) => `<path d="M${(i * 97) % 600},${20 + (i * 41) % 140} q6,-4 12,0 t12,0" stroke="#7fb4ff" stroke-width="1.6" fill="none" opacity="0.3"/>`).join('')}
+      <path d="M150,96 C220,70 380,70 450,96" stroke="#5cc8ff" stroke-width="14" opacity="0.25" fill="none"/>
+      ${[[120, 100, 80, 44, '#5fd38d'], [300, 92, 100, 54, '#69db7c'], [480, 100, 80, 44, '#b2c79a']].map(([x, y, rx, ry, c]) => `<ellipse cx="${x + 5}" cy="${y + 8}" rx="${rx}" ry="${ry}" fill="#05061a" opacity="0.3"/><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#ffe8a3"/><ellipse cx="${x}" cy="${y - 4}" rx="${rx - 12}" ry="${ry - 12}" fill="${c}"/>`).join('')}
+      ${[[280, 84, '#ff7b54'], [306, 78, '#5b7cfa'], [330, 90, '#b197fc'], [292, 104, '#ff7b54']].map(([x, y, c]) => `<g transform="translate(${x} ${y})"><rect x="-8" y="-6" width="16" height="12" fill="#f4f1ff"/><path d="M-10,-5 L0,-14 L10,-5 Z" fill="${c}"/></g>`).join('')}
+      <g transform="translate(470 92)"><rect x="-22" y="-14" width="44" height="26" rx="4" fill="#ffd166"/><path d="M-6,-2 a7,7 0 1 1 5,6" stroke="#2fb67c" stroke-width="3" fill="none"/></g>
+      ${[100, 120, 140].map((x, i) => `<path d="M${x},${96 - i * 6} h50" stroke="#2f9e44" stroke-width="5" stroke-linecap="round"/>`).join('')}
+      <g transform="translate(212 74)"><path d="M-14,-3 L14,-3 L10,6 L-10,6 Z" fill="#ff6b6b"/><rect x="-6" y="-11" width="9" height="8" rx="1.5" fill="#ff9f43"/></g>
+      ${texto(300, 158, 'EL ARCHIPIÉLAGO DE LAS ISLAS SIN', 11, '#ffd166', 'font-weight="800" letter-spacing="1.5"')}`,
+    'corazon': () => `${mesada()}<path d="M80,70 H230 M370,70 H520" stroke="#ff6b6b" stroke-width="10" stroke-linecap="round" opacity="0.6"/><path d="M80,104 H230 M370,104 H520" stroke="#5c7cfa" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+      ${ORGANO.corazon(300, 92, 1.5)}`,
+    'celula-animal': () => `${celulaAnimal(300, 86, 1.25)}`,
+    'hoja': () => `${mesada()}<g transform="translate(110 56)">${Array.from({ length: 10 }, (_, i) => `<path d="M0,-40 L5,-30 H-5 Z" fill="#ffd43b" transform="rotate(${i * 36})"/>`).join('')}${dt('<circle r="26" fill="FILL"/>', '#ffd43b', '#fab005', { x: 7 })}${cara(0, 0, 3.5, 'feliz')}</g>
+      ${[0, 1, 2].map(i => `<path d="M${150 + i * 6},${64 + i * 12} L${270 + i * 6},${78 + i * 8}" stroke="#ffe066" stroke-width="3" stroke-dasharray="6 6" opacity="0.8"/>`).join('')}
+      <g transform="translate(380 92) rotate(-20)">${dt('<path d="M-90,0 C-50,-56 50,-56 90,0 C50,56 -50,56 -90,0 Z" fill="FILL"/>', '#69db7c', '#2f9e44', { y: 0 })}<path d="M-100,4 L84,0" stroke="#d3f9d8" stroke-width="4" stroke-linecap="round"/>${[-50, -10, 30].map(x => `<path d="M${x},0 l24,-22 M${x},0 l24,22" stroke="#d3f9d8" stroke-width="2.5" stroke-linecap="round"/>`).join('')}${cara(30, -18, 3.4, 'feliz')}</g>
+      ${texto(540, 60, 'CO₂ + agua', 11, '#c9ccf5', 'font-weight="800"')}`,
+    'microscopio': () => `${mesada()}${microscopio(330, true)}`,
+    'celulas-zoom': () => `${vistaMicroscopio(300, 85, 72, 'qzd-cz' + n)}${texto(470, 76, '¿Con qué se', 14, '#ffd166', 'font-weight="800"')}${texto(470, 96, 'pueden ver?', 14, '#ffd166', 'font-weight="800"')}`,
     'dos-ollas': () => `${mesada()}${olla(190, 82, true, '#495057', '1 L')}${olla(410, 128, true, '#495057', '2 L')}`,
   };
 

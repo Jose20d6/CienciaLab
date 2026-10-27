@@ -132,7 +132,14 @@ const QuizUtil = {
   },
   // Más correctas primero; a igual puntaje, menos tiempo.
   ordenar: lista => lista.slice().sort((a, b) => b.correctas - a.correctas || a.tiempoMs - b.tiempoMs || a.fecha - b.fecha),
-  activas: (banco, config) => { const fuera = new Set(config.inactivas || []); return banco.preguntas.filter(p => !fuera.has(p.id)); },
+  // Preguntas que pueden salir: las que no están apagadas y, si se indica el año, solo de los temas habilitados para ese año.
+  // Un año sin configurar ve todos los temas.
+  activas(banco, config, anio) {
+    const fuera = new Set(config.inactivas || []), lista = anio && (config.temasPorAnio || {})[anio];
+    const temas = Array.isArray(lista) ? new Set(lista) : null;
+    return banco.preguntas.filter(p => !fuera.has(p.id) && (!temas || temas.has(p.tema)));
+  },
+  temas: banco => banco.temas || [...new Set(banco.preguntas.map(p => p.tema))],
   avisoModo(modo) {
     if (modo === 'local') return '<p class="qz-aviso">🧪 <b>Modo de prueba:</b> Firebase todavía no está configurado, así que los resultados se guardan solo en este dispositivo.</p>';
     if (modo === 'error') return '<p class="qz-aviso mal">⚠️ No se pudo conectar con la base de datos. Revisá la conexión a internet y recargá la página.</p>';
@@ -149,8 +156,8 @@ const Quiz = (function () {
     raiz = el;
     raiz.innerHTML = `
       <div class="encabezado-modulo">
-        <h1>📝 Quiz de Química</h1>
-        <p>Respondé preguntas de laboratorio, estados de la materia, sistemas materiales, energía, materiales y propiedades. ¡Sumá respuestas correctas lo más rápido que puedas!</p>
+        <h1>📝 Quiz de Ciencias</h1>
+        <p>Respondé preguntas de los temas que trabajaste en clase. ¡Sumá respuestas correctas lo más rápido que puedas!</p>
       </div>
       <div id="qz-cont"></div>
       <p class="qz-pie"><a href="#docente">🔒 Panel docente</a></p>`;
@@ -198,8 +205,10 @@ const Quiz = (function () {
       const nombre = form.nombre.value.trim().replace(/\s+/g, ' ').slice(0, 40);
       if (!escuela || !anio || !division || !nombre) return;
       Util.guardar('quiz-alumno', { escuela, anio, division, nombre });
-      empezar(nombre, escuela, QuizUtil.curso(anio, division));
+      if (!QuizUtil.activas(banco, config, anio).length) return pintarInfo();
+      empezar(nombre, escuela, QuizUtil.curso(anio, division), anio);
     });
+    form.anio.addEventListener('change', () => pintarInfo());
     raiz.querySelector('#qz-ir-tabla').addEventListener('click', () => pantallaTabla());
     if (banco) pintarInfo();
     // Sugerencias de escuelas que ya jugaron (no hace falta esperarlas).
@@ -216,16 +225,18 @@ const Quiz = (function () {
       info.innerHTML = `${QuizUtil.avisoModo(modo === 'firebase' ? 'error' : modo)}<p class="qz-aviso mal">No se pudieron cargar las preguntas. Recargá la página.</p>`;
       return;
     }
-    const n = Math.min(config.cantidad, QuizUtil.activas(banco, config).length);
-    if (!n) { info.innerHTML = '<p class="qz-aviso">Por ahora no hay preguntas activas. Esperá a que el docente habilite el quiz.</p>'; return; }
+    const anio = raiz.querySelector('#qz-form').anio.value;
+    const n = Math.min(config.cantidad, QuizUtil.activas(banco, config, anio).length);
+    boton.disabled = !n;
+    if (!n) { info.innerHTML = `<p class="qz-aviso">${anio ? `Por ahora no hay preguntas habilitadas para ${anio}.º año.` : 'Por ahora no hay preguntas activas.'} Esperá a que el docente habilite el quiz.</p>`; return; }
     info.innerHTML = `${QuizUtil.avisoModo(modo)}
-      <ul class="qz-reglas"><li>❓ Son <b>${n} preguntas</b> de opción múltiple.</li><li>⏱️ El cronómetro arranca cuando empezás y para en la última respuesta.</li><li>🏆 Gana quien tiene más respuestas correctas; si empatan, quien tardó menos.</li></ul>`;
+      <ul class="qz-reglas"><li>❓ ${anio ? `Son <b>${n} preguntas</b>` : `Hasta <b>${n} preguntas</b>`} de opción múltiple${anio ? '' : ' (depende de tu año)'}.</li><li>⏱️ El cronómetro arranca cuando empezás y para en la última respuesta.</li><li>🏆 Gana quien tiene más respuestas correctas; si empatan, quien tardó menos.</li></ul>`;
     boton.disabled = false;
   }
 
   // ---------- Juego ----------
-  function empezar(nombre, escuela, curso) {
-    const activas = QuizUtil.activas(banco, config);
+  function empezar(nombre, escuela, curso, anio) {
+    const activas = QuizUtil.activas(banco, config, anio);
     const elegidas = Util.mezclar(activas).slice(0, Math.min(config.cantidad, activas.length));
     juego = {
       nombre, escuela, curso, i: 0, inicio: Date.now(), fin: null, guardado: false,
@@ -414,7 +425,7 @@ const Quiz = (function () {
 // ---------- Panel docente ----------
 const QuizDocente = (function () {
   const { esc } = QuizUtil;
-  let raiz, banco = null, config = null, modo = 'local', usuario = null, guardarTimer = null;
+  let raiz, banco = null, config = null, modo = 'local', usuario = null;
 
   function iniciar(el) {
     raiz = el;
@@ -464,7 +475,8 @@ const QuizDocente = (function () {
   async function cargarPanel() {
     try { config = await QuizDatos.leerConfig(); } catch (e) { return mensaje('<p class="qz-aviso mal">⚠️ No se pudo leer la configuración.</p>'); }
     config.inactivas = [...new Set(config.inactivas || [])];
-    const temas = banco.temas || [...new Set(banco.preguntas.map(p => p.tema))];
+    config.temasPorAnio = config.temasPorAnio || {};
+    const temas = QuizUtil.temas(banco), ANIOS = [1, 2, 3, 4, 5, 6];
     raiz.querySelector('#qd-cont').innerHTML = `
       ${QuizUtil.avisoModo(modo)}
       ${usuario ? `<p class="qd-usuario">👤 ${esc(usuario.email)} <button class="btn chico" id="qd-salir">Salir</button></p>` : ''}
@@ -480,6 +492,15 @@ const QuizDocente = (function () {
           <div id="qd-resultados"><p class="qz-info">Cargando…</p></div>
         </section>
       </div>
+      <section class="panel qd-anios">
+        <div class="qd-cab"><h2>📅 Temas por año</h2><span class="qd-estado" id="qd-estado-anios"></span></div>
+        <p class="qz-info">Marcá qué temas le aparecen a cada año (los alumnos eligen su año al entrar). Se guarda solo.</p>
+        <div class="qd-matriz-caja"><table class="qd-matriz">
+          <thead><tr><th>Tema</th>${ANIOS.map(a => `<th>${a}.º</th>`).join('')}</tr></thead>
+          <tbody>${temas.map((t, i) => `<tr><th>${esc(t)}</th>${ANIOS.map(a => `<td><input type="checkbox" data-anio="${a}" data-ti="${i}" aria-label="${esc(t)} en ${a}.º año"></td>`).join('')}</tr>`).join('')}
+            <tr class="qd-total"><th>Preguntas activas</th>${ANIOS.map(a => `<td data-total="${a}"></td>`).join('')}</tr></tbody>
+        </table></div>
+      </section>
       <section class="panel qd-preguntas">
         <div class="qd-cab"><h2>📚 Preguntas por tema</h2><span class="qd-estado" id="qd-estado"></span></div>
         <p class="qz-info">Los interruptores se guardan solos. Una pregunta apagada no aparece en el quiz.</p>
@@ -516,6 +537,12 @@ const QuizDocente = (function () {
       pintarSwitches();
       guardarActivas();
     }));
+    raiz.querySelectorAll('input[data-anio]').forEach(c => c.addEventListener('change', () => {
+      const a = c.dataset.anio;
+      config.temasPorAnio[a] = temas.filter((t, i) => raiz.querySelector(`input[data-anio="${a}"][data-ti="${i}"]`).checked);
+      pintarSwitches();
+      guardarCambios({ temasPorAnio: config.temasPorAnio }, '#qd-estado-anios');
+    }));
     raiz.querySelector('#qd-guardar-cant').addEventListener('click', async () => {
       const n = Math.round(+raiz.querySelector('#qd-cant').value);
       const est = raiz.querySelector('#qd-estado-cant');
@@ -528,7 +555,7 @@ const QuizDocente = (function () {
   }
 
   function pintarSwitches() {
-    const fuera = new Set(config.inactivas), temas = banco.temas || [...new Set(banco.preguntas.map(p => p.tema))];
+    const fuera = new Set(config.inactivas), temas = QuizUtil.temas(banco);
     raiz.querySelectorAll('[data-id]').forEach(c => { c.checked = !fuera.has(c.dataset.id); c.closest('li').classList.toggle('apagada', !c.checked); });
     temas.forEach((t, i) => {
       const ps = banco.preguntas.filter(p => p.tema === t), on = ps.filter(p => !fuera.has(p.id)).length;
@@ -536,17 +563,24 @@ const QuizDocente = (function () {
       c.checked = on > 0; c.indeterminate = on > 0 && on < ps.length;
       raiz.querySelector(`[data-cuenta="${i}"]`).textContent = `${on} de ${ps.length} activas`;
     });
+    raiz.querySelectorAll('input[data-anio]').forEach(c => {
+      const lista = config.temasPorAnio[c.dataset.anio];
+      c.checked = !Array.isArray(lista) || lista.includes(temas[+c.dataset.ti]);
+    });
+    raiz.querySelectorAll('[data-total]').forEach(td => { const n = QuizUtil.activas(banco, config, td.dataset.total).length; td.textContent = n; td.classList.toggle('cero', !n); });
     const activas = QuizUtil.activas(banco, config).length;
     raiz.querySelector('#qd-activas').innerHTML = `Hay <b>${activas}</b> preguntas activas de ${banco.preguntas.length}.${activas < config.cantidad ? ` Como hay menos activas que ${config.cantidad}, cada intento tendrá ${activas}.` : ''}`;
   }
 
   // Los cambios de los interruptores se juntan y se guardan medio segundo después del último.
-  function guardarActivas() {
-    const est = raiz.querySelector('#qd-estado');
+  const guardarActivas = () => guardarCambios({ inactivas: config.inactivas }, '#qd-estado');
+  const pendientes = {};
+  function guardarCambios(cambios, selEstado) {
+    const est = raiz.querySelector(selEstado);
     est.textContent = 'Guardando…'; est.className = 'qd-estado';
-    clearTimeout(guardarTimer);
-    guardarTimer = setTimeout(async () => {
-      try { await QuizDatos.guardarConfig({ inactivas: config.inactivas }); est.textContent = '✅ Guardado'; est.classList.add('ok'); } catch (e) { console.error(e); est.textContent = '⚠️ No se pudo guardar'; est.classList.add('mal'); }
+    clearTimeout(pendientes[selEstado]);
+    pendientes[selEstado] = setTimeout(async () => {
+      try { await QuizDatos.guardarConfig(cambios); est.textContent = '✅ Guardado'; est.classList.add('ok'); } catch (e) { console.error(e); est.textContent = '⚠️ No se pudo guardar'; est.classList.add('mal'); }
     }, 500);
   }
 

@@ -1830,3 +1830,19 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 @keyframes qzd-sacude { to { transform: translate(300px, 132px) translateY(-1.5px); } }
 .qzd-gira-lento { transform-box: fill-box; transform-origin: center; animation: qz-girar 20s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .qzd-llama, .qzd-sube path, .qzd-burbuja, .qzd-flota, .qzd-cae, .qzd-pulsa, .qzd-sacude, .qzd-gira-lento { animation: none; } }
+/* Panel docente: temas por año */
+.qd-anios { margin-bottom: 1rem; }
+.qd-anios .qz-info { margin: 0.4rem 0 0.8rem; }
+.qd-matriz-caja { overflow-x: auto; }
+.qd-matriz { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 0.9rem; }
+.qd-matriz th, .qd-matriz td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--linea); }
+.qd-matriz thead th { font-size: 0.85rem; color: var(--suave); text-align: center; }
+.qd-matriz thead th:first-child, .qd-matriz tbody th { text-align: left; font-weight: 600; }
+.qd-matriz td { text-align: center; }
+.qd-matriz input { width: 1.25rem; height: 1.25rem; accent-color: var(--ok); cursor: pointer; }
+.qd-matriz tbody tr:hover { background: var(--bg); }
+.qd-total th, .qd-total td { font-weight: 800; border-bottom: 0; }
+.qd-total td.cero { color: var(--mal); }
+.qzd-fluye { animation: qzd-fluye 6s linear infinite alternate; }
+@keyframes qzd-fluye { from { transform: translateX(-12px); } to { transform: translateX(12px); } }
+@media (prefers-reduced-motion: reduce) { .qzd-fluye { animation: none; } }
