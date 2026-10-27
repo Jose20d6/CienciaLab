@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#1b1f5c"/>
+  <circle cx="32" cy="30" r="26" fill="#262a74"/>
+  <!-- Matraz en dos tonos -->
+  <path d="M25 10h14v4h-2v12l14 22c2 4-1 8-5 8H18c-4 0-7-4-5-8l14-22V14h-2z" fill="#e7f5ff"/>
+  <path d="M32 10h7v4h-2v12l14 22c2 4-1 8-5 8H32z" fill="#c5d8f5"/>
+  <path d="M20 40h24l5 8c1 3-1 5-3 5H18c-2 0-4-2-3-5z" fill="#51cf66"/>
+  <path d="M32 40h12l5 8c1 3-1 5-3 5H32z" fill="#2f9e44"/>
+  <circle cx="27" cy="46" r="2.6" fill="#b2f2bb"/>
+  <circle cx="36" cy="44" r="1.8" fill="#b2f2bb"/>
+  <circle cx="30" cy="33" r="2.2" fill="#ffd166"/>
+  <circle cx="35" cy="27" r="1.6" fill="#ffd166"/>
+  <path d="M28 16v10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>
+</svg>
