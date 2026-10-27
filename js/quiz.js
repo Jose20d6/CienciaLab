@@ -70,25 +70,27 @@ const QuizDatos = (function () {
       const s = await fb.fs.getDocs(fb.fs.query(fb.fs.collection(fb.db, 'resultados'), fb.fs.limit(5000)));
       return s.docs.map(d => {
         const x = d.data();
-        return { id: d.id, ...x, fecha: x.fecha && x.fecha.toMillis ? x.fecha.toMillis() : Date.now() };
+        return { id: d.id, ...x, escuela: x.escuela || '', fecha: x.fecha && x.fecha.toMillis ? x.fecha.toMillis() : Date.now() };
       });
     }
-    return Util.leer('quiz-resultados', []);
+    return Util.leer('quiz-resultados', []).map(r => ({ escuela: '', ...r }));
   }
 
-  // Borra todos los resultados o solo los de un curso. Devuelve cuántos borró.
-  async function borrarResultados(curso) {
+  // Borra todos los resultados o solo los de un curso de una escuela ({ escuela, curso }). Devuelve cuántos borró.
+  async function borrarResultados(grupo) {
+    const delGrupo = r => !grupo || ((r.escuela || '') === grupo.escuela && r.curso === grupo.curso);
     if (await exigir()) {
       const col = fb.fs.collection(fb.db, 'resultados');
-      const s = await fb.fs.getDocs(curso ? fb.fs.query(col, fb.fs.where('curso', '==', curso)) : col);
-      for (let i = 0; i < s.docs.length; i += 400) {
+      const s = await fb.fs.getDocs(grupo ? fb.fs.query(col, fb.fs.where('curso', '==', grupo.curso)) : col);
+      const docs = s.docs.filter(d => delGrupo(d.data()));
+      for (let i = 0; i < docs.length; i += 400) {
         const lote = fb.fs.writeBatch(fb.db);
-        s.docs.slice(i, i + 400).forEach(d => lote.delete(d.ref));
+        docs.slice(i, i + 400).forEach(d => lote.delete(d.ref));
         await lote.commit();
       }
-      return s.size;
+      return docs.length;
     }
-    const lista = Util.leer('quiz-resultados', []), quedan = curso ? lista.filter(r => r.curso !== curso) : [];
+    const lista = Util.leer('quiz-resultados', []), quedan = lista.filter(r => !delGrupo(r));
     Util.guardar('quiz-resultados', quedan);
     return lista.length - quedan.length;
   }
@@ -118,12 +120,12 @@ const QuizDatos = (function () {
 // ---------- Utilidades del quiz ----------
 const QuizUtil = {
   esc: t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]),
-  // «1ro a», «1° A», «1 a» → «1.º A». Así todos los alumnos del mismo curso quedan juntos en la tabla.
-  curso(t) {
-    const s = String(t).toUpperCase().replace(/[°º.]/g, ' ').replace(/\s+/g, ' ').trim();
-    const m = s.match(/^(\d)\s*(?:ER|ERO|DO|RO|TO|NO|MO|VO|O)?\s*(?:AÑO)?\s*([A-Z])?$/);
-    return (m ? (m[2] ? `${m[1]}.º ${m[2]}` : `${m[1]}.º`) : s).slice(0, 20);
-  },
+  // Año 1 a 6 y división 1 a 4 → «2.º 3.ª».
+  curso: (anio, division) => `${anio}.º ${division}.ª`,
+  // «escuela  n 12» y «Escuela N 12» quedan iguales, así se agrupan en la tabla.
+  escuela: t => String(t).replace(/\s+/g, ' ').trim().toUpperCase().slice(0, 60),
+  // Texto para mostrar un grupo: «ESCUELA N.º 12 · 2.º 3.ª».
+  grupo: r => (r.escuela ? `${r.escuela} · ` : '') + r.curso,
   tiempo(ms) {
     const s = ms / 1000, m = Math.floor(s / 60);
     return `${m}:${(s - m * 60).toFixed(1).padStart(4, '0').replace('.', ',')}`;
@@ -170,15 +172,20 @@ const Quiz = (function () {
   // ---------- Inicio ----------
   function pantallaInicio() {
     clearInterval(reloj);
-    const alumno = Util.leer('quiz-alumno', { nombre: '', curso: '' });
+    const alumno = { escuela: '', anio: '', division: '', nombre: '', ...Util.leer('quiz-alumno', {}) };
+    const opciones = (n, sel, sufijo) => `<option value="" disabled ${sel ? '' : 'selected'}>Elegí</option>` + Array.from({ length: n }, (_, i) => `<option value="${i + 1}"${String(sel) === String(i + 1) ? ' selected' : ''}>${i + 1}${sufijo}</option>`).join('');
     raiz.querySelector('#qz-cont').innerHTML = `
       <div class="qz-inicio">
         <div class="panel qz-hero">${heroSVG()}</div>
         <form class="panel qz-form" id="qz-form" autocomplete="on">
           <h2>¿Listos para el desafío?</h2>
-          <label>Tu nombre<input name="nombre" maxlength="40" required value="${esc(alumno.nombre)}" placeholder="Nombre y apellido" autocomplete="name"></label>
-          <label>Tu curso<input name="curso" maxlength="20" required value="${esc(alumno.curso)}" placeholder="Ej.: 1.º A" list="qz-cursos" autocomplete="off"></label>
-          <datalist id="qz-cursos"></datalist>
+          <label>Escuela<input name="escuela" maxlength="60" required value="${esc(alumno.escuela)}" placeholder="Ej.: Escuela N.º 12" list="qz-escuelas" autocomplete="off"></label>
+          <datalist id="qz-escuelas"></datalist>
+          <div class="qz-fila">
+            <label>Año<select name="anio" required>${opciones(6, alumno.anio, '.º año')}</select></label>
+            <label>División<select name="division" required>${opciones(4, alumno.division, '.ª división')}</select></label>
+          </div>
+          <label>Nombre<input name="nombre" maxlength="40" required value="${esc(alumno.nombre)}" placeholder="Nombre y apellido" autocomplete="name"></label>
           <div id="qz-info"><p class="qz-info">Cargando preguntas…</p></div>
           <button class="btn primario qz-grande" type="submit" id="qz-empezar" disabled>▶ Empezar</button>
           <button class="btn" type="button" id="qz-ir-tabla">🏆 Ver la tabla de posiciones</button>
@@ -187,17 +194,18 @@ const Quiz = (function () {
     const form = raiz.querySelector('#qz-form');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const nombre = form.nombre.value.trim().replace(/\s+/g, ' ').slice(0, 40), curso = QuizUtil.curso(form.curso.value);
-      if (!nombre || !curso) return;
-      Util.guardar('quiz-alumno', { nombre, curso });
-      empezar(nombre, curso);
+      const escuela = QuizUtil.escuela(form.escuela.value), anio = form.anio.value, division = form.division.value;
+      const nombre = form.nombre.value.trim().replace(/\s+/g, ' ').slice(0, 40);
+      if (!escuela || !anio || !division || !nombre) return;
+      Util.guardar('quiz-alumno', { escuela, anio, division, nombre });
+      empezar(nombre, escuela, QuizUtil.curso(anio, division));
     });
     raiz.querySelector('#qz-ir-tabla').addEventListener('click', () => pantallaTabla());
     if (banco) pintarInfo();
-    // Sugerencias de cursos que ya jugaron (no hace falta esperarlas).
+    // Sugerencias de escuelas que ya jugaron (no hace falta esperarlas).
     QuizDatos.leerResultados().then(rs => {
-      const dl = raiz.querySelector('#qz-cursos');
-      if (dl) dl.innerHTML = [...new Set(rs.map(r => r.curso))].sort().map(c => `<option value="${esc(c)}">`).join('');
+      const dl = raiz.querySelector('#qz-escuelas');
+      if (dl) dl.innerHTML = [...new Set(rs.map(r => r.escuela).filter(Boolean))].sort().map(c => `<option value="${esc(c)}">`).join('');
     }).catch(() => {});
   }
 
@@ -216,11 +224,11 @@ const Quiz = (function () {
   }
 
   // ---------- Juego ----------
-  function empezar(nombre, curso) {
+  function empezar(nombre, escuela, curso) {
     const activas = QuizUtil.activas(banco, config);
     const elegidas = Util.mezclar(activas).slice(0, Math.min(config.cantidad, activas.length));
     juego = {
-      nombre, curso, i: 0, inicio: Date.now(), fin: null, guardado: false,
+      nombre, escuela, curso, i: 0, inicio: Date.now(), fin: null, guardado: false,
       preguntas: elegidas.map(p => ({ p, opciones: Util.mezclar(p.opciones.map((t, k) => ({ t, ok: k === p.correcta }))), elegida: null })),
     };
     clearInterval(reloj);
@@ -234,6 +242,7 @@ const Quiz = (function () {
       <div class="panel qz-juego">
         <div class="qz-barra"><span class="qz-num">Pregunta <b>${juego.i + 1}</b> de ${n}</span><span class="qz-crono" id="qz-crono">⏱ ${QuizUtil.tiempo(Date.now() - juego.inicio)}</span></div>
         <div class="qz-progreso"><div style="width:${juego.i / n * 100}%"></div></div>
+        <div class="qz-dibujo-caja">${QuizDibujos.svg(q.p)}</div>
         <span class="etiqueta">${esc(q.p.tema)}</span>
         <h2 class="qz-enunciado">${esc(q.p.enunciado)}</h2>
         <div class="qz-opciones">${q.opciones.map((o, k) => `<button class="btn-opcion qz-op" data-k="${k}"><span class="qz-letra">${'ABCDEF'[k]}</span><span>${esc(o.t)}</span></button>`).join('')}</div>
@@ -267,7 +276,7 @@ const Quiz = (function () {
           ${anillo(correctas, total)}
           <div class="qz-res-texto">
             <p class="qz-frase">${frase}</p>
-            <p><b>${esc(juego.nombre)}</b> · ${esc(juego.curso)}</p>
+            <p><b>${esc(juego.nombre)}</b><br><small>${esc(QuizUtil.grupo(juego))}</small></p>
             <dl class="qz-datos"><div><dt>Correctas</dt><dd>${correctas} <small>de ${total}</small></dd></div><div><dt>Tiempo</dt><dd>${QuizUtil.tiempo(tiempoMs)}</dd></div></dl>
             <p class="qz-estado" id="qz-estado">💾 Guardando tu resultado…</p>
             <div class="qz-botones"><button class="btn primario" id="qz-tabla">🏆 Ver la tabla</button><button class="btn" id="qz-otra">🔁 Jugar de nuevo</button></div>
@@ -276,7 +285,7 @@ const Quiz = (function () {
         <div class="panel qz-repaso">
           <h2>🔎 Repaso de errores</h2>
           ${errores.length ? errores.map(q => `<article class="qz-error">
-              <span class="etiqueta">${esc(q.p.tema)}</span>
+              <div class="qz-dibujo-caja chica">${QuizDibujos.svg(q.p)}</div><span class="etiqueta">${esc(q.p.tema)}</span>
               <p class="qz-err-enun">${esc(q.p.enunciado)}</p>
               <p class="qz-tuya">✖ Tu respuesta: ${esc(q.opciones[q.elegida].t)}</p>
               <p class="qz-bien">✔ Respuesta correcta: ${esc(q.p.opciones[q.p.correcta])}</p>
@@ -284,14 +293,14 @@ const Quiz = (function () {
             : '<p class="qz-perfecto">🎉 ¡No tuviste ningún error!</p>'}
         </div>
       </div>`;
-    raiz.querySelector('#qz-tabla').addEventListener('click', () => pantallaTabla(juego.curso));
+    raiz.querySelector('#qz-tabla').addEventListener('click', () => pantallaTabla({ escuela: juego.escuela, curso: juego.curso }));
     raiz.querySelector('#qz-otra').addEventListener('click', () => pantallaInicio());
     if (juego.guardado) return;
     juego.guardado = true;
     const estado = raiz.querySelector('#qz-estado');
     try {
-      ultimoId = await QuizDatos.guardarResultado({ nombre: juego.nombre, curso: juego.curso, correctas, total, tiempoMs });
-      const curso = QuizUtil.ordenar((await QuizDatos.leerResultados()).filter(r => r.curso === juego.curso));
+      ultimoId = await QuizDatos.guardarResultado({ nombre: juego.nombre, escuela: juego.escuela, curso: juego.curso, correctas, total, tiempoMs });
+      const curso = QuizUtil.ordenar((await QuizDatos.leerResultados()).filter(r => r.escuela === juego.escuela && r.curso === juego.curso));
       const puesto = curso.findIndex(r => r.id === ultimoId) + 1;
       if (estado) estado.innerHTML = `✅ Resultado guardado.${puesto ? ` Estás en el puesto <b>#${puesto}</b> de ${curso.length} en ${esc(juego.curso)}.` : ''}`;
     } catch (e) {
@@ -310,13 +319,17 @@ const Quiz = (function () {
   }
 
   // ---------- Tabla de posiciones ----------
-  async function pantallaTabla(curso) {
+  async function pantallaTabla(grupo) {
     clearInterval(reloj);
-    if (curso !== undefined) filtro = curso;
+    if (grupo) filtro = { ...grupo };
+    if (!filtro) filtro = { escuela: '', curso: '' };
     raiz.querySelector('#qz-cont').innerHTML = `
       <div class="panel qz-tabla">
         <div class="qz-tabla-cab"><h2>🏆 Tabla de posiciones</h2>
-          <label class="qz-filtro">Curso <select id="qz-filtro"><option value="">Todos</option></select></label></div>
+          <div class="qz-filtros">
+            <label class="qz-filtro">Escuela <select id="qz-f-escuela"></select></label>
+            <label class="qz-filtro">Curso <select id="qz-f-curso"></select></label>
+          </div></div>
         ${QuizUtil.avisoModo(modo)}
         <div id="qz-lista"><p class="qz-info">Cargando…</p></div>
         <div class="qz-botones"><button class="btn primario" id="qz-volver">▶ Jugar</button><button class="btn" id="qz-recargar">🔄 Actualizar</button></div>
@@ -328,23 +341,29 @@ const Quiz = (function () {
       raiz.querySelector('#qz-lista').innerHTML = '<p class="qz-aviso mal">⚠️ No se pudo cargar la tabla. Revisá la conexión.</p>';
       return;
     }
-    const sel = raiz.querySelector('#qz-filtro');
-    if (!sel) return;
-    const cursos = [...new Set(todos.map(r => r.curso))].sort();
-    if (filtro && !cursos.includes(filtro)) filtro = '';
-    sel.innerHTML = '<option value="">Todos los cursos</option>' + cursos.map(c => `<option${c === filtro ? ' selected' : ''}>${esc(c)}</option>`).join('');
+    const selE = raiz.querySelector('#qz-f-escuela'), selC = raiz.querySelector('#qz-f-curso');
+    if (!selE) return;
+    const opciones = (lista, valor, todas) => `<option value="">${todas}</option>` + lista.map(c => `<option value="${esc(c)}"${c === valor ? ' selected' : ''}>${esc(c)}</option>`).join('');
     const pintar = () => {
-      const lista = filtro ? todos.filter(r => r.curso === filtro) : todos;
+      const escuelas = [...new Set(todos.map(r => r.escuela).filter(Boolean))].sort();
+      if (filtro.escuela && !escuelas.includes(filtro.escuela)) filtro.escuela = '';
+      const deEscuela = filtro.escuela ? todos.filter(r => r.escuela === filtro.escuela) : todos;
+      const cursos = [...new Set(deEscuela.map(r => r.curso))].sort();
+      if (filtro.curso && !cursos.includes(filtro.curso)) filtro.curso = '';
+      selE.innerHTML = opciones(escuelas, filtro.escuela, 'Todas las escuelas');
+      selC.innerHTML = opciones(cursos, filtro.curso, 'Todos los cursos');
+      const lista = filtro.curso ? deEscuela.filter(r => r.curso === filtro.curso) : deEscuela;
       const medalla = i => ['🥇', '🥈', '🥉'][i] || `${i + 1}`;
       raiz.querySelector('#qz-lista').innerHTML = lista.length ? `<ol class="qz-ranking">${lista.map((r, i) => `
         <li class="${r.id === ultimoId ? 'yo' : ''}${i < 3 ? ' podio' : ''}">
           <span class="qz-puesto">${medalla(i)}</span>
-          <span class="qz-quien"><b>${esc(r.nombre)}</b><small>${esc(r.curso)}</small></span>
+          <span class="qz-quien"><b>${esc(r.nombre)}</b><small>${esc(QuizUtil.grupo(r))}</small></span>
           <span class="qz-pts">${r.correctas}<small>/${r.total}</small></span>
           <span class="qz-t">${QuizUtil.tiempo(r.tiempoMs)}</span></li>`).join('')}</ol>`
         : '<p class="qz-info">Todavía no hay resultados. ¡Sé el primero en jugar!</p>';
     };
-    sel.addEventListener('change', () => { filtro = sel.value; pintar(); });
+    selE.addEventListener('change', () => { filtro = { escuela: selE.value, curso: '' }; pintar(); });
+    selC.addEventListener('change', () => { filtro.curso = selC.value; pintar(); });
     pintar();
   }
 
@@ -535,21 +554,25 @@ const QuizDocente = (function () {
     const cont = raiz.querySelector('#qd-resultados');
     let rs;
     try { rs = await QuizDatos.leerResultados(); } catch (e) { cont.innerHTML = '<p class="qz-aviso mal">⚠️ No se pudieron leer los resultados.</p>'; return; }
-    const porCurso = {};
-    rs.forEach(r => { porCurso[r.curso] = (porCurso[r.curso] || 0) + 1; });
-    const cursos = Object.keys(porCurso).sort();
-    cont.innerHTML = `<p>Hay <b>${rs.length}</b> resultados guardados.</p>
-      ${cursos.length ? `<ul class="qd-cursos">${cursos.map(c => `<li><span>${esc(c)}</span><small>${porCurso[c]} ${porCurso[c] === 1 ? 'intento' : 'intentos'}</small><button class="btn chico qd-borrar" data-curso="${esc(c)}">🗑 Borrar</button></li>`).join('')}</ul>` : ''}
+    const grupos = {};
+    rs.forEach(r => {
+      const k = JSON.stringify([r.escuela || '', r.curso]);
+      grupos[k] = (grupos[k] || 0) + 1;
+    });
+    const claves = Object.keys(grupos).sort();
+    cont.innerHTML = `<p>Hay <b>${rs.length}</b> ${rs.length === 1 ? 'resultado guardado' : 'resultados guardados'}.</p>
+      ${claves.length ? `<ul class="qd-cursos">${claves.map(k => { const [escuela, curso] = JSON.parse(k); return `<li><span>${esc(curso)}<small class="qd-escuela">${esc(escuela || 'sin escuela')}</small></span><small>${grupos[k]} ${grupos[k] === 1 ? 'intento' : 'intentos'}</small><button class="btn chico qd-borrar" data-grupo="${esc(k)}">🗑 Borrar</button></li>`; }).join('')}</ul>` : ''}
       <div class="qz-botones"><button class="btn qd-peligro" id="qd-borrar-todo" ${rs.length ? '' : 'disabled'}>🗑 Borrar todos</button><button class="btn" id="qd-actualizar">🔄 Actualizar</button></div>
       <p class="qz-estado" id="qd-estado-res"></p>`;
     const est = cont.querySelector('#qd-estado-res');
-    const borrar = async curso => {
-      const txt = curso ? `¿Borrar los ${porCurso[curso]} resultados de ${curso}?` : `¿Borrar TODOS los resultados (${rs.length})?`;
+    const borrar = async k => {
+      const g = k ? (([escuela, curso]) => ({ escuela, curso }))(JSON.parse(k)) : null;
+      const txt = g ? `¿Borrar los ${grupos[k]} resultados de ${g.curso}${g.escuela ? ' de ' + g.escuela : ''}?` : `¿Borrar TODOS los resultados (${rs.length})?`;
       if (!confirm(txt + ' No se puede deshacer.')) return;
       est.textContent = 'Borrando…';
-      try { const n = await QuizDatos.borrarResultados(curso || null); await pintarResultados(); raiz.querySelector('#qd-estado-res').textContent = `✅ Se borraron ${n} resultados.`; } catch (e) { console.error(e); est.textContent = '⚠️ No se pudieron borrar.'; }
+      try { const n = await QuizDatos.borrarResultados(g); await pintarResultados(); raiz.querySelector('#qd-estado-res').textContent = `✅ Se borraron ${n} resultados.`; } catch (e) { console.error(e); est.textContent = '⚠️ No se pudieron borrar.'; }
     };
-    cont.querySelectorAll('[data-curso]').forEach(b => b.addEventListener('click', () => borrar(b.dataset.curso)));
+    cont.querySelectorAll('[data-grupo]').forEach(b => b.addEventListener('click', () => borrar(b.dataset.grupo)));
     cont.querySelector('#qd-borrar-todo').addEventListener('click', () => borrar(null));
     cont.querySelector('#qd-actualizar').addEventListener('click', () => pintarResultados());
   }

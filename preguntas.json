@@ -19,7 +19,8 @@
         "No es peligroso si se usa poca cantidad"
       ],
       "correcta": 0,
-      "explicacion": "La lavandina (hipoclorito de sodio) y el amoníaco reaccionan y liberan cloraminas, gases tóxicos. Nunca hay que mezclar productos de limpieza."
+      "explicacion": "La lavandina (hipoclorito de sodio) y el amoníaco reaccionan y liberan cloraminas, gases tóxicos. Nunca hay que mezclar productos de limpieza.",
+      "imagen": "armando-lavandina"
     },
     {
       "id": "lab-02",
@@ -32,7 +33,8 @@
         "Mezclarlo con agua para ver qué pasa"
       ],
       "correcta": 1,
-      "explicacion": "Un frasco sin rótulo no se usa nunca: no sabemos qué contiene ni qué riesgos tiene. Todos los frascos deben estar rotulados."
+      "explicacion": "Un frasco sin rótulo no se usa nunca: no sabemos qué contiene ni qué riesgos tiene. Todos los frascos deben estar rotulados.",
+      "imagen": "armando-frasco"
     },
     {
       "id": "lab-03",
@@ -45,7 +47,8 @@
         "Ninguna: el mate no es una sustancia química"
       ],
       "correcta": 2,
-      "explicacion": "En el laboratorio no se come ni se bebe: los alimentos y la bombilla pueden contaminarse con sustancias peligrosas."
+      "explicacion": "En el laboratorio no se come ni se bebe: los alimentos y la bombilla pueden contaminarse con sustancias peligrosas.",
+      "imagen": "armando-mate"
     },
     {
       "id": "lab-04",
@@ -58,7 +61,8 @@
         "Apagarlo y cerrar la llave de gas"
       ],
       "correcta": 3,
-      "explicacion": "El mechero se apaga cerrando la llave de gas. Un mechero encendido sin nadie que lo controle puede provocar un incendio, y una llave abierta deja escapar gas."
+      "explicacion": "El mechero se apaga cerrando la llave de gas. Un mechero encendido sin nadie que lo controle puede provocar un incendio, y una llave abierta deja escapar gas.",
+      "imagen": "armando-mechero"
     },
     {
       "id": "lab-05",
@@ -97,7 +101,8 @@
         "hacia abajo"
       ],
       "correcta": 2,
-      "explicacion": "El líquido puede salpicar o saltar de golpe. Por eso el tubo se inclina apuntando hacia donde no haya personas."
+      "explicacion": "El líquido puede salpicar o saltar de golpe. Por eso el tubo se inclina apuntando hacia donde no haya personas.",
+      "imagen": "tubo"
     },
     {
       "id": "lab-08",
@@ -110,7 +115,8 @@
         "Para calentar sólidos directamente en la llama"
       ],
       "correcta": 0,
-      "explicacion": "La probeta es un cilindro graduado que sirve para medir volúmenes de líquidos."
+      "explicacion": "La probeta es un cilindro graduado que sirve para medir volúmenes de líquidos.",
+      "imagen": "probeta"
     },
     {
       "id": "lab-09",
@@ -149,7 +155,8 @@
         "guardar reactivos por mucho tiempo"
       ],
       "correcta": 0,
-      "explicacion": "Con la pipeta (y una propipeta, nunca con la boca) se toman volúmenes chicos y precisos de un líquido."
+      "explicacion": "Con la pipeta (y una propipeta, nunca con la boca) se toman volúmenes chicos y precisos de un líquido.",
+      "imagen": "pipeta"
     },
     {
       "id": "lab-12",
@@ -175,7 +182,8 @@
         "Para calentar líquidos"
       ],
       "correcta": 1,
-      "explicacion": "El embudo con papel de filtro retiene las partículas sólidas y deja pasar el líquido: es la filtración."
+      "explicacion": "El embudo con papel de filtro retiene las partículas sólidas y deja pasar el líquido: es la filtración.",
+      "imagen": "embudo"
     },
     {
       "id": "lab-14",
@@ -188,7 +196,8 @@
         "medir volúmenes con precisión"
       ],
       "correcta": 0,
-      "explicacion": "Su forma redonda reparte el calor de manera uniforme; por eso se usa para calentar líquidos y en la destilación."
+      "explicacion": "Su forma redonda reparte el calor de manera uniforme; por eso se usa para calentar líquidos y en la destilación.",
+      "imagen": "balon"
     },
     {
       "id": "lab-15",
@@ -227,7 +236,8 @@
         "Sublimación"
       ],
       "correcta": 0,
-      "explicacion": "El vapor de agua (gas) se enfría al tocar el espejo y pasa a líquido: es una condensación."
+      "explicacion": "El vapor de agua (gas) se enfría al tocar el espejo y pasa a líquido: es una condensación.",
+      "imagen": "espejo"
     },
     {
       "id": "est-03",
@@ -292,7 +302,8 @@
         "Condensación"
       ],
       "correcta": 2,
-      "explicacion": "La naftalina pasa directamente de sólido a gas: eso es una sublimación."
+      "explicacion": "La naftalina pasa directamente de sólido a gas: eso es una sublimación.",
+      "imagen": "naftalina"
     },
     {
       "id": "est-08",
@@ -305,7 +316,8 @@
         "sube y baja todo el tiempo"
       ],
       "correcta": 1,
-      "explicacion": "Durante un cambio de estado la temperatura no cambia: la energía se usa para separar las partículas."
+      "explicacion": "Durante un cambio de estado la temperatura no cambia: la energía se usa para separar las partículas.",
+      "imagen": "hielo"
     },
     {
       "id": "est-09",
@@ -318,7 +330,8 @@
         "calor específico"
       ],
       "correcta": 1,
-      "explicacion": "El punto de ebullición es la temperatura a la que un líquido hierve. Para el agua a nivel del mar es 100 °C."
+      "explicacion": "El punto de ebullición es la temperatura a la que un líquido hierve. Para el agua a nivel del mar es 100 °C.",
+      "imagen": "olla"
     },
     {
       "id": "est-10",
@@ -383,7 +396,8 @@
         "4"
       ],
       "correcta": 2,
-      "explicacion": "Hay tres fases: el agua líquida, el aceite y el hielo (que es agua sólida)."
+      "explicacion": "Hay tres fases: el agua líquida, el aceite y el hielo (que es agua sólida).",
+      "imagen": "agua-aceite-hielo"
     },
     {
       "id": "sis-04",
@@ -396,7 +410,8 @@
         "2 fases y 3 componentes"
       ],
       "correcta": 1,
-      "explicacion": "Fases: la solución de agua salada y el hielo. Componentes: agua y sal (el hielo también es agua)."
+      "explicacion": "Fases: la solución de agua salada y el hielo. Componentes: agua y sal (el hielo también es agua).",
+      "imagen": "agua-sal-hielo"
     },
     {
       "id": "sis-05",
@@ -409,7 +424,8 @@
         "Decantación"
       ],
       "correcta": 0,
-      "explicacion": "El imán atrae las limaduras de hierro y deja la arena: es la imantación (o separación magnética)."
+      "explicacion": "El imán atrae las limaduras de hierro y deja la arena: es la imantación (o separación magnética).",
+      "imagen": "hierro-arena"
     },
     {
       "id": "sis-06",
@@ -422,7 +438,8 @@
         "Filtración"
       ],
       "correcta": 1,
-      "explicacion": "El aceite y el agua no se mezclan y tienen distinta densidad: se dejan reposar en la ampolla de decantación y se abre la llave para sacar el líquido de abajo."
+      "explicacion": "El aceite y el agua no se mezclan y tienen distinta densidad: se dejan reposar en la ampolla de decantación y se abre la llave para sacar el líquido de abajo.",
+      "imagen": "agua-aceite"
     },
     {
       "id": "sis-07",
@@ -435,7 +452,8 @@
         "Con un imán"
       ],
       "correcta": 2,
-      "explicacion": "Al evaporarse el agua, la sal queda en el recipiente (así se obtiene la sal en las salinas)."
+      "explicacion": "Al evaporarse el agua, la sal queda en el recipiente (así se obtiene la sal en las salinas).",
+      "imagen": "agua-salada"
     },
     {
       "id": "sis-08",
@@ -461,7 +479,8 @@
         "la evaporación"
       ],
       "correcta": 0,
-      "explicacion": "El tamiz deja pasar los granos chicos (arena) y retiene los grandes (piedras)."
+      "explicacion": "El tamiz deja pasar los granos chicos (arena) y retiene los grandes (piedras).",
+      "imagen": "arena-piedras"
     },
     {
       "id": "sis-10",
@@ -539,7 +558,8 @@
         "sonora"
       ],
       "correcta": 1,
-      "explicacion": "Por estar a cierta altura tiene energía potencial gravitatoria; si cae, se transforma en energía cinética."
+      "explicacion": "Por estar a cierta altura tiene energía potencial gravitatoria; si cae, se transforma en energía cinética.",
+      "imagen": "pelota-mesa"
     },
     {
       "id": "ene-05",
@@ -552,7 +572,8 @@
         "luminosa"
       ],
       "correcta": 0,
-      "explicacion": "La energía cinética es la que tiene un cuerpo por estar en movimiento."
+      "explicacion": "La energía cinética es la que tiene un cuerpo por estar en movimiento.",
+      "imagen": "auto"
     },
     {
       "id": "ene-06",
@@ -565,7 +586,8 @@
         "luminosa"
       ],
       "correcta": 0,
-      "explicacion": "La energía química está guardada en las sustancias y se libera en transformaciones químicas, como la combustión o la digestión."
+      "explicacion": "La energía química está guardada en las sustancias y se libera en transformaciones químicas, como la combustión o la digestión.",
+      "imagen": "alimentos"
     },
     {
       "id": "ene-07",
@@ -578,7 +600,8 @@
         "materia"
       ],
       "correcta": 1,
-      "explicacion": "La lamparita transforma la energía eléctrica en luz y en calor."
+      "explicacion": "La lamparita transforma la energía eléctrica en luz y en calor.",
+      "imagen": "lamparita"
     },
     {
       "id": "ene-08",
@@ -604,7 +627,8 @@
         "El Sol"
       ],
       "correcta": 3,
-      "explicacion": "La energía solar es renovable porque no se agota. El petróleo, el gas y el carbón son combustibles fósiles que tardan millones de años en formarse."
+      "explicacion": "La energía solar es renovable porque no se agota. El petróleo, el gas y el carbón son combustibles fósiles que tardan millones de años en formarse.",
+      "imagen": "fuentes"
     },
     {
       "id": "ene-10",
@@ -617,7 +641,8 @@
         "térmica se transforma en nuclear"
       ],
       "correcta": 1,
-      "explicacion": "El panel solar recibe la luz del Sol y la transforma en energía eléctrica."
+      "explicacion": "El panel solar recibe la luz del Sol y la transforma en energía eléctrica.",
+      "imagen": "panel"
     },
     {
       "id": "ene-11",
@@ -656,7 +681,8 @@
         "El tamaño"
       ],
       "correcta": 1,
-      "explicacion": "La cuchara es el cuerpo y el acero es el material con el que está hecha."
+      "explicacion": "La cuchara es el cuerpo y el acero es el material con el que está hecha.",
+      "imagen": "cuchara"
     },
     {
       "id": "cue-03",
@@ -721,7 +747,8 @@
         "Porque los metales son frágiles"
       ],
       "correcta": 0,
-      "explicacion": "Los metales conducen bien el calor: así la comida se calienta rápido."
+      "explicacion": "Los metales conducen bien el calor: así la comida se calienta rápido.",
+      "imagen": "olla-mango"
     },
     {
       "id": "cue-08",
@@ -734,7 +761,8 @@
         "frágiles"
       ],
       "correcta": 1,
-      "explicacion": "El plástico y la madera conducen mal el calor: así podemos agarrar la olla sin quemarnos."
+      "explicacion": "El plástico y la madera conducen mal el calor: así podemos agarrar la olla sin quemarnos.",
+      "imagen": "olla-mango"
     },
     {
       "id": "cue-09",
@@ -760,7 +788,8 @@
         "los dos conducen la electricidad"
       ],
       "correcta": 0,
-      "explicacion": "La corriente circula por el cobre, que es conductor; el plástico aislante evita que nos electrocutemos."
+      "explicacion": "La corriente circula por el cobre, que es conductor; el plástico aislante evita que nos electrocutemos.",
+      "imagen": "cable"
     },
     {
       "id": "cue-11",
@@ -838,7 +867,8 @@
         "depende del recipiente"
       ],
       "correcta": 2,
-      "explicacion": "El punto de ebullición es una propiedad intensiva: no depende de la cantidad. Lo que cambia es el tiempo que tarda en hervir."
+      "explicacion": "El punto de ebullición es una propiedad intensiva: no depende de la cantidad. Lo que cambia es el tiempo que tarda en hervir.",
+      "imagen": "dos-ollas"
     },
     {
       "id": "pro-06",
@@ -864,7 +894,8 @@
         "30 g/cm³"
       ],
       "correcta": 1,
-      "explicacion": "Densidad = 20 g ÷ 10 cm³ = 2 g/cm³."
+      "explicacion": "Densidad = 20 g ÷ 10 cm³ = 2 g/cm³.",
+      "imagen": "cubo-densidad"
     },
     {
       "id": "pro-08",
@@ -877,7 +908,8 @@
         "es más espeso"
       ],
       "correcta": 1,
-      "explicacion": "Un líquido menos denso queda arriba de uno más denso cuando no se mezclan."
+      "explicacion": "Un líquido menos denso queda arriba de uno más denso cuando no se mezclan.",
+      "imagen": "agua-aceite"
     },
     {
       "id": "pro-09",
@@ -903,7 +935,8 @@
         "el doble de densidad"
       ],
       "correcta": 1,
-      "explicacion": "La masa (extensiva) se reduce a la mitad, pero la densidad (intensiva) es la misma porque sigue siendo hierro."
+      "explicacion": "La masa (extensiva) se reduce a la mitad, pero la densidad (intensiva) es la misma porque sigue siendo hierro.",
+      "imagen": "barra-hierro"
     },
     {
       "id": "pro-11",
