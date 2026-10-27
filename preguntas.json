@@ -1,0 +1,922 @@
+{
+  "temas": [
+    "Normas de seguridad y material de laboratorio",
+    "Estados de la materia y cambios de estado",
+    "Sistemas materiales",
+    "Materia y energía",
+    "Cuerpos y materiales",
+    "Propiedades intensivas y extensivas"
+  ],
+  "preguntas": [
+    {
+      "id": "lab-01",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "Armando Siempretarde mezcló amoníaco con lavandina para «limpiar mejor» la mesada. ¿Por qué es peligroso?",
+      "opciones": [
+        "Porque se liberan gases tóxicos que dañan los ojos y las vías respiratorias",
+        "Porque la mezcla deja de limpiar, pero no hace daño",
+        "Porque se forma un sólido que tapa las cañerías",
+        "No es peligroso si se usa poca cantidad"
+      ],
+      "correcta": 0,
+      "explicacion": "La lavandina (hipoclorito de sodio) y el amoníaco reaccionan y liberan cloraminas, gases tóxicos. Nunca hay que mezclar productos de limpieza."
+    },
+    {
+      "id": "lab-02",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "Armando encontró un frasco sin rótulo y quiso usar su contenido en la experiencia. ¿Qué tendría que haber hecho?",
+      "opciones": [
+        "Olerlo de cerca para descubrir qué es",
+        "No usarlo y avisarle al docente",
+        "Probar un poquito con la punta del dedo",
+        "Mezclarlo con agua para ver qué pasa"
+      ],
+      "correcta": 1,
+      "explicacion": "Un frasco sin rótulo no se usa nunca: no sabemos qué contiene ni qué riesgos tiene. Todos los frascos deben estar rotulados."
+    },
+    {
+      "id": "lab-03",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "Armando llevó el mate al laboratorio y lo tomó mientras trabajaba. ¿Qué norma no respetó?",
+      "opciones": [
+        "Solo se puede tomar mate si es amargo",
+        "En el laboratorio está prohibido comer, pero se puede beber",
+        "En el laboratorio no se come ni se bebe",
+        "Ninguna: el mate no es una sustancia química"
+      ],
+      "correcta": 2,
+      "explicacion": "En el laboratorio no se come ni se bebe: los alimentos y la bombilla pueden contaminarse con sustancias peligrosas."
+    },
+    {
+      "id": "lab-04",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "Al terminar la clase, Armando se fue y dejó el mechero encendido. ¿Qué debería haber hecho?",
+      "opciones": [
+        "Dejarlo encendido para el grupo siguiente",
+        "Taparlo con un papel",
+        "Apagarlo soplando y dejar la llave abierta",
+        "Apagarlo y cerrar la llave de gas"
+      ],
+      "correcta": 3,
+      "explicacion": "El mechero se apaga cerrando la llave de gas. Un mechero encendido sin nadie que lo controle puede provocar un incendio, y una llave abierta deja escapar gas."
+    },
+    {
+      "id": "lab-05",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Cuál es la forma correcta de oler una sustancia en el laboratorio?",
+      "opciones": [
+        "Acercar la nariz al frasco y respirar fuerte",
+        "Abanicar los vapores con la mano hacia la nariz, a distancia",
+        "Calentarla primero para que tenga más olor",
+        "Probarla, porque el sabor es más seguro que el olor"
+      ],
+      "correcta": 1,
+      "explicacion": "Los vapores se acercan abanicando con la mano. Nunca se huele directamente ni se prueba una sustancia."
+    },
+    {
+      "id": "lab-06",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Qué elementos de protección hay que usar en el laboratorio?",
+      "opciones": [
+        "Guardapolvo, anteojos de seguridad y el pelo recogido",
+        "Ojotas y ropa suelta para estar cómodos",
+        "Solo guantes de lana",
+        "Ninguno, si se trabaja con cuidado"
+      ],
+      "correcta": 0,
+      "explicacion": "El guardapolvo protege la ropa y la piel, los anteojos protegen los ojos de salpicaduras y el pelo recogido evita que se acerque a la llama."
+    },
+    {
+      "id": "lab-07",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "Al calentar un líquido en un tubo de ensayo, la boca del tubo tiene que apuntar…",
+      "opciones": [
+        "hacia la propia cara, para ver mejor",
+        "hacia el compañero de al lado",
+        "hacia un lugar donde no haya nadie",
+        "hacia abajo"
+      ],
+      "correcta": 2,
+      "explicacion": "El líquido puede salpicar o saltar de golpe. Por eso el tubo se inclina apuntando hacia donde no haya personas."
+    },
+    {
+      "id": "lab-08",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Para qué se usa la probeta?",
+      "opciones": [
+        "Para medir volúmenes de líquidos",
+        "Para moler sólidos",
+        "Para medir la temperatura",
+        "Para calentar sólidos directamente en la llama"
+      ],
+      "correcta": 0,
+      "explicacion": "La probeta es un cilindro graduado que sirve para medir volúmenes de líquidos."
+    },
+    {
+      "id": "lab-09",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Qué material de laboratorio se usa para moler o triturar sólidos?",
+      "opciones": [
+        "El embudo",
+        "La bureta",
+        "El mortero",
+        "El balón"
+      ],
+      "correcta": 2,
+      "explicacion": "El mortero (con su mano o pilón) sirve para moler sólidos y convertirlos en polvo."
+    },
+    {
+      "id": "lab-10",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Qué instrumento mide volúmenes con mucha precisión y deja caer el líquido gota a gota gracias a una llave (robinete)?",
+      "opciones": [
+        "La probeta",
+        "La bureta",
+        "El erlenmeyer",
+        "El tubo de ensayo"
+      ],
+      "correcta": 1,
+      "explicacion": "La bureta es un tubo largo y graduado con un robinete en la parte de abajo que permite controlar la salida del líquido gota a gota."
+    },
+    {
+      "id": "lab-11",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "La pipeta sirve para…",
+      "opciones": [
+        "medir y trasvasar pequeños volúmenes de líquido con precisión",
+        "calentar líquidos",
+        "separar un sólido de un líquido",
+        "guardar reactivos por mucho tiempo"
+      ],
+      "correcta": 0,
+      "explicacion": "Con la pipeta (y una propipeta, nunca con la boca) se toman volúmenes chicos y precisos de un líquido."
+    },
+    {
+      "id": "lab-12",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Qué recipiente tiene forma de cono, base ancha y cuello angosto, y se usa para mezclar y calentar líquidos sin que salpiquen?",
+      "opciones": [
+        "El balón",
+        "El mortero",
+        "El erlenmeyer",
+        "La probeta"
+      ],
+      "correcta": 2,
+      "explicacion": "El erlenmeyer tiene forma cónica: su cuello angosto permite agitar y calentar líquidos sin que salpiquen."
+    },
+    {
+      "id": "lab-13",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Para qué se usa el embudo con papel de filtro?",
+      "opciones": [
+        "Para medir volúmenes exactos",
+        "Para separar un sólido de un líquido (filtración)",
+        "Para medir la masa de un sólido",
+        "Para calentar líquidos"
+      ],
+      "correcta": 1,
+      "explicacion": "El embudo con papel de filtro retiene las partículas sólidas y deja pasar el líquido: es la filtración."
+    },
+    {
+      "id": "lab-14",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "El balón de fondo redondo se usa principalmente para…",
+      "opciones": [
+        "calentar líquidos de forma pareja, por ejemplo en una destilación",
+        "moler sólidos",
+        "medir la temperatura",
+        "medir volúmenes con precisión"
+      ],
+      "correcta": 0,
+      "explicacion": "Su forma redonda reparte el calor de manera uniforme; por eso se usa para calentar líquidos y en la destilación."
+    },
+    {
+      "id": "lab-15",
+      "tema": "Normas de seguridad y material de laboratorio",
+      "enunciado": "¿Qué instrumento se usa para medir la temperatura de un líquido?",
+      "opciones": [
+        "La balanza",
+        "El mechero",
+        "El termómetro",
+        "La pipeta"
+      ],
+      "correcta": 2,
+      "explicacion": "El termómetro mide la temperatura. El mechero da calor, pero no lo mide."
+    },
+    {
+      "id": "est-01",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "¿Cómo se llama el paso del estado sólido al líquido?",
+      "opciones": [
+        "Solidificación",
+        "Fusión",
+        "Vaporización",
+        "Condensación"
+      ],
+      "correcta": 1,
+      "explicacion": "La fusión es el paso de sólido a líquido, como el hielo que se derrite."
+    },
+    {
+      "id": "est-02",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Después de bañarte, el espejo se llena de gotitas de agua. ¿Qué cambio de estado ocurrió?",
+      "opciones": [
+        "Condensación",
+        "Evaporación",
+        "Fusión",
+        "Sublimación"
+      ],
+      "correcta": 0,
+      "explicacion": "El vapor de agua (gas) se enfría al tocar el espejo y pasa a líquido: es una condensación."
+    },
+    {
+      "id": "est-03",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "¿Qué estado de la materia tiene forma y volumen propios?",
+      "opciones": [
+        "Líquido",
+        "Gaseoso",
+        "Sólido",
+        "Ninguno"
+      ],
+      "correcta": 2,
+      "explicacion": "Los sólidos tienen forma y volumen propios: sus partículas están muy juntas y ordenadas."
+    },
+    {
+      "id": "est-04",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Un líquido…",
+      "opciones": [
+        "tiene forma y volumen propios",
+        "tiene volumen propio, pero toma la forma del recipiente",
+        "no tiene ni forma ni volumen propios",
+        "tiene forma propia, pero su volumen cambia"
+      ],
+      "correcta": 1,
+      "explicacion": "Los líquidos conservan su volumen, pero adoptan la forma del recipiente que los contiene."
+    },
+    {
+      "id": "est-05",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "¿Qué característica tienen los gases?",
+      "opciones": [
+        "Tienen forma propia",
+        "No se pueden comprimir",
+        "Ocupan todo el recipiente y se pueden comprimir",
+        "Sus partículas están muy juntas"
+      ],
+      "correcta": 2,
+      "explicacion": "Las partículas de un gas están muy separadas y se mueven rápido: ocupan todo el espacio disponible y se pueden comprimir."
+    },
+    {
+      "id": "est-06",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Según el modelo de partículas, en un sólido las partículas…",
+      "opciones": [
+        "están muy juntas y solo vibran en su lugar",
+        "están muy separadas y se mueven libremente",
+        "no se mueven nada",
+        "se deslizan unas sobre otras"
+      ],
+      "correcta": 0,
+      "explicacion": "En los sólidos las partículas están muy unidas y ordenadas: no se desplazan, solo vibran."
+    },
+    {
+      "id": "est-07",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Las bolitas de naftalina del ropero se achican sin dejar ningún líquido. ¿Qué cambio de estado ocurre?",
+      "opciones": [
+        "Fusión",
+        "Evaporación",
+        "Sublimación",
+        "Condensación"
+      ],
+      "correcta": 2,
+      "explicacion": "La naftalina pasa directamente de sólido a gas: eso es una sublimación."
+    },
+    {
+      "id": "est-08",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Mientras un cubo de hielo se derrite (a nivel del mar), su temperatura…",
+      "opciones": [
+        "sube sin parar",
+        "se mantiene en 0 °C hasta que se derrite todo",
+        "baja",
+        "sube y baja todo el tiempo"
+      ],
+      "correcta": 1,
+      "explicacion": "Durante un cambio de estado la temperatura no cambia: la energía se usa para separar las partículas."
+    },
+    {
+      "id": "est-09",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "El agua hierve a 100 °C a nivel del mar. Ese valor es su…",
+      "opciones": [
+        "punto de fusión",
+        "punto de ebullición",
+        "temperatura ambiente",
+        "calor específico"
+      ],
+      "correcta": 1,
+      "explicacion": "El punto de ebullición es la temperatura a la que un líquido hierve. Para el agua a nivel del mar es 100 °C."
+    },
+    {
+      "id": "est-10",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "¿En qué se diferencian la evaporación y la ebullición?",
+      "opciones": [
+        "Son exactamente lo mismo",
+        "La evaporación solo ocurre a 100 °C",
+        "La evaporación ocurre en la superficie y a cualquier temperatura; la ebullición, en todo el líquido y a una temperatura fija",
+        "La ebullición ocurre solo en la superficie del líquido"
+      ],
+      "correcta": 2,
+      "explicacion": "La ropa se seca por evaporación a temperatura ambiente; en la ebullición se forman burbujas de vapor en todo el líquido."
+    },
+    {
+      "id": "est-11",
+      "tema": "Estados de la materia y cambios de estado",
+      "enunciado": "Cuando el agua líquida se congela, el agua…",
+      "opciones": [
+        "absorbe calor",
+        "cede (libera) calor",
+        "no intercambia calor",
+        "gana masa"
+      ],
+      "correcta": 1,
+      "explicacion": "Para pasar de líquido a sólido hay que quitarle energía: el agua cede calor al ambiente (por ejemplo, al freezer)."
+    },
+    {
+      "id": "sis-01",
+      "tema": "Sistemas materiales",
+      "enunciado": "Un sistema homogéneo es el que…",
+      "opciones": [
+        "tiene dos o más fases",
+        "tiene las mismas propiedades en todos sus puntos (una sola fase)",
+        "siempre es una sustancia pura",
+        "se puede separar con un imán"
+      ],
+      "correcta": 1,
+      "explicacion": "En un sistema homogéneo no se distinguen partes: tiene una sola fase, aunque puede tener varios componentes (como el agua salada)."
+    },
+    {
+      "id": "sis-02",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Cuál de estos es un sistema heterogéneo?",
+      "opciones": [
+        "Agua con sal disuelta",
+        "Agua con arena",
+        "Alcohol con agua",
+        "Aire filtrado"
+      ],
+      "correcta": 1,
+      "explicacion": "En el agua con arena se distinguen dos fases: el agua y la arena."
+    },
+    {
+      "id": "sis-03",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Cuántas fases tiene un vaso con agua, aceite y cubitos de hielo?",
+      "opciones": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "correcta": 2,
+      "explicacion": "Hay tres fases: el agua líquida, el aceite y el hielo (que es agua sólida)."
+    },
+    {
+      "id": "sis-04",
+      "tema": "Sistemas materiales",
+      "enunciado": "Un vaso con agua salada y cubitos de hielo tiene…",
+      "opciones": [
+        "1 fase y 2 componentes",
+        "2 fases y 2 componentes",
+        "3 fases y 3 componentes",
+        "2 fases y 3 componentes"
+      ],
+      "correcta": 1,
+      "explicacion": "Fases: la solución de agua salada y el hielo. Componentes: agua y sal (el hielo también es agua)."
+    },
+    {
+      "id": "sis-05",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Qué método sirve para separar limaduras de hierro mezcladas con arena?",
+      "opciones": [
+        "Imantación",
+        "Filtración",
+        "Destilación",
+        "Decantación"
+      ],
+      "correcta": 0,
+      "explicacion": "El imán atrae las limaduras de hierro y deja la arena: es la imantación (o separación magnética)."
+    },
+    {
+      "id": "sis-06",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Con qué método se separan el agua y el aceite?",
+      "opciones": [
+        "Tamización",
+        "Decantación con una ampolla de decantación",
+        "Imantación",
+        "Filtración"
+      ],
+      "correcta": 1,
+      "explicacion": "El aceite y el agua no se mezclan y tienen distinta densidad: se dejan reposar en la ampolla de decantación y se abre la llave para sacar el líquido de abajo."
+    },
+    {
+      "id": "sis-07",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Cómo se obtiene la sal disuelta en el agua salada?",
+      "opciones": [
+        "Por filtración",
+        "Por tamización",
+        "Por evaporación del agua",
+        "Con un imán"
+      ],
+      "correcta": 2,
+      "explicacion": "Al evaporarse el agua, la sal queda en el recipiente (así se obtiene la sal en las salinas)."
+    },
+    {
+      "id": "sis-08",
+      "tema": "Sistemas materiales",
+      "enunciado": "¿Qué método permite separar el agua pura del agua salada recuperando el agua?",
+      "opciones": [
+        "Decantación",
+        "Destilación",
+        "Tamización",
+        "Filtración"
+      ],
+      "correcta": 1,
+      "explicacion": "En la destilación el agua se evapora, el vapor se enfría en el refrigerante y se condensa como agua pura; la sal queda en el balón."
+    },
+    {
+      "id": "sis-09",
+      "tema": "Sistemas materiales",
+      "enunciado": "Para separar piedras de la arena se usa…",
+      "opciones": [
+        "la tamización",
+        "la destilación",
+        "la imantación",
+        "la evaporación"
+      ],
+      "correcta": 0,
+      "explicacion": "El tamiz deja pasar los granos chicos (arena) y retiene los grandes (piedras)."
+    },
+    {
+      "id": "sis-10",
+      "tema": "Sistemas materiales",
+      "enunciado": "Una solución está formada por…",
+      "opciones": [
+        "soluto y solvente",
+        "dos fases distintas",
+        "un solo componente",
+        "un sólido sin disolver en un líquido"
+      ],
+      "correcta": 0,
+      "explicacion": "Una solución es un sistema homogéneo: el soluto (por ejemplo, la sal) se disuelve en el solvente (por ejemplo, el agua)."
+    },
+    {
+      "id": "sis-11",
+      "tema": "Sistemas materiales",
+      "enunciado": "La filtración, la decantación y la tamización son métodos para separar…",
+      "opciones": [
+        "las fases de un sistema heterogéneo",
+        "los componentes de una solución",
+        "los átomos de una sustancia",
+        "los estados de un gas"
+      ],
+      "correcta": 0,
+      "explicacion": "Son métodos de separación de fases. Para separar los componentes de una solución se usan métodos de fraccionamiento, como la destilación."
+    },
+    {
+      "id": "ene-01",
+      "tema": "Materia y energía",
+      "enunciado": "¿Qué es la materia?",
+      "opciones": [
+        "Todo lo que se puede ver",
+        "Todo lo que tiene masa y ocupa un lugar en el espacio",
+        "Solo los seres vivos",
+        "Todo lo que produce energía"
+      ],
+      "correcta": 1,
+      "explicacion": "La materia es todo lo que tiene masa y ocupa un lugar en el espacio, aunque no la veamos (como el aire)."
+    },
+    {
+      "id": "ene-02",
+      "tema": "Materia y energía",
+      "enunciado": "¿Cuál de estas opciones NO es materia?",
+      "opciones": [
+        "El aire",
+        "El agua",
+        "Una piedra",
+        "La luz"
+      ],
+      "correcta": 3,
+      "explicacion": "La luz es una forma de energía: no tiene masa ni ocupa lugar. El aire, aunque no se vea, sí es materia."
+    },
+    {
+      "id": "ene-03",
+      "tema": "Materia y energía",
+      "enunciado": "La energía es…",
+      "opciones": [
+        "la capacidad de producir cambios o transformaciones",
+        "un tipo de materia",
+        "algo que solo tienen los seres vivos",
+        "algo que se crea cuando se usa"
+      ],
+      "correcta": 0,
+      "explicacion": "La energía permite producir cambios: mover objetos, calentarlos, iluminar, hacer funcionar aparatos."
+    },
+    {
+      "id": "ene-04",
+      "tema": "Materia y energía",
+      "enunciado": "Una pelota quieta sobre una mesa alta tiene energía…",
+      "opciones": [
+        "cinética",
+        "potencial gravitatoria",
+        "eléctrica",
+        "sonora"
+      ],
+      "correcta": 1,
+      "explicacion": "Por estar a cierta altura tiene energía potencial gravitatoria; si cae, se transforma en energía cinética."
+    },
+    {
+      "id": "ene-05",
+      "tema": "Materia y energía",
+      "enunciado": "Un auto que se mueve por la ruta tiene energía…",
+      "opciones": [
+        "cinética",
+        "potencial elástica",
+        "nuclear",
+        "luminosa"
+      ],
+      "correcta": 0,
+      "explicacion": "La energía cinética es la que tiene un cuerpo por estar en movimiento."
+    },
+    {
+      "id": "ene-06",
+      "tema": "Materia y energía",
+      "enunciado": "Los alimentos y los combustibles almacenan energía…",
+      "opciones": [
+        "química",
+        "sonora",
+        "cinética",
+        "luminosa"
+      ],
+      "correcta": 0,
+      "explicacion": "La energía química está guardada en las sustancias y se libera en transformaciones químicas, como la combustión o la digestión."
+    },
+    {
+      "id": "ene-07",
+      "tema": "Materia y energía",
+      "enunciado": "En una lamparita encendida, la energía eléctrica se transforma en…",
+      "opciones": [
+        "energía química",
+        "energía luminosa y térmica (calor)",
+        "energía nuclear",
+        "materia"
+      ],
+      "correcta": 1,
+      "explicacion": "La lamparita transforma la energía eléctrica en luz y en calor."
+    },
+    {
+      "id": "ene-08",
+      "tema": "Materia y energía",
+      "enunciado": "¿Qué dice el principio de conservación de la energía?",
+      "opciones": [
+        "La energía se gasta y desaparece",
+        "La energía se crea al encender un motor",
+        "La energía no se crea ni se destruye, se transforma",
+        "La energía solo se conserva en los seres vivos"
+      ],
+      "correcta": 2,
+      "explicacion": "La energía no se crea ni se destruye: pasa de una forma a otra (por ejemplo, de eléctrica a luminosa y térmica)."
+    },
+    {
+      "id": "ene-09",
+      "tema": "Materia y energía",
+      "enunciado": "¿Cuál de estas es una fuente de energía renovable?",
+      "opciones": [
+        "El petróleo",
+        "El gas natural",
+        "El carbón",
+        "El Sol"
+      ],
+      "correcta": 3,
+      "explicacion": "La energía solar es renovable porque no se agota. El petróleo, el gas y el carbón son combustibles fósiles que tardan millones de años en formarse."
+    },
+    {
+      "id": "ene-10",
+      "tema": "Materia y energía",
+      "enunciado": "En un panel solar, la energía…",
+      "opciones": [
+        "eléctrica se transforma en luminosa",
+        "luminosa se transforma en eléctrica",
+        "química se transforma en cinética",
+        "térmica se transforma en nuclear"
+      ],
+      "correcta": 1,
+      "explicacion": "El panel solar recibe la luz del Sol y la transforma en energía eléctrica."
+    },
+    {
+      "id": "ene-11",
+      "tema": "Materia y energía",
+      "enunciado": "¿Cuál es la unidad de energía en el Sistema Internacional?",
+      "opciones": [
+        "El kilogramo (kg)",
+        "El metro (m)",
+        "El joule (J)",
+        "El litro (L)"
+      ],
+      "correcta": 2,
+      "explicacion": "La energía se mide en joules (J). En los alimentos también se usan las calorías."
+    },
+    {
+      "id": "cue-01",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Un cuerpo es…",
+      "opciones": [
+        "una porción limitada de materia con forma definida",
+        "el material con el que está hecho un objeto",
+        "un estado de la materia",
+        "una forma de energía"
+      ],
+      "correcta": 0,
+      "explicacion": "Un cuerpo es una porción de materia con límites y forma definidos, por ejemplo una cuchara o una mesa."
+    },
+    {
+      "id": "cue-02",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "En «una cuchara de acero», ¿cuál es el material?",
+      "opciones": [
+        "La cuchara",
+        "El acero",
+        "La forma",
+        "El tamaño"
+      ],
+      "correcta": 1,
+      "explicacion": "La cuchara es el cuerpo y el acero es el material con el que está hecha."
+    },
+    {
+      "id": "cue-03",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "¿Cuál de estos es un cuerpo?",
+      "opciones": [
+        "El vidrio",
+        "El plástico",
+        "Una botella",
+        "La madera"
+      ],
+      "correcta": 2,
+      "explicacion": "La botella es un cuerpo. El vidrio, el plástico y la madera son materiales."
+    },
+    {
+      "id": "cue-04",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "¿Se pueden fabricar distintos cuerpos con un mismo material?",
+      "opciones": [
+        "No, cada material forma un solo tipo de cuerpo",
+        "Sí, por ejemplo con madera se hacen mesas, sillas y lápices",
+        "Solo con los metales",
+        "Solo con los materiales naturales"
+      ],
+      "correcta": 1,
+      "explicacion": "Con un mismo material se pueden fabricar cuerpos muy distintos."
+    },
+    {
+      "id": "cue-05",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Un vaso puede estar hecho de…",
+      "opciones": [
+        "un único material posible",
+        "distintos materiales: vidrio, plástico o metal",
+        "ningún material",
+        "solo vidrio"
+      ],
+      "correcta": 1,
+      "explicacion": "Un mismo tipo de cuerpo puede fabricarse con distintos materiales. Se elige el material según sus propiedades y su uso."
+    },
+    {
+      "id": "cue-06",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "¿Cuál de estos materiales es natural?",
+      "opciones": [
+        "El plástico",
+        "El vidrio",
+        "La lana",
+        "El acero"
+      ],
+      "correcta": 2,
+      "explicacion": "La lana se obtiene directamente de la oveja. El plástico, el vidrio y el acero se fabrican a partir de otros materiales: son artificiales."
+    },
+    {
+      "id": "cue-07",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "¿Por qué las ollas suelen ser de metal?",
+      "opciones": [
+        "Porque los metales son buenos conductores del calor",
+        "Porque los metales son aislantes del calor",
+        "Porque los metales son transparentes",
+        "Porque los metales son frágiles"
+      ],
+      "correcta": 0,
+      "explicacion": "Los metales conducen bien el calor: así la comida se calienta rápido."
+    },
+    {
+      "id": "cue-08",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Los mangos de las ollas suelen ser de plástico o de madera porque esos materiales son…",
+      "opciones": [
+        "buenos conductores del calor",
+        "aislantes térmicos",
+        "magnéticos",
+        "frágiles"
+      ],
+      "correcta": 1,
+      "explicacion": "El plástico y la madera conducen mal el calor: así podemos agarrar la olla sin quemarnos."
+    },
+    {
+      "id": "cue-09",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Un material frágil es el que…",
+      "opciones": [
+        "se estira sin romperse",
+        "se rompe con facilidad al golpearlo, como el vidrio",
+        "conduce la electricidad",
+        "es atraído por un imán"
+      ],
+      "correcta": 1,
+      "explicacion": "La fragilidad es la facilidad para romperse ante un golpe. El vidrio es frágil, aunque es duro."
+    },
+    {
+      "id": "cue-10",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Los cables eléctricos tienen cobre por dentro y plástico por fuera porque…",
+      "opciones": [
+        "el cobre conduce la electricidad y el plástico es aislante",
+        "el plástico conduce la electricidad y el cobre es aislante",
+        "los dos son aislantes",
+        "los dos conducen la electricidad"
+      ],
+      "correcta": 0,
+      "explicacion": "La corriente circula por el cobre, que es conductor; el plástico aislante evita que nos electrocutemos."
+    },
+    {
+      "id": "cue-11",
+      "tema": "Cuerpos y materiales",
+      "enunciado": "Un material elástico es el que…",
+      "opciones": [
+        "se rompe al estirarlo",
+        "recupera su forma después de estirarlo o deformarlo",
+        "conduce el calor",
+        "deja pasar la luz"
+      ],
+      "correcta": 1,
+      "explicacion": "Los materiales elásticos, como la goma de una gomita, vuelven a su forma original."
+    },
+    {
+      "id": "pro-01",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "Una propiedad extensiva es la que…",
+      "opciones": [
+        "no depende de la cantidad de materia",
+        "depende de la cantidad de materia",
+        "solo la tienen los líquidos",
+        "sirve para identificar una sustancia"
+      ],
+      "correcta": 1,
+      "explicacion": "Las propiedades extensivas, como la masa y el volumen, cambian según la cantidad de materia."
+    },
+    {
+      "id": "pro-02",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "¿Cuál de estas propiedades es extensiva?",
+      "opciones": [
+        "La densidad",
+        "La masa",
+        "El punto de ebullición",
+        "El color"
+      ],
+      "correcta": 1,
+      "explicacion": "La masa depende de la cantidad de materia: es extensiva. Las otras tres son intensivas."
+    },
+    {
+      "id": "pro-03",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "¿Cuál de estas propiedades es intensiva?",
+      "opciones": [
+        "El volumen",
+        "La masa",
+        "El peso",
+        "El punto de fusión"
+      ],
+      "correcta": 3,
+      "explicacion": "El punto de fusión no depende de la cantidad: un cubito o un bloque de hielo se funden a 0 °C."
+    },
+    {
+      "id": "pro-04",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "¿Por qué las propiedades intensivas sirven para identificar una sustancia?",
+      "opciones": [
+        "Porque no dependen de la cantidad de materia: son características de cada sustancia",
+        "Porque cambian según el tamaño de la muestra",
+        "Porque se miden siempre con una balanza",
+        "Porque todas las sustancias tienen las mismas"
+      ],
+      "correcta": 0,
+      "explicacion": "Como no dependen de la cantidad, las propiedades intensivas (densidad, punto de fusión, punto de ebullición) son como el «documento» de cada sustancia."
+    },
+    {
+      "id": "pro-05",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "Tenemos 1 litro y 2 litros de agua pura a nivel del mar. Sobre su punto de ebullición, podemos decir que…",
+      "opciones": [
+        "el de 2 litros es mayor",
+        "el de 1 litro es mayor",
+        "es el mismo: 100 °C",
+        "depende del recipiente"
+      ],
+      "correcta": 2,
+      "explicacion": "El punto de ebullición es una propiedad intensiva: no depende de la cantidad. Lo que cambia es el tiempo que tarda en hervir."
+    },
+    {
+      "id": "pro-06",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "¿Cómo se calcula la densidad?",
+      "opciones": [
+        "Masa dividida por volumen",
+        "Volumen dividido por masa",
+        "Masa por volumen",
+        "Masa menos volumen"
+      ],
+      "correcta": 0,
+      "explicacion": "Densidad = masa ÷ volumen. Por ejemplo, en g/cm³."
+    },
+    {
+      "id": "pro-07",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "Un cuerpo tiene 20 g de masa y ocupa 10 cm³. ¿Cuál es su densidad?",
+      "opciones": [
+        "200 g/cm³",
+        "2 g/cm³",
+        "0,5 g/cm³",
+        "30 g/cm³"
+      ],
+      "correcta": 1,
+      "explicacion": "Densidad = 20 g ÷ 10 cm³ = 2 g/cm³."
+    },
+    {
+      "id": "pro-08",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "El aceite flota sobre el agua porque…",
+      "opciones": [
+        "es más denso que el agua",
+        "es menos denso que el agua",
+        "tiene más masa",
+        "es más espeso"
+      ],
+      "correcta": 1,
+      "explicacion": "Un líquido menos denso queda arriba de uno más denso cuando no se mezclan."
+    },
+    {
+      "id": "pro-09",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "¿Cuál de estas propiedades es extensiva?",
+      "opciones": [
+        "La densidad",
+        "La dureza",
+        "El volumen",
+        "El olor"
+      ],
+      "correcta": 2,
+      "explicacion": "El volumen depende de la cantidad de materia: es extensivo."
+    },
+    {
+      "id": "pro-10",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "Si cortamos una barra de hierro por la mitad, cada mitad tiene…",
+      "opciones": [
+        "la misma masa que la barra entera",
+        "la mitad de la masa y la misma densidad",
+        "la mitad de la densidad",
+        "el doble de densidad"
+      ],
+      "correcta": 1,
+      "explicacion": "La masa (extensiva) se reduce a la mitad, pero la densidad (intensiva) es la misma porque sigue siendo hierro."
+    },
+    {
+      "id": "pro-11",
+      "tema": "Propiedades intensivas y extensivas",
+      "enunciado": "El color, el olor y el sabor son propiedades…",
+      "opciones": [
+        "extensivas, porque dependen de la cantidad",
+        "intensivas que se perciben con los sentidos (organolépticas)",
+        "que solo tienen los gases",
+        "que no sirven para describir una sustancia"
+      ],
+      "correcta": 1,
+      "explicacion": "Son propiedades intensivas organolépticas: se perciben con los sentidos. (¡En el laboratorio nunca se prueba ni se huele directamente!)"
+    }
+  ]
+}

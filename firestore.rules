@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Reglas de seguridad del Quiz de CienciaLab.
+// - Cualquiera puede leer la configuración (qué preguntas están activas) y la tabla de posiciones.
+// - Cualquiera puede agregar un resultado, pero solo con los campos y valores esperados.
+// - Solo la cuenta del docente puede cambiar la configuración y borrar resultados.
+// - Nadie puede modificar un resultado ya guardado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esDocente() {
+      return request.auth != null
+        && request.auth.token.email == 'linkin.lp2001@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    match /config/{documento} {
+      allow read: if true;
+      allow write: if esDocente();
+    }
+
+    match /resultados/{resultado} {
+      allow read: if true;
+      allow update: if false;
+      allow delete: if esDocente();
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'curso', 'correctas', 'total', 'tiempoMs', 'fecha'])
+        && request.resource.data.keys().hasAll(['nombre', 'curso', 'correctas', 'total', 'tiempoMs', 'fecha'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 40
+        && request.resource.data.curso is string
+        && request.resource.data.curso.size() > 0
+        && request.resource.data.curso.size() <= 20
+        && request.resource.data.total is int
+        && request.resource.data.total > 0
+        && request.resource.data.total <= 100
+        && request.resource.data.correctas is int
+        && request.resource.data.correctas >= 0
+        && request.resource.data.correctas <= request.resource.data.total
+        && request.resource.data.tiempoMs is int
+        && request.resource.data.tiempoMs > 0
+        && request.resource.data.tiempoMs < 10800000
+        && request.resource.data.fecha == request.time;
+    }
+  }
+}

@@ -15,6 +15,7 @@ Hecha por **Avila del Cali Jose**.
 | ⚛️ **Átomos y moléculas** | Estructura de la materia | Arman átomos con protones, neutrones y electrones (hasta Z = 20) y ven qué elemento, isótopo o ion formaron, si el núcleo es estable y su notación con número másico y atómico. Luego unen átomos (H, C, N, O, S, Cl) con enlaces simples, dobles o triples respetando cuántos enlaces forma cada uno. Ambos modos tienen misiones. |
 | 🥣 **Mezclas homogéneas y heterogéneas** | Sistemas materiales | **Al microscopio:** 15 mezclas (agua con sal, aire, bronce, agua y aceite, granito, ensalada de frutas…) vistas a simple vista y con una lupa que muestra sus partículas, con fases, componentes y método de separación. **¿Homogénea o heterogénea?:** clasifican mezclas y la lupa revela cómo son por dentro. **¿Cómo la separo?:** eligen entre filtración, decantación, imantación, tamización, tría, evaporación y destilación. |
 | 🧊 **Estados de la materia** | Cambios de estado | **Calentar y enfriar:** un recipiente con moléculas de agua que vibran, se deslizan o vuelan según la temperatura, con termómetro y curva de calentamiento (mesetas de fusión y ebullición). **Los cambios de estado:** mapa con los seis cambios y si absorben o liberan calor. **¿Qué cambio es?:** situaciones cotidianas. |
+| 📝 **Quiz de Química** | Evaluación (1.º y 2.º año) | Los alumnos entran por link, sin cuenta, con su nombre y curso. Responden preguntas al azar (de las activas) con las opciones mezcladas y cronómetro; al final ven correctas, tiempo y un repaso de errores con explicaciones, y su puesto en la tabla de posiciones (filtrable por curso). Temas: normas de seguridad y material de laboratorio, estados de la materia, sistemas materiales, materia y energía, cuerpos y materiales, y propiedades intensivas y extensivas. El **panel docente** (`#docente`) permite activar o desactivar preguntas y temas, elegir cuántas preguntas tiene cada intento y borrar resultados. |
 | 🔭 **Niveles de organización** | La materia y la vida | **Viaje con zoom:** acercan una lupa desde la biosfera hasta las partículas subatómicas, siguiendo a un carpincho de los Esteros del Iberá, con el tamaño de cada nivel y si tiene vida o no. **Ordenar:** acomodan los niveles del más pequeño al más grande (6 o los 14). **¿Qué nivel es?:** reconocen a qué nivel pertenecen ejemplos cotidianos. |
 | 🌍 **Efecto invernadero** | Cambio climático | Suben o bajan el CO₂ (con un deslizador, momentos históricos o acciones humanas) y ven la radiación solar y el calor en la atmósfera, la temperatura media año a año en un gráfico y sus consecuencias. Modelo simplificado: +3 °C por cada duplicación del CO₂. Además: **metano** (con sus fuentes), **efecto albedo** (el hielo refleja la luz y al derretirse la Tierra se calienta más) y **erupciones volcánicas** que enfrían unos años, con el aporte de cada efecto a la temperatura. También: **matriz energética** (fósil/renovable, con emisiones por año, molinos, paneles y humo de la fábrica), **escenarios hasta 2100** (emisiones altas, medias, cero neto o un plan propio) con un **termómetro de impactos** (nivel del mar, glaciares, especies) y **tiempo y clima** (hora del día con día y noche, y estaciones). |
 | 🔬 **Explorador de la célula** | La célula | Tocan los orgánulos de una célula animal o vegetal para acercarse y ver su función y una analogía; comparan ambas con una tabla, juegan a "¿Dónde está?" y siguen **rutas en la célula** (la insulina desde el núcleo hasta afuera, la glucosa hasta la mitocondria, una bacteria hasta el lisosoma, la energía del Sol y el agua hasta la vacuola). |
@@ -36,7 +37,7 @@ Para compartirla con los estudiantes por un enlace, se puede publicar gratis con
 - El botón **📽️** (modo proyector) agranda los textos para proyectar en el aula.
 - El botón **🌙/☀️** cambia entre modo claro y oscuro (por defecto sigue la configuración del dispositivo).
 - En las actividades con preguntas, cada ronda trae preguntas distintas y no se repiten las de la ronda anterior.
-- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#mezclas`, `#estados`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#glucemia`, `#nutricion`, `#mediciones`, `#mru` o `#electricidad`.
+- Cada módulo tiene su propio enlace: `index.html#transformaciones`, `#laboratorio`, `#balanceo`, `#tabla`, `#atomos`, `#mezclas`, `#estados`, `#niveles`, `#invernadero`, `#celula`, `#ciclos`, `#biomoleculas`, `#alimentacion`, `#glucemia`, `#nutricion`, `#mediciones`, `#mru`, `#electricidad`, `#quiz` o `#docente` (panel del docente).
 - El progreso (cuaderno del laboratorio, ecuaciones resueltas, récord del desafío) se guarda en el navegador de cada dispositivo.
 
 ## Estructura
@@ -67,7 +68,32 @@ js/nutricion-extra.js  Sistemas de la nutrición: esquema para completar y las i
 js/mediciones.js      Física: área y volumen de cajas con distintas unidades
 js/mru.js             Física: movimiento rectilíneo uniforme
 js/electricidad.js    Física: circuitos eléctricos, conductores y aislantes
+js/quiz.js            Quiz para alumnos y panel docente
+js/firebase-config.js Datos del proyecto de Firebase para el quiz
+preguntas.json        Banco de preguntas del quiz
+firestore.rules       Reglas de seguridad de Firestore para el quiz
 js/app.js             Navegación
 ```
 
 Para **agregar contenido**, edita las listas al principio de cada archivo: `CASOS` en transformaciones, `REACTIVOS` y `REACCIONES` en el laboratorio, y `ECUACIONES` en balanceo.
+
+## Quiz: banco de preguntas y Firebase
+
+Las preguntas están en `preguntas.json`. Cada una tiene esta forma:
+
+```json
+{
+  "id": "lab-01",
+  "tema": "Normas de seguridad y material de laboratorio",
+  "enunciado": "¿Para qué se usa la probeta?",
+  "opciones": ["Para medir volúmenes de líquidos", "Para moler sólidos", "Para medir la temperatura", "Para calentar sólidos"],
+  "correcta": 0,
+  "explicacion": "La probeta es un cilindro graduado que sirve para medir volúmenes de líquidos."
+}
+```
+
+- `correcta` es la **posición** de la opción correcta, contando desde 0 (la primera es 0, la segunda es 1…). El quiz mezcla las opciones al mostrarlas.
+- El `id` tiene que ser único y no conviene cambiarlo: el panel docente lo usa para recordar qué preguntas están apagadas. Las preguntas nuevas aparecen activas.
+- Para un tema nuevo, alcanza con usar un `tema` nuevo en las preguntas (y agregarlo a la lista `temas` del principio para elegir su orden).
+
+La configuración (preguntas apagadas y cantidad por intento) y los resultados se guardan en **Firestore**. Los datos del proyecto van en `js/firebase-config.js` y las reglas de seguridad están en `firestore.rules`. Mientras `js/firebase-config.js` esté vacío, el quiz funciona en **modo de prueba** y guarda todo solo en el navegador.
