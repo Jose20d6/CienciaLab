@@ -4,12 +4,12 @@
 // Lo que protege los datos son las reglas de Firestore (archivo firestore.rules).
 // Mientras estén vacíos, el quiz funciona en «modo de prueba» y guarda los resultados solo en este dispositivo.
 window.CIENCIALAB_FIREBASE = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: 'AIzaSyAAIwyV6gAvjiaNeK6SGPAgjgMc56E1V4g',
+  authDomain: 'ciencialab-69fab.firebaseapp.com',
+  projectId: 'ciencialab-69fab',
+  storageBucket: 'ciencialab-69fab.firebasestorage.app',
+  messagingSenderId: '104951833325',
+  appId: '1:104951833325:web:54ad30e65194249dfee2e4',
 };
 
 // Única cuenta que puede entrar al panel docente. Tiene que ser la misma que figura en firestore.rules.
