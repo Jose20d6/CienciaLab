@@ -491,6 +491,111 @@ const QuizDibujos = (function () {
     'tanque': () => `${mesada()}${caja(230, 40, 100, 100, 40, '#74c0fc', { largo: '3 m', alto: '3 m', ancho: '3 m' })}<rect x="325" y="${PISO - 26}" width="26" height="8" rx="2" fill="#adb5bd"/><circle cx="350" cy="${PISO - 12}" r="3" fill="#74c0fc" class="qzd-cae"/>${cara(280, 90, 4, 'feliz')}`,
   });
 
+  // ---------- 2.º año: Química y Ciencias naturales ----------
+  // Partículas dentro de una caja: 'solido' (ordenadas, vibran), 'liquido' (juntas, se deslizan) o 'gas' (separadas, vuelan).
+  function particulas(x, y, w, h, estado, c = '#74c0fc', semilla = 1) {
+    let s = semilla;
+    const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    const r = 7, pts = [];
+    if (estado === 'solido') {
+      for (let f = 0; f < 3; f++) for (let k = 0; k < 5; k++) pts.push([x + w / 2 - 34 + k * 17, y + h - 12 - f * 16]);
+    } else if (estado === 'liquido') {
+      for (let i = 0; i < 13; i++) pts.push([x + 12 + rnd() * (w - 24), y + h - 12 - rnd() * (h * 0.45)]);
+    } else {
+      for (let i = 0; i < 7; i++) pts.push([x + 12 + rnd() * (w - 24), y + 12 + rnd() * (h - 24)]);
+    }
+    const mov = (i) => {
+      if (estado === 'solido') return `<animateTransform attributeName="transform" type="translate" values="0 0;1.5 -1;-1.5 1;0 0" dur="${0.4 + (i % 3) * 0.1}s" repeatCount="indefinite"/>`;
+      const a = estado === 'gas' ? 26 : 7, d = estado === 'gas' ? 1.6 : 3;
+      const v = Array.from({ length: 4 }, () => `${((rnd() - 0.5) * 2 * a).toFixed(1)} ${((rnd() - 0.5) * 2 * a * (estado === 'gas' ? 1 : 0.4)).toFixed(1)}`);
+      return `<animateTransform attributeName="transform" type="translate" values="0 0;${v.join(';')};0 0" dur="${d + rnd()}s" repeatCount="indefinite"/>`;
+    };
+    return `${sombra(x + w / 2 + 3, y + h + 3, w * 0.55)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#dbe4ff" opacity="0.1"/>
+      ${pts.map(([px, py], i) => `<g>${mov(i)}<circle cx="${px}" cy="${py}" r="${r}" fill="${c}"/><circle cx="${px - 2}" cy="${py - 2}" r="2.2" fill="#fff" opacity="0.6"/></g>`).join('')}
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="none" stroke="#e7f5ff" stroke-width="3"/>`;
+  }
+  // Molécula de agua con cara.
+  const molecula = (x, y, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})">
+      <line x1="0" y1="0" x2="-26" y2="18" stroke="#dbe4ff" stroke-width="6"/><line x1="0" y1="0" x2="26" y2="18" stroke="#dbe4ff" stroke-width="6"/>
+      ${[-26, 26].map(dx => dt(`<circle cx="${dx}" cy="18" r="12" fill="FILL"/>`, '#f8f9fa', '#ced4da', { x: dx + 4 })).join('')}
+      ${dt('<circle r="20" fill="FILL"/>', '#ff6b6b', '#e03131', { x: 6 })}${brillo('M-12,-6 a12,12 0 0 1 8,-9', 2.5)}${cara(0, -1, 2.8, 'feliz')}</g>`;
+  const carpincho = (x, y, k = 1, dir = 1) => `<g transform="translate(${x} ${y}) scale(${k * dir} ${k})">${sombra(0, 22, 36)}
+      <rect x="-24" y="8" width="9" height="16" rx="4" fill="#7a4a2a"/><rect x="14" y="8" width="9" height="16" rx="4" fill="#7a4a2a"/>
+      ${dt('<path d="M-36,4 C-40,-22 -8,-30 18,-24 C34,-22 46,-10 44,4 C42,16 -32,18 -36,4 Z" fill="FILL"/>', '#b07a4a', '#8c5a32', { y: 2 })}
+      ${dt('<path d="M24,-22 C34,-34 58,-30 60,-14 C62,-4 50,2 36,0 C28,-2 22,-12 24,-22 Z" fill="FILL"/>', '#b07a4a', '#8c5a32', { y: -8 })}
+      <ellipse cx="30" cy="-28" rx="5" ry="4" fill="#8c5a32"/>${ojo(44, -18, 3.2)}<circle cx="58" cy="-12" r="2" fill="#4a2c18"/>
+      <path d="M50,-5 q4,2 8,0" stroke="#4a2c18" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>`;
+  const juncos = (x, h = 46) => `<g>${[0, 8, 16].map((dx, i) => `<path d="M${x + dx},${PISO} q${-3 + i * 3},${-h / 2} ${-2 + i * 2},${-h + i * 6}" stroke="#2f9e44" stroke-width="3" fill="none"/>`).join('')}<rect x="${x + 5}" y="${PISO - h - 4}" width="6" height="16" rx="3" fill="#7a4a2a"/></g>`;
+  const aguaPantano = () => `<rect y="${PISO - 14}" width="${W}" height="${H - PISO + 14}" fill="#1c7ed6" opacity="0.75"/>${[60, 220, 380, 520].map((a, i) => `<path d="M${a},${PISO + 4 + (i % 2) * 8} q8,-4 16,0 t16,0" stroke="#a5d8ff" stroke-width="2" fill="none" class="qzd-fluye"/>`).join('')}`;
+  // Tubo digestivo con cara en el estómago (sin rótulos ni glándulas).
+  const tuboDigestivo = (x, y, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})">
+      <path d="M0,-70 V-34" stroke="#ff8fab" stroke-width="9" stroke-linecap="round"/>
+      ${dt('<path d="M-6,-40 C14,-46 36,-28 32,-8 C28,10 4,14 -12,6 C-22,0 -16,-12 -6,-14 C2,-16 2,-24 -6,-28 Z" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 12 })}
+      <path d="M30,66 V18 H-34 V66 Q-34,74 -24,74 H6 V86" fill="none" stroke="#e8a0b0" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M-12,6 V28 H18 V38 H-20 V48 H18 V58 H-20" fill="none" stroke="#ffc9c9" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>${cara(10, -18, 2.8, 'feliz')}</g>`;
+  const corredor = (x, color = '#4dabf7') => `<g transform="translate(${x} ${PISO}) scale(0.8)">${sombra(0, 2, 26)}
+      <path d="M-4,-32 L-22,-2 M4,-32 L18,-14 L10,0" stroke="#364fc7" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dt('<rect x="-18" y="-78" width="36" height="50" rx="14" fill="FILL" transform="rotate(12 0 -50)"/>', color, tono(color, -0.2), { x: 6 })}
+      <path d="M-10,-66 L-30,-48 L-20,-36 M14,-68 L30,-58 L40,-70" stroke="#f2c094" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(8 -96)">${dt('<circle r="19" fill="FILL"/>', '#f2c094', '#d9a273', { x: 7 })}<path d="M-20,-2 C-22,-22 22,-24 20,-2 C14,-12 -14,-12 -20,-2 Z" fill="#3d2614"/>${cara(3, 2, 3.8, 'oh')}
+        <path d="M22,-6 q4,6 0,10" stroke="#74c0fc" stroke-width="3" fill="none" class="qzd-cae"/></g>
+      ${[0, 1, 2].map(i => `<path d="M-40,${-80 + i * 18} h-${18 + i * 6}" stroke="#c9ccf5" stroke-width="3" stroke-linecap="round" opacity="0.6"/>`).join('')}</g>`;
+  const frascoMiel = (x) => `${sombra(x + 2, PISO + 2, 20)}${dt(`<rect x="${x - 18}" y="${PISO - 40}" width="36" height="40" rx="8" fill="FILL"/>`, '#fab005', '#e67700', { x: x + 6 })}<rect x="${x - 20}" y="${PISO - 48}" width="40" height="10" rx="3" fill="#e8590c"/>${cara(x, PISO - 22, 2.6, 'feliz')}`;
+  const vasoTe = (x) => `${sombra(x + 2, PISO + 2, 34)}<path d="M${x + 30},${PISO - 40} q22,4 0,24" stroke="#f8f9fa" stroke-width="6" fill="none"/>
+      ${dt(`<path d="M${x - 34},${PISO - 52} H${x + 34} L${x + 28},${PISO - 4} Q${x + 27},${PISO} ${x + 22},${PISO} H${x - 22} Q${x - 27},${PISO} ${x - 28},${PISO - 4} Z" fill="FILL"/>`, '#f8f9fa', '#dee2e6', { x: x + 12 })}
+      <ellipse cx="${x}" cy="${PISO - 50}" rx="31" ry="5" fill="#c0792f"/>${vapor(x, PISO - 62, '#c9ccf5', 0.8)}`;
+
+  Object.assign(TEMAS, {
+    'Niveles de organización de la materia': () => `${tierra(110, 86, 56)}${lupa(300, 72, 34)}${molecula(480, 74, 1.3)}
+      ${[[200, 80], [400, 80]].map(([a, b]) => `<path d="M${a - 16},${b} h28" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/><path d="M${a + 12},${b - 8} l10,8 -10,8" fill="#ffd166"/>`).join('')}`,
+    'Modelo cinético de partículas': () => `${mesada()}${particulas(70, 66, 120, 70, 'solido', '#a5d8ff', 3)}${particulas(240, 66, 120, 70, 'liquido', '#74c0fc', 5)}${particulas(410, 30, 120, 106, 'gas', '#4dabf7', 7)}`,
+    'Sustancias puras y soluciones': () => `${mesada()}${frasco(110, 'H₂O', '#a5d8ff', '#2f9e44')}
+      ${vaso(270, 100, 100, [{ h: 70, c: '#74c0fc', borde: true }], `<path d="M${300},${PISO - 112} L${262},${PISO - 26}" stroke="#adb5bd" stroke-width="5" stroke-linecap="round"/>${[0, 1, 2, 3].map(i => `<circle cx="${250 + i * 14}" cy="${PISO - 60 + (i % 2) * 14}" r="3" fill="#fff" class="qzd-burbuja" style="animation-delay:${i * 0.3}s"/>`).join('')}`)}
+      ${sombra(450, PISO + 2, 60)}${dt(`<path d="M${400},${PISO} L${410},${PISO - 26} H${500} L${490},${PISO} Z" fill="FILL"/>`, '#e8a33d', '#b8741c', { x: 470 })}${brillo(`M414,${PISO - 20} H480`, 2.5)}${cara(450, PISO - 13, 3, 'feliz')}`,
+    'Alimentos y nutrientes': () => `${mesada()}${comida('pan', 90, PISO - 26)}${comida('leche', 200, PISO - 30)}${comida('huevo', 300, PISO - 24)}${comida('manzana', 400, PISO - 24)}${comida('carne', 510, PISO - 24)}`,
+    'El sistema digestivo': () => `${mesada()}${comida('manzana', 130, PISO - 24)}<path d="M180,${PISO - 60} h40" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/><path d="M220,${PISO - 68} l10,8 -10,8" fill="#ffd166"/>${tuboDigestivo(320, 60, 0.95)}
+      ${[0, 1, 2].map(i => `<circle cx="${430 + i * 30}" cy="${70 + (i % 2) * 20}" r="${7 - i}" fill="#ffd43b" class="qzd-flota" style="animation-delay:${i * 0.5}s"/>`).join('')}`,
+    'La nutrición en la vida cotidiana': () => `${mesada()}${corredor(200)}${ORGANO.corazon(380, 70, 0.9)}${ORGANO.pulmones(500, 86)}`,
+  });
+  Object.assign(DIBUJOS, {
+    'niveles': () => `${mesada()}${chico(90, { color: '#69db7c' })}${celulaAnimal(220, 80, 0.5)}${ORGANO.corazon(340, 86, 0.9)}${vistaMicroscopio(470, 78, 46, 'qzd-nv' + n)}`,
+    'carpinchos': () => `${aguaPantano()}${juncos(30)}${juncos(560, 60)}${carpincho(150, PISO - 30, 1)}${carpincho(310, PISO - 26, 0.8, -1)}${carpincho(440, PISO - 30, 1.05)}`,
+    'humedal': () => `${aguaPantano()}${juncos(40)}${juncos(110, 60)}${juncos(480, 54)}${juncos(540)}
+      <g transform="translate(300 ${PISO - 40})"><path d="M-4,26 V48 M6,26 V48" stroke="#ffa94d" stroke-width="3"/>${dt('<ellipse cx="0" cy="12" rx="22" ry="16" fill="FILL"/>', '#f8f9fa', '#dee2e6', { y: 16 })}<path d="M14,4 C24,-16 16,-36 28,-42" stroke="#f8f9fa" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="30" cy="-44" r="9" fill="#f8f9fa"/><path d="M38,-44 l18,3 -18,3 Z" fill="#ffa94d"/>${ojo(32, -46, 2.6, 1)}</g>
+      ${nube(150, 40, 0.8, '#dbe4ff', '#a5b4fc')}`,
+    'particulas-calor': () => `${mesada()}${particulas(240, 36, 120, 80, 'liquido', '#74c0fc', 11)}${sombra(303, PISO + 2, 80)}${dt(`<rect x="226" y="${PISO - 22}" width="148" height="22" rx="5" fill="FILL"/>`, '#868e96', '#5c636a', { x: 330 })}<rect x="236" y="${PISO - 24}" width="128" height="5" rx="2" fill="#ff6b6b" class="qzd-pulsa"/>${termometro(450)}`,
+    'particulas-estados': () => TEMAS['Modelo cinético de partículas'](),
+    'globo': () => `${mesada()}${chico(250, { color: '#ffd43b', brazo: brazoC(30, -96, '#ffd43b'), animo: 'oh' })}
+      <path d="M274,${PISO - 77} C290,${PISO - 110} 300,${PISO - 120} 320,${PISO - 124}" stroke="#adb5bd" stroke-width="1.5" fill="none"/>
+      <g class="qzd-flota">${dt('<ellipse cx="330" cy="40" rx="26" ry="32" fill="FILL"/>', '#ff6b6b', '#e03131', { x: 338 })}${brillo('M316,26 q4,-10 12,-12', 3)}</g>
+      ${[[420, 46], [450, 30], [470, 62], [440, 76], [490, 40]].map(([a, b], i) => `<path d="M${a},${b} l${(i % 2 ? 1 : -1) * 10},${-6 + i * 3}" stroke="#ffd166" stroke-width="3" stroke-linecap="round" class="qzd-pulsa"/>`).join('')}
+      ${texto(450, 100, '¡PUM!', 22, '#ffd166', 'font-weight="900"')}`,
+    'te': () => `${mesada()}${vasoTe(240)}<g transform="translate(400 ${PISO})">${sombra(2, 2, 30)}${dt('<path d="M-30,-40 H30 V-8 Q30,0 22,0 H-22 Q-30,0 -30,-8 Z" fill="FILL"/>', '#f8f9fa', '#dee2e6', { x: 10 })}<ellipse cx="0" cy="-40" rx="30" ry="6" fill="#fff"/>${[-12, -2, 9].map(dx => `<rect x="${dx}" y="-48" width="9" height="9" fill="#fff" stroke="#dee2e6"/>`).join('')}${cara(0, -22, 3, 'feliz')}</g>`,
+    'azucar-fondo': () => `${mesada()}${vaso(300, 110, 112, [{ h: 14, c: '#f8f9fa' }, { h: 70, c: '#a5d8ff', borde: true }])}${cara(300, PISO - 50, 3.4, 'oh')}`,
+    'origen': () => `${mesada()}${comida('huevo', 170, PISO - 24)}${frascoMiel(300)}${comida('leche', 430, PISO - 30)}${texto(300, 30, '?', 26, '#ffd166', 'font-weight="900"')}`,
+    'etiqueta': () => `${mesada()}<g transform="translate(200 ${PISO})">${sombra(4, 2, 50)}${dt('<rect x="-50" y="-112" width="100" height="112" rx="8" fill="FILL"/>', '#ffa94d', '#e8590c', { x: 20 })}${cara(0, -84, 3.6, 'feliz')}</g>
+      <g transform="translate(330 22)"><rect width="190" height="112" rx="6" fill="#fff"/>${texto(95, 18, 'Información nutricional', 11, '#12143a', 'font-weight="900"')}
+        ${['Valor energético', 'Carbohidratos', 'Proteínas', 'Grasas totales', 'Sodio'].map((t, i) => `<path d="M10,${30 + i * 16} H180" stroke="#adb5bd"/><text x="12" y="${42 + i * 16}" class="qzd-t" style="font-size:10px" fill="#12143a">${t}</text><rect x="140" y="${33 + i * 16}" width="34" height="9" rx="2" fill="#dee2e6"/>`).join('')}</g>`,
+    'chatarra': () => `${mesada()}${comida('snack', 160, PISO - 30, 1.8)}${comida('gaseosa', 300, PISO - 30, 1.9)}${comida('golosina', 440, PISO - 26, 1.8)}`,
+    'digestivo': () => `${mesada()}${tuboDigestivo(300, 62, 0.95)}${[[210, 70], [400, 60], [390, 112]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="14" fill="#12143a" stroke="#ffd166" stroke-width="2" stroke-dasharray="4 3"/>${texto(a, b + 6, '?', 16, '#ffd166', 'font-weight="900"')}`).join('')}`,
+    'beaumont': () => `${mesada()}<g transform="translate(330 70)">${ORGANO.estomago(0, 0)}</g><path d="M180,24 C230,30 300,30 324,52" stroke="#e9ecef" stroke-width="2" fill="none"/><rect x="316" y="48" width="18" height="12" rx="4" fill="#c0392b"/>
+      ${lupa(150, 70, 28)}<g transform="translate(470 ${PISO})">${sombra(0, 2, 30)}<rect x="-26" y="-40" width="52" height="40" rx="3" fill="#fff8e1"/><path d="M0,-40 V0" stroke="#dee2e6" stroke-width="2"/>${[0, 1, 2].map(i => `<path d="M-20,${-30 + i * 10} h14 M6,${-30 + i * 10} h14" stroke="#adb5bd" stroke-width="2"/>`).join('')}</g>`,
+    'jarabe': () => `${mesada()}${frasco(150, 'JARABE', '#c2255c', '#495057', 46, 72)}<g transform="translate(260 ${PISO - 70}) rotate(-20)">${dt('<path d="M-50,-4 H10 C20,-14 50,-12 54,0 C50,12 20,14 10,4 H-50 Q-54,0 -50,-4 Z" fill="FILL"/>', '#e9ecef', '#adb5bd', { y: 0 })}<ellipse cx="34" cy="0" rx="14" ry="6" fill="#c2255c"/></g>
+      ${chico(440, { color: '#748ffc', animo: 'oh' })}<circle cx="480" cy="30" r="14" fill="#fff"/>${texto(480, 37, '?', 20, '#12143a', 'font-weight="900"')}`,
+    'antidoping': () => `${mesada()}${chico(220, { color: '#51cf66', brazo: brazoC(36, -92, '#51cf66') })}<g transform="translate(220 ${PISO - 72})"><path d="M-10,-14 L0,6 L10,-14" stroke="#4dabf7" stroke-width="4" fill="none"/><circle cy="12" r="9" fill="#ffd43b"/><circle cy="12" r="4" fill="#fab005"/></g>
+      <g transform="translate(400 ${PISO})">${sombra(2, 2, 24)}<rect x="-20" y="-52" width="40" height="52" rx="6" fill="#e7f5ff" opacity="0.6" stroke="#e7f5ff" stroke-width="2.5"/><rect x="-17" y="-30" width="34" height="27" rx="4" fill="#ffe066"/><rect x="-23" y="-60" width="46" height="10" rx="3" fill="#4dabf7"/><rect x="-14" y="-46" width="28" height="12" fill="#fff"/></g>`,
+    'pulso': () => `${mesada()}<g transform="translate(220 ${PISO}) scale(1.08)">${sombra(2, 2, 24)}${dt('<rect x="-20" y="-78" width="40" height="52" rx="14" fill="FILL"/>', '#ff922b', '#e8590c', { x: 7 })}<rect x="-7" y="-84" width="14" height="10" fill="#d9a273"/>
+        <g transform="translate(0 -102)">${dt('<circle r="20" fill="FILL"/>', '#f2c094', '#d9a273', { x: 7 })}<path d="M-21,-2 C-24,-24 24,-26 21,-2 C14,-14 -14,-14 -21,-2 Z" fill="#7a4a2a"/>${cara(0, 2, 4, 'feliz')}</g>
+        <path d="M14,-66 Q28,-76 10,-82" stroke="#e8590c" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="8" cy="-82" r="6" fill="#f2c094"/></g>
+      ${ORGANO.corazon(400, 70, 0.8)}${cronometro(510, 70, 28)}`,
+    'correr': () => `${mesada()}${corredor(230, '#ff6b6b')}${cronometro(420, 64, 32)}${[0, 1, 2].map(i => `<g class="qzd-flota" style="animation-delay:${i * 0.6}s"><circle cx="${500 + i * 26}" cy="${50 + (i % 2) * 30}" r="13" fill="#a5d8ff" opacity="0.8"/>${texto(500 + i * 26, 55 + (i % 2) * 30, 'O₂', 10, '#12143a', 'font-weight="900"')}</g>`).join('')}`,
+    'arteria': () => `<rect width="${W}" height="${H}" fill="#2b0d1e"/><path d="M0,22 H${W} V148 H0 Z" fill="#c92a2a"/><path d="M0,34 H${W} V136 H0 Z" fill="#8c1a41"/>
+      ${dt('<path d="M220,36 C260,36 300,64 340,64 C380,64 400,36 430,36 Z" fill="FILL"/>', '#ffe066', '#fab005', { y: 50 })}${dt('<path d="M240,134 C280,134 300,112 340,112 C370,112 390,134 420,134 Z" fill="FILL"/>', '#ffe066', '#fab005', { y: 124 })}
+      <g class="qzd-fluye">${[[80, 70], [140, 100], [200, 84], [470, 80], [530, 104], [400, 92]].map(([a, b]) => `<g transform="translate(${a} ${b})">${dt('<ellipse rx="13" ry="9" fill="FILL"/>', '#ff6b6b', '#e03131', { y: 2 })}<ellipse rx="6" ry="3.5" fill="#c92a2a"/></g>`).join('')}</g>`,
+    'galletitas': () => `${mesada()}${comida('avena', 90, PISO - 26)}${comida('huevo', 190, PISO - 24)}${comida('aceite', 290, PISO - 30)}${frascoMiel(390)}
+      <g transform="translate(510 ${PISO - 14})">${sombra(0, 14, 40)}${[[-20, 0], [18, 2], [0, -14]].map(([a, b]) => `${dt(`<circle cx="${a}" cy="${b}" r="16" fill="FILL"/>`, '#e8a65d', '#c97b33', { x: a + 5 })}<circle cx="${a - 4}" cy="${b - 3}" r="2" fill="#7a4a2a"/><circle cx="${a + 5}" cy="${b + 4}" r="2" fill="#7a4a2a"/>`).join('')}</g>`,
+  });
+
   function svg(p) {
     const id = 'qzd' + (n++);
     const dibujo = (p.imagen && DIBUJOS[p.imagen]) || TEMAS[p.tema];

@@ -6,9 +6,15 @@
     "Materia y energía",
     "Cuerpos y materiales",
     "Propiedades intensivas y extensivas",
+    "Niveles de organización de la materia",
+    "Modelo cinético de partículas",
+    "Sustancias puras y soluciones",
     "Alimentación saludable",
     "Sistemas de la nutrición",
     "La célula",
+    "Alimentos y nutrientes",
+    "El sistema digestivo",
+    "La nutrición en la vida cotidiana",
     "La física y el método científico",
     "Magnitudes y unidades",
     "Masa y peso",
@@ -21,12 +27,18 @@
       "Sistemas materiales",
       "Materia y energía",
       "Cuerpos y materiales",
-      "Propiedades intensivas y extensivas"
+      "Propiedades intensivas y extensivas",
+      "Niveles de organización de la materia",
+      "Modelo cinético de partículas",
+      "Sustancias puras y soluciones"
     ],
     "Ciencias naturales": [
       "Alimentación saludable",
       "Sistemas de la nutrición",
-      "La célula"
+      "La célula",
+      "Alimentos y nutrientes",
+      "El sistema digestivo",
+      "La nutrición en la vida cotidiana"
     ],
     "Física": [
       "La física y el método científico",
@@ -2203,6 +2215,963 @@
       "correcta": 0,
       "explicacion": "V = 3 × 3 × 3 = 27 m³. Como 1 m³ = 1000 L, entran 27 000 litros.",
       "imagen": "tanque"
+    },
+    {
+      "id": "niv-01",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Qué estudia la química?",
+      "opciones": [
+        "La composición, la estructura y las propiedades de la materia, y sus cambios",
+        "Solo los seres vivos",
+        "El movimiento de los planetas",
+        "Únicamente los medicamentos"
+      ],
+      "correcta": 0,
+      "explicacion": "La química estudia de qué está hecha la materia, cómo es por dentro, sus propiedades y las transformaciones que sufre, como las reacciones químicas."
+    },
+    {
+      "id": "niv-02",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál de estas es una aplicación de la química en la vida cotidiana?",
+      "opciones": [
+        "Fabricar medicamentos, jabones y plásticos",
+        "Medir la distancia entre ciudades",
+        "Escribir un cuento",
+        "Contar los habitantes de un país"
+      ],
+      "correcta": 0,
+      "explicacion": "La química está en los remedios, los productos de limpieza, los plásticos, los fertilizantes, la cocina…"
+    },
+    {
+      "id": "niv-03",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál de estos niveles de organización es el MÁS pequeño?",
+      "opciones": [
+        "Átomo",
+        "Molécula",
+        "Célula",
+        "Órgano"
+      ],
+      "correcta": 0,
+      "explicacion": "El orden de menor a mayor empieza: partículas subatómicas → átomo → molécula → célula → tejido → órgano…"
+    },
+    {
+      "id": "niv-04",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál es el orden correcto, de menor a mayor complejidad?",
+      "opciones": [
+        "Célula → tejido → órgano → sistema de órganos → organismo",
+        "Tejido → célula → organismo → órgano → sistema",
+        "Órgano → célula → tejido → organismo → sistema",
+        "Organismo → sistema → órgano → tejido → célula"
+      ],
+      "correcta": 0,
+      "explicacion": "Las células forman tejidos; los tejidos, órganos; los órganos trabajan juntos en sistemas, y los sistemas forman un organismo.",
+      "imagen": "niveles"
+    },
+    {
+      "id": "niv-05",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál es el primer nivel de organización que tiene VIDA?",
+      "opciones": [
+        "La célula",
+        "La molécula",
+        "El átomo",
+        "El tejido"
+      ],
+      "correcta": 0,
+      "explicacion": "La célula es la unidad más pequeña con vida. Las moléculas y los átomos que la forman no están vivos."
+    },
+    {
+      "id": "niv-06",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "Una molécula de agua (H₂O) tiene propiedades distintas de las del oxígeno y el hidrógeno por separado. Esto muestra que cada nivel…",
+      "opciones": [
+        "tiene propiedades nuevas, que no son solo la suma de sus partes",
+        "es igual al nivel anterior",
+        "no tiene ninguna propiedad",
+        "siempre es más pesado que el anterior"
+      ],
+      "correcta": 0,
+      "explicacion": "Cada nivel de organización presenta propiedades nuevas (propiedades emergentes). Una célula, por ejemplo, está viva, aunque sus moléculas no lo estén."
+    },
+    {
+      "id": "niv-07",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "Un conjunto de carpinchos de la misma especie que viven en los Esteros del Iberá forma…",
+      "opciones": [
+        "una población",
+        "una comunidad",
+        "un organismo",
+        "un tejido"
+      ],
+      "correcta": 0,
+      "explicacion": "Población: individuos de la misma especie en un mismo lugar. Si sumamos las otras especies (yacarés, garzas, plantas…), es una comunidad.",
+      "imagen": "carpinchos"
+    },
+    {
+      "id": "niv-08",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "Todas las poblaciones de distintas especies que viven juntas en un lugar forman…",
+      "opciones": [
+        "una comunidad",
+        "una población",
+        "un órgano",
+        "una molécula"
+      ],
+      "correcta": 0,
+      "explicacion": "Una comunidad reúne a todas las poblaciones de seres vivos de un lugar: plantas, animales, hongos, bacterias…"
+    },
+    {
+      "id": "niv-09",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "La comunidad de seres vivos junto con el ambiente (agua, suelo, aire, luz) forman…",
+      "opciones": [
+        "un ecosistema",
+        "una población",
+        "un sistema de órganos",
+        "una célula"
+      ],
+      "correcta": 0,
+      "explicacion": "El ecosistema incluye a los seres vivos y a los componentes no vivos del ambiente, y las relaciones entre ellos. Un humedal es un ejemplo."
+    },
+    {
+      "id": "niv-10",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál es el nivel de organización más grande?",
+      "opciones": [
+        "La biosfera",
+        "El ecosistema",
+        "La comunidad",
+        "El organismo"
+      ],
+      "correcta": 0,
+      "explicacion": "La biosfera es el conjunto de todos los ecosistemas de la Tierra: todo el lugar del planeta donde hay vida."
+    },
+    {
+      "id": "niv-11",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Qué es un humedal?",
+      "opciones": [
+        "Un ambiente con suelo inundado o saturado de agua durante buena parte del tiempo",
+        "Un desierto sin agua",
+        "Una zona de montaña con nieve todo el año",
+        "Una ciudad construida sobre un río"
+      ],
+      "correcta": 0,
+      "explicacion": "En los humedales el agua es el elemento clave: define sus suelos, sus plantas y sus animales. Los Esteros del Iberá son un humedal.",
+      "imagen": "humedal"
+    },
+    {
+      "id": "niv-12",
+      "tema": "Niveles de organización de la materia",
+      "enunciado": "¿Cuál de estas acciones daña a los humedales?",
+      "opciones": [
+        "Rellenarlos para construir y contaminarlos",
+        "Protegerlos como parques nacionales",
+        "Estudiar las especies que viven ahí",
+        "Respetar el ciclo natural del agua"
+      ],
+      "correcta": 0,
+      "explicacion": "Los humedales se pierden por la urbanización, los rellenos, la contaminación, las especies invasoras y el cambio climático. Desde 1970 se perdió cerca del 35 %."
+    },
+    {
+      "id": "cin-01",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "Según el modelo cinético de partículas, la materia está formada por…",
+      "opciones": [
+        "partículas muy pequeñas en constante movimiento",
+        "una sola pieza sin espacios",
+        "partículas quietas que nunca se mueven",
+        "agua en todos los casos"
+      ],
+      "correcta": 0,
+      "explicacion": "Toda la materia está formada por partículas que no se ven a simple vista y que siempre se mueven."
+    },
+    {
+      "id": "cin-02",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "¿Qué hay entre una partícula y otra?",
+      "opciones": [
+        "Espacio vacío",
+        "Aire",
+        "Agua",
+        "Más materia del mismo tipo"
+      ],
+      "correcta": 0,
+      "explicacion": "Entre las partículas hay espacio vacío. Por eso, por ejemplo, los gases se pueden comprimir."
+    },
+    {
+      "id": "cin-03",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "Cuando aumenta la temperatura, las partículas…",
+      "opciones": [
+        "se mueven más rápido",
+        "se quedan quietas",
+        "se hacen más grandes",
+        "desaparecen"
+      ],
+      "correcta": 0,
+      "explicacion": "La energía cinética (de movimiento) de las partículas depende de la temperatura: más calor, más movimiento.",
+      "imagen": "particulas-calor"
+    },
+    {
+      "id": "cin-04",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "¿En qué estado las partículas están muy separadas y se mueven muy rápido en todas direcciones?",
+      "opciones": [
+        "Gaseoso",
+        "Sólido",
+        "Líquido",
+        "En ninguno"
+      ],
+      "correcta": 0,
+      "explicacion": "En los gases casi no hay atracción entre partículas: se separan mucho y ocupan todo el recipiente.",
+      "imagen": "particulas-estados"
+    },
+    {
+      "id": "cin-05",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "En un líquido, las partículas…",
+      "opciones": [
+        "están cerca, pero pueden deslizarse unas sobre otras",
+        "están fijas en un lugar",
+        "están muy lejos entre sí",
+        "no se atraen nada"
+      ],
+      "correcta": 0,
+      "explicacion": "Por eso un líquido tiene volumen propio pero toma la forma del recipiente.",
+      "imagen": "particulas-estados"
+    },
+    {
+      "id": "cin-06",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "En un sólido, la fuerza de atracción entre las partículas es…",
+      "opciones": [
+        "fuerte: por eso mantienen su lugar y el sólido tiene forma propia",
+        "nula",
+        "más débil que en un gas",
+        "igual que en un gas"
+      ],
+      "correcta": 0,
+      "explicacion": "En un sólido la atracción (cohesión) le gana al movimiento: las partículas solo vibran en su lugar."
+    },
+    {
+      "id": "cin-07",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "En un gas, la energía cinética (de movimiento) de las partículas es…",
+      "opciones": [
+        "mayor que la fuerza que las une",
+        "menor que la fuerza que las une",
+        "igual a cero",
+        "igual que en un sólido"
+      ],
+      "correcta": 0,
+      "explicacion": "Gas: el movimiento le gana a la atracción. Sólido: la atracción le gana al movimiento. Líquido: están más o menos equilibrados."
+    },
+    {
+      "id": "cin-08",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "Juan infla un globo para su cumpleaños. ¿Qué pasa con el aire si el globo se pincha?",
+      "opciones": [
+        "Se escapa y se esparce por la habitación, porque los gases ocupan todo el espacio disponible",
+        "Se queda con la forma del globo",
+        "Se convierte en líquido",
+        "Desaparece porque no es materia"
+      ],
+      "correcta": 0,
+      "explicacion": "El aire es materia en estado gaseoso: no tiene forma propia y se expande para ocupar todo el lugar disponible.",
+      "imagen": "globo"
+    },
+    {
+      "id": "cin-09",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "La mamá de Juan sirve la chocolatada de la jarra a los vasos. La chocolatada…",
+      "opciones": [
+        "cambia de forma pero mantiene su volumen",
+        "mantiene la forma de la jarra",
+        "cambia su volumen",
+        "se convierte en gas"
+      ],
+      "correcta": 0,
+      "explicacion": "Los líquidos tienen volumen propio, pero adoptan la forma del recipiente que los contiene."
+    },
+    {
+      "id": "cin-10",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "¿Qué pasa con las partículas del agua cuando se congela?",
+      "opciones": [
+        "Pierden energía, se mueven menos y quedan ordenadas en su lugar",
+        "Ganan energía y se separan",
+        "Se hacen más grandes",
+        "Desaparecen"
+      ],
+      "correcta": 0,
+      "explicacion": "Al enfriarse, las partículas se mueven menos y la atracción las mantiene fijas: se forma un sólido."
+    },
+    {
+      "id": "cin-11",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "Un perfume se abre en una esquina del aula y al rato se siente en toda el aula. Según el modelo de partículas…",
+      "opciones": [
+        "las partículas del perfume se mueven y se mezclan con las del aire",
+        "el perfume se convierte en sólido",
+        "las partículas del aire se quedan quietas",
+        "el olor viaja solo por la luz"
+      ],
+      "correcta": 0,
+      "explicacion": "Las partículas del gas se mueven sin parar y en todas direcciones: así se esparcen por todo el lugar (difusión)."
+    },
+    {
+      "id": "cin-12",
+      "tema": "Modelo cinético de partículas",
+      "enunciado": "Para representar el modelo cinético con bolitas de plastilina, cada bolita representa…",
+      "opciones": [
+        "una partícula",
+        "un gramo de materia",
+        "un estado de la materia",
+        "una célula"
+      ],
+      "correcta": 0,
+      "explicacion": "En la maqueta, cada bolita es una partícula. Su ubicación y distancia muestran si el material está sólido, líquido o gaseoso."
+    },
+    {
+      "id": "spu-01",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Qué es una sustancia pura?",
+      "opciones": [
+        "Un material formado por un solo componente, con propiedades fijas",
+        "Cualquier mezcla de dos líquidos",
+        "Un material que siempre es transparente",
+        "Un sistema heterogéneo"
+      ],
+      "correcta": 0,
+      "explicacion": "Una sustancia pura tiene un solo componente y propiedades intensivas fijas: por ejemplo, el agua destilada hierve siempre a 100 °C a nivel del mar."
+    },
+    {
+      "id": "spu-02",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Qué es una solución?",
+      "opciones": [
+        "Un sistema homogéneo formado por dos o más componentes",
+        "Un sistema heterogéneo de dos fases",
+        "Una sustancia pura",
+        "Un sólido con partes distintas"
+      ],
+      "correcta": 0,
+      "explicacion": "Una solución se ve igual en todas partes (una fase), pero tiene más de un componente, como el agua con sal disuelta."
+    },
+    {
+      "id": "spu-03",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Cuál de estos es una SOLUCIÓN?",
+      "opciones": [
+        "Agua mineral",
+        "Agua con arena",
+        "Hierro",
+        "Una ensalada de frutas"
+      ],
+      "correcta": 0,
+      "explicacion": "El agua mineral tiene sales disueltas: es homogénea y tiene varios componentes."
+    },
+    {
+      "id": "spu-04",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Cuál de estos es una SUSTANCIA PURA?",
+      "opciones": [
+        "Hierro",
+        "Soda",
+        "Bronce",
+        "Agua con vinagre"
+      ],
+      "correcta": 0,
+      "explicacion": "El hierro está formado por un solo tipo de átomo. La soda, el bronce (cobre y estaño) y el agua con vinagre son soluciones."
+    },
+    {
+      "id": "spu-05",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "El bronce es una aleación de cobre y estaño. ¿Qué tipo de sistema es?",
+      "opciones": [
+        "Una solución sólida",
+        "Una sustancia pura",
+        "Un sistema heterogéneo",
+        "Una sustancia simple"
+      ],
+      "correcta": 0,
+      "explicacion": "Una aleación es una mezcla homogénea de metales: es una solución en estado sólido."
+    },
+    {
+      "id": "spu-06",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿En qué se diferencian una sustancia simple y una sustancia compuesta?",
+      "opciones": [
+        "La simple tiene un solo tipo de átomo; la compuesta, dos o más tipos de átomos unidos",
+        "La simple es líquida y la compuesta es sólida",
+        "La simple es una mezcla y la compuesta no",
+        "No hay diferencia"
+      ],
+      "correcta": 0,
+      "explicacion": "El oxígeno (O₂) es una sustancia simple. El agua (H₂O) es compuesta: tiene hidrógeno y oxígeno unidos."
+    },
+    {
+      "id": "spu-07",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Cuál de estas es una sustancia COMPUESTA?",
+      "opciones": [
+        "El agua (H₂O)",
+        "El oxígeno (O₂)",
+        "El hierro (Fe)",
+        "El oro (Au)"
+      ],
+      "correcta": 0,
+      "explicacion": "El agua está formada por átomos de dos elementos distintos: hidrógeno y oxígeno."
+    },
+    {
+      "id": "spu-08",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "Un té con azúcar totalmente disuelta es…",
+      "opciones": [
+        "un sistema homogéneo: una solución",
+        "un sistema heterogéneo",
+        "una sustancia pura",
+        "una sustancia simple"
+      ],
+      "correcta": 0,
+      "explicacion": "No se distinguen partes: tiene una sola fase, pero varios componentes (agua, sustancias del té y azúcar).",
+      "imagen": "te"
+    },
+    {
+      "id": "spu-09",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "Agua con mucho azúcar, con parte del azúcar depositada en el fondo, es un sistema…",
+      "opciones": [
+        "heterogéneo de dos fases",
+        "homogéneo de una fase",
+        "heterogéneo de tres fases",
+        "que es una sustancia pura"
+      ],
+      "correcta": 0,
+      "explicacion": "Hay dos fases: la solución de agua con azúcar disuelta y el azúcar sólido del fondo, que ya no se disolvió.",
+      "imagen": "azucar-fondo"
+    },
+    {
+      "id": "spu-10",
+      "tema": "Sustancias puras y soluciones",
+      "enunciado": "¿Qué método se usa para separar sal gruesa de harina?",
+      "opciones": [
+        "Tamización",
+        "Imantación",
+        "Destilación",
+        "Decantación"
+      ],
+      "correcta": 0,
+      "explicacion": "Son dos sólidos de distinto tamaño: con un tamiz, la harina pasa y la sal gruesa queda arriba."
+    },
+    {
+      "id": "anu-01",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Qué es un alimento?",
+      "opciones": [
+        "Todo lo que comemos y bebemos que aporta nutrientes al cuerpo",
+        "Solo las comidas calientes",
+        "Una sustancia que el cuerpo fabrica solo",
+        "Únicamente las frutas y verduras"
+      ],
+      "correcta": 0,
+      "explicacion": "Alimento es todo lo que ingerimos (comida y bebida). Al pasar por el sistema digestivo, los alimentos se transforman en nutrientes."
+    },
+    {
+      "id": "anu-02",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Cuál de estas características corresponde a la NUTRICIÓN?",
+      "opciones": [
+        "Es involuntaria: ocurre dentro del cuerpo sin que lo decidamos",
+        "Es voluntaria: elegimos cuándo hacerla",
+        "Consiste solo en elegir qué comer",
+        "Depende de la publicidad"
+      ],
+      "correcta": 0,
+      "explicacion": "Alimentarse es un acto voluntario (elegimos qué comer). Nutrirse es involuntario: el cuerpo digiere, absorbe y usa los nutrientes."
+    },
+    {
+      "id": "anu-03",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Cómo se clasifican estos alimentos según su origen: huevo, miel, leche?",
+      "opciones": [
+        "Animal",
+        "Vegetal",
+        "Mineral",
+        "Artificial"
+      ],
+      "correcta": 0,
+      "explicacion": "Los tres los producen animales (gallina, abeja, vaca). La harina y el arroz son de origen vegetal; la sal y el agua, mineral.",
+      "imagen": "origen"
+    },
+    {
+      "id": "anu-04",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Cuál de estos alimentos es de origen MINERAL?",
+      "opciones": [
+        "La sal",
+        "La harina de trigo",
+        "El atún",
+        "El yogur"
+      ],
+      "correcta": 0,
+      "explicacion": "La sal y el agua no provienen de seres vivos: son de origen mineral."
+    },
+    {
+      "id": "anu-05",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Cuáles son los macronutrientes?",
+      "opciones": [
+        "Carbohidratos, proteínas y grasas (lípidos)",
+        "Vitaminas y minerales",
+        "Agua y sal",
+        "Fibra y azúcar"
+      ],
+      "correcta": 0,
+      "explicacion": "Los macronutrientes se necesitan en grandes cantidades. Las vitaminas y los minerales son micronutrientes: se necesitan en poca cantidad, pero son imprescindibles."
+    },
+    {
+      "id": "anu-06",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Cuáles son micronutrientes?",
+      "opciones": [
+        "Las vitaminas y los minerales",
+        "Los carbohidratos",
+        "Las proteínas",
+        "Las grasas"
+      ],
+      "correcta": 0,
+      "explicacion": "Se necesitan en cantidades muy pequeñas, pero regulan muchas funciones del cuerpo."
+    },
+    {
+      "id": "anu-07",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "Los nutrientes cumplen tres funciones. ¿Cuál de estas NO es una de ellas?",
+      "opciones": [
+        "Cambiar el color de los ojos",
+        "Dar energía",
+        "Construir y reparar el cuerpo",
+        "Regular las reacciones de las células"
+      ],
+      "correcta": 0,
+      "explicacion": "Funciones de los nutrientes: energética (dar energía), plástica o estructural (construir y reparar) y reguladora."
+    },
+    {
+      "id": "anu-08",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Dónde se puede ver cuántas proteínas o grasas tiene un alimento envasado?",
+      "opciones": [
+        "En la tabla de información nutricional de la etiqueta",
+        "En el precio",
+        "En el color del envase",
+        "En la fecha de vencimiento"
+      ],
+      "correcta": 0,
+      "explicacion": "La etiqueta tiene una tabla con la cantidad de carbohidratos, proteínas, grasas, sodio, etc., por porción.",
+      "imagen": "etiqueta"
+    },
+    {
+      "id": "anu-09",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿A qué se llama «comida chatarra»?",
+      "opciones": [
+        "A alimentos con mucha grasa, azúcar o sal y pocos nutrientes",
+        "A la comida hecha en casa",
+        "A las frutas y verduras",
+        "A cualquier comida con carne"
+      ],
+      "correcta": 0,
+      "explicacion": "Papas fritas, chizitos o gaseosas aportan muchas calorías pero pocos nutrientes. Su consumo frecuente perjudica la salud.",
+      "imagen": "chatarra"
+    },
+    {
+      "id": "anu-10",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿Todas las personas necesitamos la misma cantidad de alimentos?",
+      "opciones": [
+        "No: depende de la edad, la actividad física y el estado de salud",
+        "Sí, todos necesitamos exactamente lo mismo",
+        "Sí, si tenemos el mismo nombre",
+        "No, solo los adultos necesitan comer"
+      ],
+      "correcta": 0,
+      "explicacion": "Un deportista necesita más energía que una persona sedentaria, y un adolescente en crecimiento no come igual que un niño."
+    },
+    {
+      "id": "anu-11",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "«Comer mucho» ¿es lo mismo que «comer bien»?",
+      "opciones": [
+        "No: se puede comer mucho y no obtener todos los nutrientes necesarios",
+        "Sí, cuanto más se come, mejor",
+        "Sí, si se come rápido",
+        "No, comer bien es comer poco siempre"
+      ],
+      "correcta": 0,
+      "explicacion": "Una alimentación equilibrada es variada y en cantidades adecuadas, no simplemente abundante."
+    },
+    {
+      "id": "anu-12",
+      "tema": "Alimentos y nutrientes",
+      "enunciado": "¿En qué unidad se suele indicar la energía que aportan los alimentos?",
+      "opciones": [
+        "Calorías (kilocalorías)",
+        "Litros",
+        "Metros",
+        "Grados"
+      ],
+      "correcta": 0,
+      "explicacion": "Las etiquetas indican el valor energético en kcal (kilocalorías) y también en kJ (kilojoules)."
+    },
+    {
+      "id": "dig-01",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Cuál es la función del sistema digestivo?",
+      "opciones": [
+        "Descomponer los alimentos en nutrientes, absorberlos y eliminar los desechos",
+        "Llevar el oxígeno a la sangre",
+        "Bombear la sangre",
+        "Filtrar la sangre y formar orina"
+      ],
+      "correcta": 0,
+      "explicacion": "El sistema digestivo transforma los alimentos en sustancias simples (nutrientes), los absorbe y elimina lo que no se aprovecha."
+    },
+    {
+      "id": "dig-02",
+      "tema": "El sistema digestivo",
+      "enunciado": "El sistema digestivo está formado por el tubo digestivo y…",
+      "opciones": [
+        "las glándulas anexas (glándulas salivales, hígado y páncreas)",
+        "los pulmones",
+        "los riñones",
+        "el corazón"
+      ],
+      "correcta": 0,
+      "explicacion": "Las glándulas anexas no forman parte del tubo, pero vuelcan en él jugos que ayudan a digerir.",
+      "imagen": "digestivo"
+    },
+    {
+      "id": "dig-03",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Cuál es el orden correcto de las etapas de la digestión?",
+      "opciones": [
+        "Ingestión → digestión → absorción → egestión",
+        "Absorción → ingestión → egestión → digestión",
+        "Digestión → egestión → ingestión → absorción",
+        "Egestión → absorción → digestión → ingestión"
+      ],
+      "correcta": 0,
+      "explicacion": "Primero entra el alimento (ingestión), se transforma (digestión), los nutrientes pasan a la sangre (absorción) y se eliminan los restos (egestión)."
+    },
+    {
+      "id": "dig-04",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Qué es la digestión MECÁNICA?",
+      "opciones": [
+        "Romper y mezclar los alimentos en pedazos más chicos, sin cambiar las sustancias",
+        "Transformar las sustancias con enzimas",
+        "Absorber los nutrientes",
+        "Eliminar los desechos"
+      ],
+      "correcta": 0,
+      "explicacion": "La realizan los dientes al masticar, la lengua y los movimientos del estómago y los intestinos."
+    },
+    {
+      "id": "dig-05",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Qué es la digestión QUÍMICA?",
+      "opciones": [
+        "La transformación de los alimentos en nutrientes por acción de enzimas",
+        "Masticar los alimentos",
+        "Tragar los alimentos",
+        "Eliminar la materia fecal"
+      ],
+      "correcta": 0,
+      "explicacion": "Las enzimas de los jugos digestivos (saliva, jugo gástrico, jugo pancreático, jugo intestinal) rompen las sustancias grandes en nutrientes."
+    },
+    {
+      "id": "dig-06",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Dónde empieza la digestión química de los carbohidratos (como el almidón de la avena o el pan)?",
+      "opciones": [
+        "En la boca, con la saliva",
+        "En el estómago",
+        "En el intestino grueso",
+        "En el esófago"
+      ],
+      "correcta": 0,
+      "explicacion": "La saliva tiene amilasa, una enzima que empieza a descomponer el almidón. Por eso el pan masticado un rato se siente dulce."
+    },
+    {
+      "id": "dig-07",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Dónde empieza la digestión química de las proteínas (como la del huevo o la carne)?",
+      "opciones": [
+        "En el estómago",
+        "En la boca",
+        "En el intestino grueso",
+        "En el hígado"
+      ],
+      "correcta": 0,
+      "explicacion": "El jugo gástrico del estómago contiene pepsina y ácido, que empiezan a descomponer las proteínas."
+    },
+    {
+      "id": "dig-08",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿En qué órgano se realiza la mayor parte de la digestión y la absorción de nutrientes?",
+      "opciones": [
+        "En el intestino delgado",
+        "En el estómago",
+        "En la boca",
+        "En el intestino grueso"
+      ],
+      "correcta": 0,
+      "explicacion": "En el intestino delgado actúan el jugo pancreático, la bilis y el jugo intestinal; sus vellosidades absorben los nutrientes hacia la sangre."
+    },
+    {
+      "id": "dig-09",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Qué hace el hígado en la digestión?",
+      "opciones": [
+        "Produce la bilis, que ayuda a digerir las grasas",
+        "Tritura los alimentos",
+        "Absorbe el agua",
+        "Produce la saliva"
+      ],
+      "correcta": 0,
+      "explicacion": "La bilis separa las grasas en gotitas muy pequeñas (las emulsiona) para que las enzimas puedan actuar sobre ellas."
+    },
+    {
+      "id": "dig-10",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Qué aporta el páncreas a la digestión?",
+      "opciones": [
+        "El jugo pancreático, con enzimas que digieren carbohidratos, proteínas y grasas",
+        "La bilis",
+        "La saliva",
+        "El ácido del estómago"
+      ],
+      "correcta": 0,
+      "explicacion": "El páncreas vuelca su jugo en el intestino delgado. Además, fabrica la insulina, que regula la glucosa en sangre."
+    },
+    {
+      "id": "dig-11",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Cuál es la función principal del intestino grueso?",
+      "opciones": [
+        "Absorber agua y formar la materia fecal",
+        "Digerir las proteínas",
+        "Producir la bilis",
+        "Masticar los alimentos"
+      ],
+      "correcta": 0,
+      "explicacion": "En el intestino grueso se absorbe agua y sales; lo que queda forma la materia fecal, que se elimina (egestión)."
+    },
+    {
+      "id": "dig-12",
+      "tema": "El sistema digestivo",
+      "enunciado": "Las grasas del aceite se digieren químicamente sobre todo en…",
+      "opciones": [
+        "el intestino delgado, con la bilis y el jugo pancreático",
+        "la boca, con la saliva",
+        "el esófago",
+        "el intestino grueso"
+      ],
+      "correcta": 0,
+      "explicacion": "La bilis emulsiona las grasas y la lipasa del jugo pancreático las descompone en el intestino delgado."
+    },
+    {
+      "id": "dig-13",
+      "tema": "El sistema digestivo",
+      "enunciado": "A principios del siglo XIX, William Beaumont estudió la digestión observando…",
+      "opciones": [
+        "el estómago de un paciente a través de una herida que no se cerró",
+        "su propio corazón",
+        "animales en el microscopio electrónico",
+        "radiografías"
+      ],
+      "correcta": 0,
+      "explicacion": "Beaumont introducía alimentos atados a un hilo por la abertura del estómago de su paciente y los observaba. Descubrió que el jugo gástrico digiere químicamente los alimentos.",
+      "imagen": "beaumont"
+    },
+    {
+      "id": "dig-14",
+      "tema": "El sistema digestivo",
+      "enunciado": "¿Qué nos enseña la historia de Beaumont sobre la ciencia?",
+      "opciones": [
+        "Que el conocimiento científico se construye de a poco, con experimentos y observaciones",
+        "Que la ciencia nunca cambia",
+        "Que no hace falta experimentar",
+        "Que un solo científico lo sabe todo"
+      ],
+      "correcta": 0,
+      "explicacion": "Lo que hoy sabemos de la digestión es el resultado de muchas investigaciones a lo largo del tiempo, según la tecnología y el contexto de cada época."
+    },
+    {
+      "id": "cot-01",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Las publicidades muestran un jarabe para la tos que va de la boca directo a los pulmones. ¿Qué recorrido hace en realidad?",
+      "opciones": [
+        "Boca → sistema digestivo → se absorbe a la sangre → el sistema circulatorio lo lleva a los pulmones",
+        "Boca → tráquea → pulmones directamente",
+        "Boca → riñones → pulmones",
+        "No sale nunca del estómago"
+      ],
+      "correcta": 0,
+      "explicacion": "El jarabe se traga: va por el tubo digestivo, se absorbe en el intestino y la sangre lo transporta a todo el cuerpo, incluidos los pulmones.",
+      "imagen": "jarabe"
+    },
+    {
+      "id": "cot-02",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "¿Cómo se puede detectar con un análisis de ORINA si un deportista tomó una sustancia prohibida?",
+      "opciones": [
+        "La sustancia pasa a la sangre y los riñones la filtran: queda en la orina",
+        "La orina se forma en el estómago",
+        "Los pulmones la mandan a la vejiga",
+        "No se puede detectar por la orina"
+      ],
+      "correcta": 0,
+      "explicacion": "La sustancia se absorbe en el sistema digestivo, viaja por la sangre y los riñones (sistema excretor) la filtran junto con otros desechos.",
+      "imagen": "antidoping"
+    },
+    {
+      "id": "cot-03",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "En el control antidoping intervienen varios sistemas. ¿Cuál filtra la sangre?",
+      "opciones": [
+        "El sistema excretor (urinario)",
+        "El sistema respiratorio",
+        "El sistema digestivo",
+        "El sistema óseo"
+      ],
+      "correcta": 0,
+      "explicacion": "Los riñones filtran la sangre y forman la orina, que se guarda en la vejiga hasta eliminarse."
+    },
+    {
+      "id": "cot-04",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "¿Qué es la frecuencia cardíaca?",
+      "opciones": [
+        "La cantidad de latidos del corazón por minuto",
+        "La cantidad de respiraciones por minuto",
+        "La temperatura del cuerpo",
+        "La cantidad de sangre del cuerpo"
+      ],
+      "correcta": 0,
+      "explicacion": "Se mide tomando el pulso, por ejemplo en la arteria carótida (en el cuello), y contando los latidos durante un minuto.",
+      "imagen": "pulso"
+    },
+    {
+      "id": "cot-05",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "¿Qué es la frecuencia respiratoria?",
+      "opciones": [
+        "La cantidad de respiraciones (inspiraciones) por minuto",
+        "Los latidos del corazón por minuto",
+        "La cantidad de aire de los pulmones",
+        "La velocidad de la sangre"
+      ],
+      "correcta": 0,
+      "explicacion": "Se cuenta cuántas veces se inspira durante un minuto."
+    },
+    {
+      "id": "cot-06",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Después de correr 5 minutos, ¿qué pasa con la frecuencia cardíaca y la respiratoria?",
+      "opciones": [
+        "Aumentan las dos",
+        "Disminuyen las dos",
+        "No cambian",
+        "Aumenta una y la otra baja"
+      ],
+      "correcta": 0,
+      "explicacion": "Al hacer ejercicio, el corazón late más rápido y respiramos más seguido.",
+      "imagen": "correr"
+    },
+    {
+      "id": "cot-07",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "¿POR QUÉ aumentan la frecuencia cardíaca y la respiratoria al hacer ejercicio?",
+      "opciones": [
+        "Porque las células de los músculos necesitan más oxígeno y nutrientes para obtener energía",
+        "Porque el cuerpo quiere eliminar más agua",
+        "Porque los músculos dejan de trabajar",
+        "Porque el estómago digiere más rápido"
+      ],
+      "correcta": 0,
+      "explicacion": "Los músculos trabajan más y necesitan más energía: se respira más para tomar oxígeno y el corazón late más para llevarlo rápido con la sangre (y retirar el CO₂)."
+    },
+    {
+      "id": "cot-08",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Al correr, el consumo de oxígeno (VO₂) sube durante los primeros minutos y luego…",
+      "opciones": [
+        "se mantiene más o menos estable",
+        "baja a cero",
+        "sube sin parar para siempre",
+        "se vuelve negativo"
+      ],
+      "correcta": 0,
+      "explicacion": "Al principio el cuerpo se adapta y el VO₂ aumenta; después de unos 6 minutos se estabiliza mientras el esfuerzo es constante.",
+      "imagen": "correr"
+    },
+    {
+      "id": "cot-09",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Comer muchas grasas con frecuencia puede favorecer la aterosclerosis. ¿Qué es?",
+      "opciones": [
+        "La acumulación de grasa en las paredes de las arterias, que las estrecha",
+        "Una enfermedad de los pulmones",
+        "Un tipo de digestión",
+        "El aumento de glóbulos rojos"
+      ],
+      "correcta": 0,
+      "explicacion": "Las placas de grasa estrechan las arterias y dificultan el paso de la sangre. Si se tapa una arteria del corazón, puede producirse un infarto.",
+      "imagen": "arteria"
+    },
+    {
+      "id": "cot-10",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Homero llega sin desayunar y come una dona. ¿Qué sistemas intervienen para que la energía de la dona llegue a sus músculos?",
+      "opciones": [
+        "Digestivo, circulatorio y respiratorio (y el excretor elimina los desechos)",
+        "Solo el digestivo",
+        "Solo el respiratorio",
+        "Solo el circulatorio"
+      ],
+      "correcta": 0,
+      "explicacion": "El digestivo obtiene los nutrientes, el circulatorio los transporta, el respiratorio aporta el oxígeno para obtener energía en las células y el excretor elimina los desechos."
+    },
+    {
+      "id": "cot-11",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "Unas galletitas de avena tienen avena, huevo, aceite y miel. ¿Qué nutriente predomina en el huevo?",
+      "opciones": [
+        "Proteínas",
+        "Carbohidratos",
+        "Fibra",
+        "Agua"
+      ],
+      "correcta": 0,
+      "explicacion": "El huevo aporta sobre todo proteínas. La avena y la miel aportan carbohidratos, y el aceite, grasas.",
+      "imagen": "galletitas"
+    },
+    {
+      "id": "cot-12",
+      "tema": "La nutrición en la vida cotidiana",
+      "enunciado": "¿Por qué las glándulas salivales, el hígado y el páncreas son importantes para digerir unas galletitas de avena?",
+      "opciones": [
+        "Porque fabrican jugos con enzimas (o bilis) que descomponen sus carbohidratos, proteínas y grasas",
+        "Porque absorben el agua",
+        "Porque mastican las galletitas",
+        "Porque llevan oxígeno a la sangre"
+      ],
+      "correcta": 0,
+      "explicacion": "La saliva empieza a digerir el almidón, la bilis del hígado ayuda con las grasas del aceite y el jugo pancreático digiere los tres tipos de macronutrientes."
     }
   ]
 }
