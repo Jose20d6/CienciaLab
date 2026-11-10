@@ -2,7 +2,7 @@ rules_version = '2';
 
 // Reglas de seguridad del Quiz de CienciaLab.
 // - Cualquiera puede leer la configuración (qué preguntas están activas) y la tabla de posiciones.
-// - Cualquiera puede agregar un resultado, pero solo con los campos y valores esperados.
+// - Cualquiera puede agregar un resultado, pero solo con los campos y valores esperados (la materia es opcional).
 // - Solo la cuenta del docente puede cambiar la configuración y borrar resultados.
 // - Nadie puede modificar un resultado ya guardado.
 service cloud.firestore {
@@ -23,7 +23,7 @@ service cloud.firestore {
       allow read: if true;
       allow update: if false;
       allow delete: if esDocente();
-      allow create: if request.resource.data.keys().hasOnly(['nombre', 'escuela', 'curso', 'correctas', 'total', 'tiempoMs', 'fecha'])
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'escuela', 'curso', 'materia', 'correctas', 'total', 'tiempoMs', 'fecha'])
         && request.resource.data.keys().hasAll(['nombre', 'escuela', 'curso', 'correctas', 'total', 'tiempoMs', 'fecha'])
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
@@ -34,6 +34,10 @@ service cloud.firestore {
         && request.resource.data.curso is string
         && request.resource.data.curso.size() > 0
         && request.resource.data.curso.size() <= 20
+        && (!('materia' in request.resource.data)
+          || (request.resource.data.materia is string
+            && request.resource.data.materia.size() > 0
+            && request.resource.data.materia.size() <= 40))
         && request.resource.data.total is int
         && request.resource.data.total > 0
         && request.resource.data.total <= 100

@@ -8,8 +8,33 @@
     "Propiedades intensivas y extensivas",
     "Alimentación saludable",
     "Sistemas de la nutrición",
-    "La célula"
+    "La célula",
+    "La física y el método científico",
+    "Magnitudes y unidades",
+    "Masa y peso",
+    "Magnitudes derivadas, área y volumen"
   ],
+  "materias": {
+    "Química": [
+      "Normas de seguridad y material de laboratorio",
+      "Estados de la materia y cambios de estado",
+      "Sistemas materiales",
+      "Materia y energía",
+      "Cuerpos y materiales",
+      "Propiedades intensivas y extensivas"
+    ],
+    "Ciencias naturales": [
+      "Alimentación saludable",
+      "Sistemas de la nutrición",
+      "La célula"
+    ],
+    "Física": [
+      "La física y el método científico",
+      "Magnitudes y unidades",
+      "Masa y peso",
+      "Magnitudes derivadas, área y volumen"
+    ]
+  },
   "preguntas": [
     {
       "id": "lab-01",
@@ -1483,6 +1508,701 @@
       ],
       "correcta": 0,
       "explicacion": "La vacuola guarda agua y sustancias. Cuando está llena, la planta se mantiene firme; cuando se vacía, la planta se marchita."
+    },
+    {
+      "id": "fis-01",
+      "tema": "La física y el método científico",
+      "enunciado": "La palabra «física» viene del griego «physis». ¿Qué significa?",
+      "opciones": [
+        "Naturaleza",
+        "Movimiento",
+        "Energía",
+        "Medida"
+      ],
+      "correcta": 0,
+      "explicacion": "«Physis» significa naturaleza: la física estudia los fenómenos de la naturaleza."
+    },
+    {
+      "id": "fis-02",
+      "tema": "La física y el método científico",
+      "enunciado": "¿Qué estudia la física?",
+      "opciones": [
+        "Los fenómenos naturales, como el movimiento, la luz, el sonido o la electricidad",
+        "Solo los seres vivos y cómo se reproducen",
+        "La composición de las sustancias y cómo se transforman en otras",
+        "La historia de los científicos famosos"
+      ],
+      "correcta": 0,
+      "explicacion": "La física estudia la materia, la energía y sus interacciones: movimiento, fuerzas, luz, sonido, electricidad, calor… Los cambios de sustancias son tema de la química."
+    },
+    {
+      "id": "fis-03",
+      "tema": "La física y el método científico",
+      "enunciado": "¿Cuál es el primer paso del método científico?",
+      "opciones": [
+        "Observar un fenómeno y plantear una pregunta o problema",
+        "Escribir las conclusiones",
+        "Hacer el experimento",
+        "Publicar los resultados"
+      ],
+      "correcta": 0,
+      "explicacion": "Todo empieza con la observación: algo nos llama la atención y nos preguntamos por qué pasa."
+    },
+    {
+      "id": "fis-04",
+      "tema": "La física y el método científico",
+      "enunciado": "¿Qué es una hipótesis?",
+      "opciones": [
+        "Una posible explicación que todavía hay que comprobar",
+        "Una ley que ya está demostrada",
+        "El resultado final del experimento",
+        "Un instrumento de medición"
+      ],
+      "correcta": 0,
+      "explicacion": "La hipótesis es una respuesta tentativa al problema. Con experimentos se pone a prueba para ver si se cumple o no."
+    },
+    {
+      "id": "fis-05",
+      "tema": "La física y el método científico",
+      "enunciado": "¿Para qué se hace un experimento en el método científico?",
+      "opciones": [
+        "Para poner a prueba la hipótesis",
+        "Para elegir qué fenómeno observar",
+        "Para no tener que sacar conclusiones",
+        "Para que el resultado salga siempre igual a lo que pensábamos"
+      ],
+      "correcta": 0,
+      "explicacion": "El experimento sirve para comprobar si la hipótesis se cumple, controlando las condiciones y registrando los datos."
+    },
+    {
+      "id": "fis-06",
+      "tema": "La física y el método científico",
+      "enunciado": "Si los resultados del experimento NO confirman la hipótesis, ¿qué conviene hacer?",
+      "opciones": [
+        "Plantear una nueva hipótesis y volver a ponerla a prueba",
+        "Cambiar los datos para que coincidan",
+        "Abandonar la investigación para siempre",
+        "Decir igual que la hipótesis era correcta"
+      ],
+      "correcta": 0,
+      "explicacion": "Un resultado que no confirma la hipótesis también enseña algo: se revisa, se propone otra explicación y se vuelve a experimentar."
+    },
+    {
+      "id": "fis-07",
+      "tema": "La física y el método científico",
+      "enunciado": "El televisor no enciende al apretar el botón. ¿Cuál de estas frases es una HIPÓTESIS?",
+      "opciones": [
+        "«Puede ser que esté desenchufado»",
+        "«El televisor no enciende»",
+        "«Apreté el botón tres veces»",
+        "«El televisor es negro»"
+      ],
+      "correcta": 0,
+      "explicacion": "Una hipótesis es una posible explicación que se puede comprobar (por ejemplo, revisando el enchufe). Las otras frases son observaciones.",
+      "imagen": "tele"
+    },
+    {
+      "id": "fis-08",
+      "tema": "La física y el método científico",
+      "enunciado": "Isaac Newton es famoso por…",
+      "opciones": [
+        "las leyes del movimiento y la ley de gravitación universal",
+        "inventar la pila eléctrica",
+        "descubrir la radiactividad",
+        "la teoría de la relatividad"
+      ],
+      "correcta": 0,
+      "explicacion": "Según la historia, la caída de una manzana lo hizo pensar en la gravedad. Formuló las leyes del movimiento y la gravitación universal.",
+      "imagen": "manzana"
+    },
+    {
+      "id": "fis-09",
+      "tema": "La física y el método científico",
+      "enunciado": "¿Qué inventó Alessandro Volta alrededor del año 1800?",
+      "opciones": [
+        "La pila eléctrica",
+        "El telescopio",
+        "La lamparita",
+        "El termómetro"
+      ],
+      "correcta": 0,
+      "explicacion": "Volta apiló discos de metal y cartón mojado en salmuera y logró la primera corriente eléctrica continua. Por él, la unidad de tensión se llama voltio.",
+      "imagen": "pila"
+    },
+    {
+      "id": "fis-10",
+      "tema": "La física y el método científico",
+      "enunciado": "Marie Curie fue la primera persona en ganar dos premios Nobel. ¿Qué estudió?",
+      "opciones": [
+        "La radiactividad",
+        "El movimiento de los planetas",
+        "El sonido",
+        "Los imanes"
+      ],
+      "correcta": 0,
+      "explicacion": "Marie Curie investigó la radiactividad y descubrió el polonio y el radio. Ganó el Nobel de Física (1903) y el de Química (1911)."
+    },
+    {
+      "id": "fis-11",
+      "tema": "La física y el método científico",
+      "enunciado": "Albert Einstein es conocido sobre todo por…",
+      "opciones": [
+        "la teoría de la relatividad",
+        "la ley de gravitación universal",
+        "inventar la pila",
+        "descubrir los microorganismos"
+      ],
+      "correcta": 0,
+      "explicacion": "Einstein propuso la teoría de la relatividad, que cambió la forma de entender el espacio, el tiempo y la energía (E = m·c²)."
+    },
+    {
+      "id": "fis-12",
+      "tema": "La física y el método científico",
+      "enunciado": "La física se suele dividir en clásica y moderna. ¿Qué estudia la física moderna?",
+      "opciones": [
+        "Lo muy pequeño (átomos) y lo muy rápido (cerca de la velocidad de la luz)",
+        "Solo los objetos que se ven a simple vista",
+        "Los seres vivos",
+        "Únicamente las máquinas antiguas"
+      ],
+      "correcta": 0,
+      "explicacion": "La física clásica explica lo cotidiano (movimiento, calor, luz). La moderna, desde principios del siglo XX, estudia el mundo de los átomos y lo que se mueve rapidísimo."
+    },
+    {
+      "id": "mag-01",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Qué es una magnitud?",
+      "opciones": [
+        "Todo lo que se puede medir",
+        "Algo que se puede ver",
+        "Un instrumento de laboratorio",
+        "Un número muy grande"
+      ],
+      "correcta": 0,
+      "explicacion": "Magnitud es toda propiedad que se puede medir y expresar con un número y una unidad: longitud, masa, tiempo, temperatura…"
+    },
+    {
+      "id": "mag-02",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Cuál de estas es una magnitud?",
+      "opciones": [
+        "La temperatura",
+        "La belleza",
+        "La alegría",
+        "El sabor"
+      ],
+      "correcta": 0,
+      "explicacion": "La temperatura se mide con un termómetro y se expresa en grados. La belleza o la alegría no se pueden medir con un instrumento y una unidad."
+    },
+    {
+      "id": "mag-03",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Qué significa medir?",
+      "opciones": [
+        "Comparar una magnitud con otra de la misma clase tomada como unidad",
+        "Adivinar cuánto mide algo",
+        "Mirar un objeto con atención",
+        "Pesar cualquier cosa en una balanza"
+      ],
+      "correcta": 0,
+      "explicacion": "Medir es ver cuántas veces entra la unidad en lo que medimos. Por ejemplo: la mesa mide 2 m porque el metro entra 2 veces."
+    },
+    {
+      "id": "mag-04",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "Ana midió el banco con su mano y le dio 7 palmas; Leo le dio 9. ¿Por qué no coinciden?",
+      "opciones": [
+        "Porque sus manos no miden lo mismo: la palma no es una unidad fija",
+        "Porque uno de los dos no sabe contar",
+        "Porque el banco cambió de tamaño",
+        "Porque se debe medir con el pie"
+      ],
+      "correcta": 0,
+      "explicacion": "Las unidades del cuerpo (palma, pie, pulgar) cambian de persona a persona. Por eso se acordaron unidades fijas, como el metro.",
+      "imagen": "mano-banco"
+    },
+    {
+      "id": "mag-05",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Para qué se creó el Sistema Internacional de unidades (SI)?",
+      "opciones": [
+        "Para que todos usen las mismas unidades y las medidas signifiquen lo mismo en todo el mundo",
+        "Para que cada país tenga sus propias unidades",
+        "Para medir solo distancias",
+        "Para no tener que medir nunca más"
+      ],
+      "correcta": 0,
+      "explicacion": "Con unidades comunes, 1 metro es lo mismo en Argentina, en Japón o en Francia, y se pueden comparar los resultados."
+    },
+    {
+      "id": "mag-06",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Qué es el SIMELA?",
+      "opciones": [
+        "El Sistema Métrico Legal Argentino",
+        "Un instrumento para medir masa",
+        "Una unidad de tiempo",
+        "El nombre de un científico argentino"
+      ],
+      "correcta": 0,
+      "explicacion": "El SIMELA es el sistema de unidades obligatorio en Argentina. Se basa en el Sistema Internacional (metro, kilogramo, segundo…)."
+    },
+    {
+      "id": "mag-07",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Cuál es la unidad de longitud en el Sistema Internacional?",
+      "opciones": [
+        "El metro (m)",
+        "El kilogramo (kg)",
+        "El segundo (s)",
+        "El litro (L)"
+      ],
+      "correcta": 0,
+      "explicacion": "La longitud se mide en metros. El kilogramo es de masa, el segundo de tiempo y el litro de volumen."
+    },
+    {
+      "id": "mag-08",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Cuál es la unidad de masa en el Sistema Internacional?",
+      "opciones": [
+        "El kilogramo (kg)",
+        "El gramo (g)",
+        "El newton (N)",
+        "El metro (m)"
+      ],
+      "correcta": 0,
+      "explicacion": "La unidad de masa del SI es el kilogramo. El newton es la unidad de fuerza (por ejemplo, del peso)."
+    },
+    {
+      "id": "mag-09",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "¿Qué unidad conviene usar para expresar la masa de un avión?",
+      "opciones": [
+        "Toneladas",
+        "Miligramos",
+        "Gramos",
+        "Centímetros"
+      ],
+      "correcta": 0,
+      "explicacion": "Para objetos muy pesados se usan unidades grandes: un avión de pasajeros tiene una masa de decenas de toneladas (1 t = 1000 kg).",
+      "imagen": "avion"
+    },
+    {
+      "id": "mag-10",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "El recorrido de la escuela a la plaza es de 1,8 km. ¿Cuántos metros son?",
+      "opciones": [
+        "1800 m",
+        "180 m",
+        "18 m",
+        "18 000 m"
+      ],
+      "correcta": 0,
+      "explicacion": "1 km = 1000 m, entonces 1,8 × 1000 = 1800 m."
+    },
+    {
+      "id": "mag-11",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "Una película dura 2 h 45 min. ¿Cuántos minutos son en total?",
+      "opciones": [
+        "165 min",
+        "245 min",
+        "145 min",
+        "120 min"
+      ],
+      "correcta": 0,
+      "explicacion": "2 h = 2 × 60 = 120 min. Más 45 min: 120 + 45 = 165 min."
+    },
+    {
+      "id": "mag-12",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "Un recreo largo dura 540 segundos. ¿Cuántos minutos son?",
+      "opciones": [
+        "9 min",
+        "5,4 min",
+        "54 min",
+        "90 min"
+      ],
+      "correcta": 0,
+      "explicacion": "1 min = 60 s, entonces 540 ÷ 60 = 9 min."
+    },
+    {
+      "id": "mag-13",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "Lucía mide 140 cm. ¿Cuántos metros son?",
+      "opciones": [
+        "1,4 m",
+        "14 m",
+        "0,14 m",
+        "1400 m"
+      ],
+      "correcta": 0,
+      "explicacion": "1 m = 100 cm, entonces 140 ÷ 100 = 1,4 m.",
+      "imagen": "altura"
+    },
+    {
+      "id": "mag-14",
+      "tema": "Magnitudes y unidades",
+      "enunciado": "Una cuerda mide 3,25 m. ¿Cuántos centímetros son?",
+      "opciones": [
+        "325 cm",
+        "32,5 cm",
+        "3250 cm",
+        "0,325 cm"
+      ],
+      "correcta": 0,
+      "explicacion": "1 m = 100 cm, entonces 3,25 × 100 = 325 cm."
+    },
+    {
+      "id": "mp-01",
+      "tema": "Masa y peso",
+      "enunciado": "¿Qué es la masa de un cuerpo?",
+      "opciones": [
+        "La cantidad de materia que tiene",
+        "La fuerza con que la Tierra lo atrae",
+        "El espacio que ocupa",
+        "Lo rápido que se mueve"
+      ],
+      "correcta": 0,
+      "explicacion": "La masa es la cantidad de materia. No cambia aunque el cuerpo se lleve a otro lugar del universo."
+    },
+    {
+      "id": "mp-02",
+      "tema": "Masa y peso",
+      "enunciado": "¿Qué es el peso de un cuerpo?",
+      "opciones": [
+        "La fuerza con que un planeta (o la Luna) lo atrae",
+        "La cantidad de materia que tiene",
+        "Lo mismo que el volumen",
+        "Su temperatura"
+      ],
+      "correcta": 0,
+      "explicacion": "El peso es una fuerza: la atracción gravitatoria que ejerce la Tierra (u otro astro) sobre el cuerpo. Depende del lugar."
+    },
+    {
+      "id": "mp-03",
+      "tema": "Masa y peso",
+      "enunciado": "¿Con qué instrumento se mide el PESO?",
+      "opciones": [
+        "Con un dinamómetro",
+        "Con una balanza de platillos",
+        "Con una regla",
+        "Con un termómetro"
+      ],
+      "correcta": 0,
+      "explicacion": "El dinamómetro tiene un resorte que se estira según la fuerza: mide el peso en newtons. La balanza compara masas.",
+      "imagen": "instrumentos"
+    },
+    {
+      "id": "mp-04",
+      "tema": "Masa y peso",
+      "enunciado": "¿En qué unidad se mide el peso en el Sistema Internacional?",
+      "opciones": [
+        "En newtons (N)",
+        "En kilogramos (kg)",
+        "En metros (m)",
+        "En litros (L)"
+      ],
+      "correcta": 0,
+      "explicacion": "Como el peso es una fuerza, se mide en newtons. La masa, en cambio, se mide en kilogramos."
+    },
+    {
+      "id": "mp-05",
+      "tema": "Masa y peso",
+      "enunciado": "Un astronauta viaja de la Tierra a la Luna. ¿Qué le pasa?",
+      "opciones": [
+        "Su peso disminuye, pero su masa sigue igual",
+        "Su masa disminuye, pero su peso sigue igual",
+        "Su masa y su peso siguen iguales",
+        "Su masa y su peso aumentan"
+      ],
+      "correcta": 0,
+      "explicacion": "La Luna atrae con menos fuerza que la Tierra (g ≈ 1,6 m/s² en vez de 9,8 m/s²), así que pesa menos. Pero sigue teniendo la misma cantidad de materia.",
+      "imagen": "astronauta"
+    },
+    {
+      "id": "mp-06",
+      "tema": "Masa y peso",
+      "enunciado": "¿Cómo se calcula el peso de un cuerpo?",
+      "opciones": [
+        "P = m × g (masa por aceleración de la gravedad)",
+        "P = m + g",
+        "P = m ÷ g",
+        "P = g ÷ m"
+      ],
+      "correcta": 0,
+      "explicacion": "El peso es la masa multiplicada por la gravedad del lugar. En la Tierra, g ≈ 9,8 m/s²."
+    },
+    {
+      "id": "mp-07",
+      "tema": "Masa y peso",
+      "enunciado": "En la Tierra (g = 9,8 m/s²), ¿cuánto pesa una persona de 60 kg?",
+      "opciones": [
+        "588 N",
+        "60 N",
+        "69,8 N",
+        "6 N"
+      ],
+      "correcta": 0,
+      "explicacion": "P = m × g = 60 kg × 9,8 m/s² = 588 N."
+    },
+    {
+      "id": "mp-08",
+      "tema": "Masa y peso",
+      "enunciado": "Una caja pesa 98 N en la Tierra (g = 9,8 m/s²). ¿Cuál es su masa?",
+      "opciones": [
+        "10 kg",
+        "98 kg",
+        "960 kg",
+        "1 kg"
+      ],
+      "correcta": 0,
+      "explicacion": "m = P ÷ g = 98 N ÷ 9,8 m/s² = 10 kg."
+    },
+    {
+      "id": "mp-09",
+      "tema": "Masa y peso",
+      "enunciado": "Un planeta tiene g = 12 m/s². ¿Cuánto pesaría ahí una mochila de 25 kg?",
+      "opciones": [
+        "300 N",
+        "37 N",
+        "25 N",
+        "2,1 N"
+      ],
+      "correcta": 0,
+      "explicacion": "P = m × g = 25 kg × 12 m/s² = 300 N.",
+      "imagen": "mochila"
+    },
+    {
+      "id": "mp-10",
+      "tema": "Masa y peso",
+      "enunciado": "En la Luna, g = 1,6 m/s². ¿Cuánto pesa ahí una bolsa de 10 kg?",
+      "opciones": [
+        "16 N",
+        "98 N",
+        "10 N",
+        "1,6 N"
+      ],
+      "correcta": 0,
+      "explicacion": "P = m × g = 10 kg × 1,6 m/s² = 16 N. En la Tierra pesaría 98 N."
+    },
+    {
+      "id": "mp-11",
+      "tema": "Masa y peso",
+      "enunciado": "Lejos de cualquier planeta, en el espacio, un astronauta…",
+      "opciones": [
+        "tiene masa, pero su peso es casi nulo",
+        "no tiene masa ni peso",
+        "tiene peso, pero no masa",
+        "pesa lo mismo que en la Tierra"
+      ],
+      "correcta": 0,
+      "explicacion": "Su cantidad de materia no cambia. Lo que casi desaparece es la atracción gravitatoria, por eso flota.",
+      "imagen": "astronauta"
+    },
+    {
+      "id": "mp-12",
+      "tema": "Masa y peso",
+      "enunciado": "Cuando decimos «compré 2 kg de pan», en realidad estamos hablando de…",
+      "opciones": [
+        "la masa del pan",
+        "el peso del pan",
+        "el volumen del pan",
+        "la densidad del pan"
+      ],
+      "correcta": 0,
+      "explicacion": "En la vida diaria decimos «peso», pero el kilogramo es unidad de masa. El peso, en física, se mide en newtons."
+    },
+    {
+      "id": "der-01",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "¿Cuál de estas es una magnitud FUNDAMENTAL?",
+      "opciones": [
+        "El tiempo",
+        "La velocidad",
+        "El área",
+        "La superficie de un terreno"
+      ],
+      "correcta": 0,
+      "explicacion": "Las fundamentales no dependen de otras: longitud, masa, tiempo, temperatura… Las derivadas, como la velocidad o el área, se obtienen combinándolas."
+    },
+    {
+      "id": "der-02",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "¿Por qué la velocidad es una magnitud DERIVADA?",
+      "opciones": [
+        "Porque se obtiene a partir de la distancia y el tiempo",
+        "Porque no se puede medir",
+        "Porque se mide solo con una regla",
+        "Porque es más importante que las demás"
+      ],
+      "correcta": 0,
+      "explicacion": "v = distancia ÷ tiempo: se calcula combinando dos magnitudes fundamentales. Por eso se mide en m/s o km/h.",
+      "imagen": "velocimetro"
+    },
+    {
+      "id": "der-03",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Un ciclista recorre 30 km en 2 horas. ¿Cuál es su velocidad?",
+      "opciones": [
+        "15 km/h",
+        "60 km/h",
+        "32 km/h",
+        "28 km/h"
+      ],
+      "correcta": 0,
+      "explicacion": "v = d ÷ t = 30 km ÷ 2 h = 15 km/h.",
+      "imagen": "bici"
+    },
+    {
+      "id": "der-04",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "¿En qué unidad se mide la energía en el Sistema Internacional?",
+      "opciones": [
+        "Joule (J)",
+        "Watt (W)",
+        "Newton (N)",
+        "Metro (m)"
+      ],
+      "correcta": 0,
+      "explicacion": "La energía se mide en joules. El watt es de potencia (energía por segundo) y el newton es de fuerza."
+    },
+    {
+      "id": "der-05",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "¿En qué unidad se mide la potencia, por ejemplo de una lamparita?",
+      "opciones": [
+        "Watt (W)",
+        "Joule (J)",
+        "Kilogramo (kg)",
+        "Segundo (s)"
+      ],
+      "correcta": 0,
+      "explicacion": "La potencia indica cuánta energía se usa por segundo y se mide en watts: una lamparita LED puede ser de 9 W."
+    },
+    {
+      "id": "der-06",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "La aceleración indica…",
+      "opciones": [
+        "cuánto cambia la velocidad en cada unidad de tiempo",
+        "la distancia total recorrida",
+        "cuánto pesa un cuerpo",
+        "el espacio que ocupa un cuerpo"
+      ],
+      "correcta": 0,
+      "explicacion": "La aceleración es el cambio de velocidad dividido el tiempo. Se mide en m/s²."
+    },
+    {
+      "id": "der-07",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "En una probeta hay 120 mL de agua. Al sumergir una piedra, el agua sube hasta 180 mL. ¿Cuál es el volumen de la piedra?",
+      "opciones": [
+        "60 cm³",
+        "180 cm³",
+        "300 cm³",
+        "120 cm³"
+      ],
+      "correcta": 0,
+      "explicacion": "El volumen de la piedra es lo que subió el agua: 180 − 120 = 60 mL, y 1 mL = 1 cm³.",
+      "imagen": "probeta-piedra"
+    },
+    {
+      "id": "der-08",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Según el método de Arquímedes, al sumergir un cuerpo en agua…",
+      "opciones": [
+        "el agua desplazada tiene el mismo volumen que el cuerpo",
+        "el agua desaparece",
+        "el cuerpo pierde masa",
+        "el nivel del agua baja"
+      ],
+      "correcta": 0,
+      "explicacion": "El cuerpo ocupa lugar y empuja el agua hacia arriba: el volumen que sube el nivel es igual al volumen del cuerpo sumergido.",
+      "imagen": "probeta-piedra"
+    },
+    {
+      "id": "der-09",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Una pileta mide 10 m de largo, 5 m de ancho y 2 m de profundidad. ¿Cuál es su volumen?",
+      "opciones": [
+        "100 m³",
+        "17 m³",
+        "50 m³",
+        "1000 m³"
+      ],
+      "correcta": 0,
+      "explicacion": "V = largo × ancho × alto = 10 × 5 × 2 = 100 m³.",
+      "imagen": "piscina"
+    },
+    {
+      "id": "der-10",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Un terreno rectangular mide 30 m por 50 m. ¿Cuál es su área?",
+      "opciones": [
+        "1500 m²",
+        "80 m²",
+        "160 m²",
+        "150 m²"
+      ],
+      "correcta": 0,
+      "explicacion": "A = largo × ancho = 30 m × 50 m = 1500 m².",
+      "imagen": "terreno"
+    },
+    {
+      "id": "der-11",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Para alambrar ese mismo terreno de 30 m por 50 m, ¿cuántos metros de alambre hacen falta (una vuelta)?",
+      "opciones": [
+        "160 m",
+        "80 m",
+        "1500 m",
+        "100 m"
+      ],
+      "correcta": 0,
+      "explicacion": "El perímetro es la suma de los 4 lados: 30 + 50 + 30 + 50 = 160 m.",
+      "imagen": "terreno"
+    },
+    {
+      "id": "der-12",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "¿Qué diferencia hay entre el área y el volumen?",
+      "opciones": [
+        "El área mide una superficie (2 dimensiones) y el volumen el espacio que ocupa un cuerpo (3 dimensiones)",
+        "Son lo mismo con distinto nombre",
+        "El área se mide en litros y el volumen en metros",
+        "El volumen solo se usa para líquidos"
+      ],
+      "correcta": 0,
+      "explicacion": "El área se mide en m² (largo × ancho) y el volumen en m³ (largo × ancho × alto)."
+    },
+    {
+      "id": "der-13",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Un cartón de leche de 1 litro ocupa un volumen de…",
+      "opciones": [
+        "1 dm³",
+        "1 m³",
+        "1 cm³",
+        "10 m³"
+      ],
+      "correcta": 0,
+      "explicacion": "1 litro equivale a 1 dm³: un cubo de 10 cm × 10 cm × 10 cm.",
+      "imagen": "carton-leche"
+    },
+    {
+      "id": "der-14",
+      "tema": "Magnitudes derivadas, área y volumen",
+      "enunciado": "Un tanque de agua tiene forma de cubo de 3 m de lado. ¿Cuántos litros entran?",
+      "opciones": [
+        "27 000 L",
+        "9 L",
+        "27 L",
+        "9000 L"
+      ],
+      "correcta": 0,
+      "explicacion": "V = 3 × 3 × 3 = 27 m³. Como 1 m³ = 1000 L, entran 27 000 litros.",
+      "imagen": "tanque"
     }
   ]
 }

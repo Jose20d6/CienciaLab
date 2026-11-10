@@ -70,10 +70,10 @@ const QuizDatos = (function () {
       const s = await fb.fs.getDocs(fb.fs.query(fb.fs.collection(fb.db, 'resultados'), fb.fs.limit(5000)));
       return s.docs.map(d => {
         const x = d.data();
-        return { id: d.id, ...x, escuela: x.escuela || '', fecha: x.fecha && x.fecha.toMillis ? x.fecha.toMillis() : Date.now() };
+        return { id: d.id, ...x, escuela: x.escuela || '', materia: x.materia || '', fecha: x.fecha && x.fecha.toMillis ? x.fecha.toMillis() : Date.now() };
       });
     }
-    return Util.leer('quiz-resultados', []).map(r => ({ escuela: '', ...r }));
+    return Util.leer('quiz-resultados', []).map(r => ({ escuela: '', materia: '', ...r }));
   }
 
   // Borra todos los resultados o solo los de un curso de una escuela ({ escuela, curso }). Devuelve cuántos borró.
@@ -124,8 +124,11 @@ const QuizUtil = {
   curso: (anio, division) => `${anio}.º ${division}.ª`,
   // «escuela  n 12» y «Escuela N 12» quedan iguales, así se agrupan en la tabla.
   escuela: t => String(t).replace(/\s+/g, ' ').trim().toUpperCase().slice(0, 60),
-  // Texto para mostrar un grupo: «ESCUELA N.º 12 · 2.º 3.ª».
-  grupo: r => (r.escuela ? `${r.escuela} · ` : '') + r.curso,
+  // Texto para mostrar un grupo: «ESCUELA N.º 12 · 2.º 3.ª · Física».
+  grupo: r => (r.escuela ? `${r.escuela} · ` : '') + r.curso + (r.materia ? ` · ${QuizUtil.nombreMateria(r.materia)}` : ''),
+  // «Mezcla» es el intento con preguntas de todas las materias.
+  MEZCLA: 'Mezcla',
+  nombreMateria: m => m === 'Mezcla' ? 'Todas las materias' : m,
   tiempo(ms) {
     const s = ms / 1000, m = Math.floor(s / 60);
     return `${m}:${(s - m * 60).toFixed(1).padStart(4, '0').replace('.', ',')}`;
@@ -133,13 +136,25 @@ const QuizUtil = {
   // Más correctas primero; a igual puntaje, menos tiempo.
   ordenar: lista => lista.slice().sort((a, b) => b.correctas - a.correctas || a.tiempoMs - b.tiempoMs || a.fecha - b.fecha),
   // Preguntas que pueden salir: las que no están apagadas y, si se indica el año, solo de los temas habilitados para ese año.
-  // Un año sin configurar ve todos los temas.
-  activas(banco, config, anio) {
+  // Un año sin configurar ve todos los temas. Si se indica la materia, solo sus temas («Mezcla» o vacío: todas).
+  activas(banco, config, anio, materia) {
     const fuera = new Set(config.inactivas || []), lista = anio && (config.temasPorAnio || {})[anio];
     const temas = Array.isArray(lista) ? new Set(lista) : null;
-    return banco.preguntas.filter(p => !fuera.has(p.id) && (!temas || temas.has(p.tema)));
+    const deMateria = materia && QuizUtil.materias(banco)[materia];
+    const tm = Array.isArray(deMateria) ? new Set(deMateria) : null;
+    return banco.preguntas.filter(p => !fuera.has(p.id) && (!temas || temas.has(p.tema)) && (!tm || tm.has(p.tema)));
   },
   temas: banco => banco.temas || [...new Set(banco.preguntas.map(p => p.tema))],
+  // { materia: [temas] } tal como está en preguntas.json.
+  materias: banco => banco.materias || {},
+  // Temas agrupados por materia, en orden: [[materia, [índices en temas(banco)]]]. Lo que no tiene materia va en «Otros temas».
+  porMateria(banco) {
+    const temas = QuizUtil.temas(banco), mats = QuizUtil.materias(banco), usados = new Set();
+    const grupos = Object.keys(mats).map(m => [m, temas.map((t, i) => mats[m].includes(t) && !usados.has(i) ? (usados.add(i), i) : -1).filter(i => i >= 0)]);
+    const resto = temas.map((t, i) => i).filter(i => !usados.has(i));
+    if (resto.length) grupos.push([grupos.length ? 'Otros temas' : '', resto]);
+    return grupos.filter(g => g[1].length);
+  },
   avisoModo(modo) {
     if (modo === 'local') return '<p class="qz-aviso">🧪 <b>Modo de prueba:</b> Firebase todavía no está configurado, así que los resultados se guardan solo en este dispositivo.</p>';
     if (modo === 'error') return '<p class="qz-aviso mal">⚠️ No se pudo conectar con la base de datos. Revisá la conexión a internet y recargá la página.</p>';
@@ -179,7 +194,7 @@ const Quiz = (function () {
   // ---------- Inicio ----------
   function pantallaInicio() {
     clearInterval(reloj);
-    const alumno = { escuela: '', anio: '', division: '', nombre: '', ...Util.leer('quiz-alumno', {}) };
+    const alumno = { escuela: '', anio: '', division: '', materia: '', nombre: '', ...Util.leer('quiz-alumno', {}) };
     const opciones = (n, sel, sufijo) => `<option value="" disabled ${sel ? '' : 'selected'}>Elegí</option>` + Array.from({ length: n }, (_, i) => `<option value="${i + 1}"${String(sel) === String(i + 1) ? ' selected' : ''}>${i + 1}${sufijo}</option>`).join('');
     raiz.querySelector('#qz-cont').innerHTML = `
       <div class="qz-inicio">
@@ -192,6 +207,7 @@ const Quiz = (function () {
             <label>Año<select name="anio" required>${opciones(6, alumno.anio, '.º año')}</select></label>
             <label>División<select name="division" required>${opciones(4, alumno.division, '.ª división')}</select></label>
           </div>
+          <label id="qz-l-materia">Materia<select name="materia" required data-guardada="${esc(alumno.materia)}"><option value="">Cargando…</option></select></label>
           <label>Nombre<input name="nombre" maxlength="40" required value="${esc(alumno.nombre)}" placeholder="Nombre y apellido" autocomplete="name"></label>
           <div id="qz-info"><p class="qz-info">Cargando preguntas…</p></div>
           <button class="btn primario qz-grande" type="submit" id="qz-empezar" disabled>▶ Empezar</button>
@@ -201,14 +217,15 @@ const Quiz = (function () {
     const form = raiz.querySelector('#qz-form');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const escuela = QuizUtil.escuela(form.escuela.value), anio = form.anio.value, division = form.division.value;
+      const escuela = QuizUtil.escuela(form.escuela.value), anio = form.anio.value, division = form.division.value, materia = form.materia.value;
       const nombre = form.nombre.value.trim().replace(/\s+/g, ' ').slice(0, 40);
-      if (!escuela || !anio || !division || !nombre) return;
-      Util.guardar('quiz-alumno', { escuela, anio, division, nombre });
-      if (!QuizUtil.activas(banco, config, anio).length) return pintarInfo();
-      empezar(nombre, escuela, QuizUtil.curso(anio, division), anio);
+      if (!escuela || !anio || !division || !nombre || (form.materia.required && !materia)) return;
+      Util.guardar('quiz-alumno', { escuela, anio, division, materia, nombre });
+      if (!QuizUtil.activas(banco, config, anio, materia).length) return pintarInfo();
+      empezar(nombre, escuela, QuizUtil.curso(anio, division), anio, materia);
     });
     form.anio.addEventListener('change', () => pintarInfo());
+    form.materia.addEventListener('change', () => { form.materia.dataset.guardada = form.materia.value; pintarInfo(); });
     raiz.querySelector('#qz-ir-tabla').addEventListener('click', () => pantallaTabla());
     if (banco) pintarInfo();
     // Sugerencias de escuelas que ya jugaron (no hace falta esperarlas).
@@ -225,21 +242,31 @@ const Quiz = (function () {
       info.innerHTML = `${QuizUtil.avisoModo(modo === 'firebase' ? 'error' : modo)}<p class="qz-aviso mal">No se pudieron cargar las preguntas. Recargá la página.</p>`;
       return;
     }
-    const anio = raiz.querySelector('#qz-form').anio.value;
-    const n = Math.min(config.cantidad, QuizUtil.activas(banco, config, anio).length);
+    const form = raiz.querySelector('#qz-form'), anio = form.anio.value, sel = form.materia;
+    // Materias con preguntas para el año elegido (y la mezcla, si hay más de una).
+    const disp = Object.keys(QuizUtil.materias(banco)).filter(m => QuizUtil.activas(banco, config, anio, m).length);
+    const lista = disp.length > 1 ? [...disp, QuizUtil.MEZCLA] : disp;
+    const quiere = sel.dataset.guardada || '';
+    raiz.querySelector('#qz-l-materia').hidden = !Object.keys(QuizUtil.materias(banco)).length;
+    sel.required = !raiz.querySelector('#qz-l-materia').hidden;
+    sel.innerHTML = `<option value="" disabled>${lista.length ? 'Elegí' : 'Sin materias'}</option>` + lista.map(m => `<option value="${esc(m)}">${m === QuizUtil.MEZCLA ? '🎲 Todas mezcladas' : esc(m)}</option>`).join('');
+    sel.value = lista.includes(quiere) ? quiere : lista.length === 1 ? lista[0] : '';
+    const materia = sel.value;
+    const n = Math.min(config.cantidad, QuizUtil.activas(banco, config, anio, materia).length);
     boton.disabled = !n;
     if (!n) { info.innerHTML = `<p class="qz-aviso">${anio ? `Por ahora no hay preguntas habilitadas para ${anio}.º año.` : 'Por ahora no hay preguntas activas.'} Esperá a que el docente habilite el quiz.</p>`; return; }
+    const exacto = anio && (materia || !sel.required);
     info.innerHTML = `${QuizUtil.avisoModo(modo)}
-      <ul class="qz-reglas"><li>❓ ${anio ? `Son <b>${n} preguntas</b>` : `Hasta <b>${n} preguntas</b>`} de opción múltiple${anio ? '' : ' (depende de tu año)'}.</li><li>⏱️ El cronómetro arranca cuando empezás y para en la última respuesta.</li><li>🏆 Gana quien tiene más respuestas correctas; si empatan, quien tardó menos.</li></ul>`;
+      <ul class="qz-reglas"><li>❓ ${exacto ? `Son <b>${n} preguntas</b>` : `Hasta <b>${n} preguntas</b>`} de opción múltiple${exacto ? '' : anio ? ' (depende de la materia)' : ' (depende de tu año y la materia)'}.</li><li>⏱️ El cronómetro arranca cuando empezás y para en la última respuesta.</li><li>🏆 Gana quien tiene más respuestas correctas; si empatan, quien tardó menos.</li></ul>`;
     boton.disabled = false;
   }
 
   // ---------- Juego ----------
-  function empezar(nombre, escuela, curso, anio) {
-    const activas = QuizUtil.activas(banco, config, anio);
+  function empezar(nombre, escuela, curso, anio, materia = '') {
+    const activas = QuizUtil.activas(banco, config, anio, materia);
     const elegidas = Util.mezclar(activas).slice(0, Math.min(config.cantidad, activas.length));
     juego = {
-      nombre, escuela, curso, i: 0, inicio: Date.now(), fin: null, guardado: false,
+      nombre, escuela, curso, materia, i: 0, inicio: Date.now(), fin: null, guardado: false,
       preguntas: elegidas.map(p => ({ p, opciones: Util.mezclar(p.opciones.map((t, k) => ({ t, ok: k === p.correcta }))), elegida: null })),
     };
     clearInterval(reloj);
@@ -304,16 +331,18 @@ const Quiz = (function () {
             : '<p class="qz-perfecto">🎉 ¡No tuviste ningún error!</p>'}
         </div>
       </div>`;
-    raiz.querySelector('#qz-tabla').addEventListener('click', () => pantallaTabla({ escuela: juego.escuela, curso: juego.curso }));
+    raiz.querySelector('#qz-tabla').addEventListener('click', () => pantallaTabla({ escuela: juego.escuela, curso: juego.curso, materia: juego.materia }));
     raiz.querySelector('#qz-otra').addEventListener('click', () => pantallaInicio());
     if (juego.guardado) return;
     juego.guardado = true;
     const estado = raiz.querySelector('#qz-estado');
     try {
-      ultimoId = await QuizDatos.guardarResultado({ nombre: juego.nombre, escuela: juego.escuela, curso: juego.curso, correctas, total, tiempoMs });
-      const curso = QuizUtil.ordenar((await QuizDatos.leerResultados()).filter(r => r.escuela === juego.escuela && r.curso === juego.curso));
-      const puesto = curso.findIndex(r => r.id === ultimoId) + 1;
-      if (estado) estado.innerHTML = `✅ Resultado guardado.${puesto ? ` Estás en el puesto <b>#${puesto}</b> de ${curso.length} en ${esc(juego.curso)}.` : ''}`;
+      const r = { nombre: juego.nombre, escuela: juego.escuela, curso: juego.curso, correctas, total, tiempoMs };
+      if (juego.materia) r.materia = juego.materia;
+      ultimoId = await QuizDatos.guardarResultado(r);
+      const curso = QuizUtil.ordenar((await QuizDatos.leerResultados()).filter(x => x.escuela === juego.escuela && x.curso === juego.curso && (x.materia || '') === juego.materia));
+      const puesto = curso.findIndex(x => x.id === ultimoId) + 1;
+      if (estado) estado.innerHTML = `✅ Resultado guardado.${puesto ? ` Estás en el puesto <b>#${puesto}</b> de ${curso.length} en ${esc(juego.curso)}${juego.materia ? ` (${esc(QuizUtil.nombreMateria(juego.materia))})` : ''}.` : ''}`;
     } catch (e) {
       console.error(e);
       if (estado) { estado.textContent = '⚠️ No se pudo guardar el resultado. Revisá la conexión.'; estado.classList.add('mal'); }
@@ -333,13 +362,15 @@ const Quiz = (function () {
   async function pantallaTabla(grupo) {
     clearInterval(reloj);
     if (grupo) filtro = { ...grupo };
-    if (!filtro) filtro = { escuela: '', curso: '' };
+    if (!filtro) filtro = { escuela: '', curso: '', materia: '' };
+    filtro.materia = filtro.materia || '';
     raiz.querySelector('#qz-cont').innerHTML = `
       <div class="panel qz-tabla">
         <div class="qz-tabla-cab"><h2>🏆 Tabla de posiciones</h2>
           <div class="qz-filtros">
             <label class="qz-filtro">Escuela <select id="qz-f-escuela"></select></label>
             <label class="qz-filtro">Curso <select id="qz-f-curso"></select></label>
+            <label class="qz-filtro">Materia <select id="qz-f-materia"></select></label>
           </div></div>
         ${QuizUtil.avisoModo(modo)}
         <div id="qz-lista"><p class="qz-info">Cargando…</p></div>
@@ -352,9 +383,9 @@ const Quiz = (function () {
       raiz.querySelector('#qz-lista').innerHTML = '<p class="qz-aviso mal">⚠️ No se pudo cargar la tabla. Revisá la conexión.</p>';
       return;
     }
-    const selE = raiz.querySelector('#qz-f-escuela'), selC = raiz.querySelector('#qz-f-curso');
+    const selE = raiz.querySelector('#qz-f-escuela'), selC = raiz.querySelector('#qz-f-curso'), selM = raiz.querySelector('#qz-f-materia');
     if (!selE) return;
-    const opciones = (lista, valor, todas) => `<option value="">${todas}</option>` + lista.map(c => `<option value="${esc(c)}"${c === valor ? ' selected' : ''}>${esc(c)}</option>`).join('');
+    const opciones = (lista, valor, todas, nombre = c => c) => `<option value="">${todas}</option>` + lista.map(c => `<option value="${esc(c)}"${c === valor ? ' selected' : ''}>${esc(nombre(c))}</option>`).join('');
     const pintar = () => {
       const escuelas = [...new Set(todos.map(r => r.escuela).filter(Boolean))].sort();
       if (filtro.escuela && !escuelas.includes(filtro.escuela)) filtro.escuela = '';
@@ -363,7 +394,13 @@ const Quiz = (function () {
       if (filtro.curso && !cursos.includes(filtro.curso)) filtro.curso = '';
       selE.innerHTML = opciones(escuelas, filtro.escuela, 'Todas las escuelas');
       selC.innerHTML = opciones(cursos, filtro.curso, 'Todos los cursos');
-      const lista = filtro.curso ? deEscuela.filter(r => r.curso === filtro.curso) : deEscuela;
+      const deCurso = filtro.curso ? deEscuela.filter(r => r.curso === filtro.curso) : deEscuela;
+      const orden = [...Object.keys(QuizUtil.materias(banco || {})), QuizUtil.MEZCLA];
+      const materias = [...new Set(deCurso.map(r => r.materia).filter(Boolean))].sort((a, b) => (orden.indexOf(a) + 1 || 99) - (orden.indexOf(b) + 1 || 99) || a.localeCompare(b));
+      if (filtro.materia && !materias.includes(filtro.materia)) filtro.materia = '';
+      selM.innerHTML = opciones(materias, filtro.materia, 'Todas las materias', QuizUtil.nombreMateria);
+      selM.closest('label').hidden = !materias.length;
+      const lista = filtro.materia ? deCurso.filter(r => r.materia === filtro.materia) : deCurso;
       const medalla = i => ['🥇', '🥈', '🥉'][i] || `${i + 1}`;
       raiz.querySelector('#qz-lista').innerHTML = lista.length ? `<ol class="qz-ranking">${lista.map((r, i) => `
         <li class="${r.id === ultimoId ? 'yo' : ''}${i < 3 ? ' podio' : ''}">
@@ -373,8 +410,9 @@ const Quiz = (function () {
           <span class="qz-t">${QuizUtil.tiempo(r.tiempoMs)}</span></li>`).join('')}</ol>`
         : '<p class="qz-info">Todavía no hay resultados. ¡Sé el primero en jugar!</p>';
     };
-    selE.addEventListener('change', () => { filtro = { escuela: selE.value, curso: '' }; pintar(); });
+    selE.addEventListener('change', () => { filtro = { escuela: selE.value, curso: '', materia: filtro.materia }; pintar(); });
     selC.addEventListener('change', () => { filtro.curso = selC.value; pintar(); });
+    selM.addEventListener('change', () => { filtro.materia = selM.value; pintar(); });
     pintar();
   }
 
@@ -476,7 +514,7 @@ const QuizDocente = (function () {
     try { config = await QuizDatos.leerConfig(); } catch (e) { return mensaje('<p class="qz-aviso mal">⚠️ No se pudo leer la configuración.</p>'); }
     config.inactivas = [...new Set(config.inactivas || [])];
     config.temasPorAnio = config.temasPorAnio || {};
-    const temas = QuizUtil.temas(banco), ANIOS = [1, 2, 3, 4, 5, 6];
+    const temas = QuizUtil.temas(banco), ANIOS = [1, 2, 3, 4, 5, 6], grupos = QuizUtil.porMateria(banco);
     raiz.querySelector('#qd-cont').innerHTML = `
       ${QuizUtil.avisoModo(modo)}
       ${usuario ? `<p class="qd-usuario">👤 ${esc(usuario.email)} <button class="btn chico" id="qd-salir">Salir</button></p>` : ''}
@@ -497,15 +535,15 @@ const QuizDocente = (function () {
         <p class="qz-info">Marcá qué temas le aparecen a cada año (los alumnos eligen su año al entrar). Se guarda solo.</p>
         <div class="qd-matriz-caja"><table class="qd-matriz">
           <thead><tr><th>Tema</th>${ANIOS.map(a => `<th>${a}.º</th>`).join('')}</tr></thead>
-          <tbody>${temas.map((t, i) => `<tr><th>${esc(t)}</th>${ANIOS.map(a => `<td><input type="checkbox" data-anio="${a}" data-ti="${i}" aria-label="${esc(t)} en ${a}.º año"></td>`).join('')}</tr>`).join('')}
+          <tbody>${grupos.map(([m, idx]) => (m ? `<tr class="qd-materia"><th colspan="${ANIOS.length + 1}">${esc(m)}</th></tr>` : '') + idx.map(i => `<tr><th>${esc(temas[i])}</th>${ANIOS.map(a => `<td><input type="checkbox" data-anio="${a}" data-ti="${i}" aria-label="${esc(temas[i])} en ${a}.º año"></td>`).join('')}</tr>`).join('')).join('')}
             <tr class="qd-total"><th>Preguntas activas</th>${ANIOS.map(a => `<td data-total="${a}"></td>`).join('')}</tr></tbody>
         </table></div>
       </section>
       <section class="panel qd-preguntas">
         <div class="qd-cab"><h2>📚 Preguntas por tema</h2><span class="qd-estado" id="qd-estado"></span></div>
         <p class="qz-info">Los interruptores se guardan solos. Una pregunta apagada no aparece en el quiz.</p>
-        ${temas.map((t, i) => {
-          const ps = banco.preguntas.filter(p => p.tema === t);
+        ${grupos.map(([m, idx]) => (m ? `<h3 class="qd-materia-tit">${esc(m)}</h3>` : '') + idx.map(i => {
+          const t = temas[i], ps = banco.preguntas.filter(p => p.tema === t);
           return `<div class="qd-tema" data-tema="${i}">
             <div class="qd-tema-cab">
               <label class="qd-switch" title="Activar o desactivar todo el tema"><input type="checkbox" data-tema="${i}"><span></span></label>
@@ -514,7 +552,7 @@ const QuizDocente = (function () {
             <ul class="qd-lista" data-lista="${i}" hidden>${ps.map(p => `<li>
               <label class="qd-switch"><input type="checkbox" data-id="${esc(p.id)}"><span></span></label>
               <div><p>${esc(p.enunciado)}</p><small>✔ ${esc(p.opciones[p.correcta])}</small></div></li>`).join('')}</ul></div>`;
-        }).join('')}
+        }).join('')).join('')}
       </section>`;
     raiz.querySelector('#qd-salir')?.addEventListener('click', () => QuizDatos.salir());
     raiz.querySelectorAll('[data-abrir]').forEach(b => b.addEventListener('click', () => {

@@ -342,6 +342,155 @@ const QuizDibujos = (function () {
   };
 
   // Devuelve el SVG completo de una pregunta.
+  // ---------- Física ----------
+  const mejillas = (x, y, d) => `<circle cx="${x - d}" cy="${y}" r="3.5" fill="#ff8fab" opacity="0.5"/><circle cx="${x + d}" cy="${y}" r="3.5" fill="#ff8fab" opacity="0.5"/>`;
+  // Brazo con manga del color de la remera, desde el hombro derecho hasta (dx, dy).
+  const brazoC = (dx, dy, c = '#ff922b') => `<path d="M14,-66 Q${(14 + dx) / 2 + 6},${(-66 + dy) / 2 - 4} ${dx},${dy}" stroke="${tono(c, -0.15)}" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="${dx}" cy="${dy}" r="6" fill="#f2c094"/>`;
+  const chico = (x, { color = '#ff922b', pelo = '#3d2614', brazo = '', animo = 'feliz', k = 0.8, y = PISO } = {}) => `<g transform="translate(${x} ${y}) scale(${k})">${sombra(2, 2, 24)}
+      <rect x="-11" y="-30" width="9" height="30" rx="4" fill="#364fc7"/><rect x="2" y="-30" width="9" height="30" rx="4" fill="#364fc7"/>
+      ${dt('<rect x="-20" y="-78" width="40" height="52" rx="14" fill="FILL"/>', color, tono(color, -0.2), { x: 7 })}
+      ${brazo}
+      <g transform="translate(0 -98)">${dt('<circle r="20" fill="FILL"/>', '#f2c094', '#d9a273', { x: 7 })}
+        <path d="M-21,-2 C-24,-24 24,-26 21,-2 C14,-14 -14,-14 -21,-2 Z" fill="${pelo}"/>
+        ${cara(0, 2, 4, animo)}${mejillas(0, 8, 12)}</g></g>`;
+  const regla = (x, y, L, n = 10) => `<g transform="translate(${x} ${y})">${sombra(L / 2, 26, L * 0.5)}${dt(`<rect width="${L}" height="22" rx="3" fill="FILL"/>`, '#ffd43b', '#f0a830', { y: 15 })}
+      ${Array.from({ length: n * 2 + 1 }, (_, i) => `<path d="M${6 + i * (L - 12) / (n * 2)},0 v${i % 2 ? 5 : 9}" stroke="#7a5a12" stroke-width="1.5"/>`).join('')}${brillo(`M6,17 H${L - 6}`, 2)}</g>`;
+  const cronometro = (x, y, r = 30) => `<g transform="translate(${x} ${y})">${sombra(0, r + 4, r * 0.9)}
+      <rect x="-6" y="${-r - 12}" width="12" height="10" rx="2" fill="#f0a830"/><rect x="-10" y="${-r - 16}" width="20" height="7" rx="3" fill="#ffd166"/>
+      ${dt(`<circle r="${r}" fill="FILL"/>`, '#ffd166', '#f0a830', { x: r * 0.25 })}<circle r="${r * 0.78}" fill="#fff8e1"/>
+      ${Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="${-r * 0.7}" x2="0" y2="${i % 3 ? -r * 0.62 : -r * 0.55}" stroke="#c98a00" stroke-width="2" transform="rotate(${i * 30})"/>`).join('')}
+      <line x1="0" y1="0" x2="0" y2="${-r * 0.6}" stroke="#e8590c" stroke-width="3" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite"/></line>
+      <circle r="3" fill="#e8590c"/></g>`;
+  const termometro = (x, h = 92, f = 0.62) => `<g transform="translate(${x} ${PISO - 14})">${sombra(2, 15, 16)}
+      <rect x="-9" y="${-h}" width="18" height="${h}" rx="9" fill="#e7f5ff"/><rect x="-4" y="${-h * f}" width="8" height="${h * f}" fill="#ff6b6b"/>
+      <circle r="13" fill="#ff6b6b"/><circle r="13" fill="none" stroke="#e7f5ff" stroke-width="3"/>
+      ${[0.25, 0.4, 0.55, 0.7, 0.85].map(k => `<path d="M9,${-h * k} h-5" stroke="#868e96" stroke-width="1.5"/>`).join('')}${brillo(`M-4,${-h + 10} V-20`, 2)}</g>`;
+  const planeta = (x, y, r, c1, c2, extra = '', animo = 'feliz') => `<g transform="translate(${x} ${y})">${dt(`<circle r="${r}" fill="FILL"/>`, c1, c2, { x: r * 0.3, extra })}
+      ${brillo(`M${-r * 0.7},${-r * 0.25} a${r * 0.75},${r * 0.75} 0 0 1 ${r * 0.45},${-r * 0.45}`, 3)}${cara(0, r * 0.1, Math.max(2.4, r * 0.09), animo)}</g>`;
+  const tierra = (x, y, r) => planeta(x, y, r, '#4dabf7', '#1c7ed6', `<path d="M${-r},${-r * 0.5} C${-r * 0.5},${-r * 0.9} ${-r * 0.1},${-r * 0.7} ${-r * 0.2},${-r * 0.35} C${-r * 0.3},${-r * 0.1} ${-r * 0.8},0 ${-r},${-r * 0.1} Z M${r * 0.2},${r * 0.45} C${r * 0.5},${r * 0.2} ${r},${r * 0.3} ${r},${r * 0.6} C${r * 0.7},${r} ${r * 0.2},${r} ${r * 0.2},${r * 0.45} Z M${r * 0.3},${-r * 0.8} C${r * 0.6},${-r * 0.9} ${r * 0.9},${-r * 0.5} ${r * 0.6},${-r * 0.3} C${r * 0.4},${-r * 0.2} ${r * 0.2},${-r * 0.5} ${r * 0.3},${-r * 0.8} Z" fill="#51cf66" opacity="0.9"/>`);
+  const luna = (x, y, r) => planeta(x, y, r, '#e9ecef', '#adb5bd', [[-0.45, -0.45, 0.16], [0.5, -0.2, 0.12], [-0.5, 0.45, 0.1], [0.4, 0.55, 0.18]].map(([a, b, c]) => `<circle cx="${a * r}" cy="${b * r}" r="${c * r}" fill="#ced4da"/>`).join(''));
+  const astronauta = (x, y, k = 1, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${k})">
+      <rect x="-28" y="-18" width="16" height="34" rx="5" fill="#adb5bd"/>
+      <rect x="-16" y="12" width="13" height="26" rx="6" fill="#e9ecef"/><rect x="3" y="12" width="13" height="26" rx="6" fill="#ced4da"/>
+      <path d="M-14,-10 L-30,8 M14,-10 L30,-6" stroke="#dee2e6" stroke-width="10" stroke-linecap="round"/>
+      ${dt('<rect x="-19" y="-22" width="38" height="42" rx="12" fill="FILL"/>', '#f8f9fa', '#ced4da', { x: 7 })}
+      <rect x="-9" y="-6" width="18" height="11" rx="2" fill="#4dabf7"/><circle cx="-4" cy="0" r="2" fill="#ff6b6b"/><circle cx="3" cy="0" r="2" fill="#51cf66"/>
+      ${dt('<circle cy="-40" r="21" fill="FILL"/>', '#f8f9fa', '#ced4da', { x: 7 })}
+      <rect x="-15" y="-51" width="30" height="22" rx="10" fill="#1c3d6e"/>${cara(0, -42, 2.8, 'feliz')}${brillo('M-11,-48 q5,-3 10,-1', 2)}</g>`;
+  // Dinamómetro colgado de un soporte: el resorte se estira «estiro» px y del gancho cuelga «carga» (dibujada con el origen en el gancho).
+  const dinamometro = (x, estiro = 20, carga = '') => `<g transform="translate(${x} 0)">
+      <rect x="-46" y="8" width="92" height="9" rx="3" fill="#a0703d"/><path d="M0,17 v8" stroke="#adb5bd" stroke-width="3"/>
+      <path d="M0,28 ${Array.from({ length: 8 }, (_, i) => `L${i % 2 ? -7 : 7},${32 + i * (34 + estiro) / 8}`).join(' ')} L0,${66 + estiro}" stroke="#868e96" stroke-width="2.5" fill="none"/>
+      <rect x="-12" y="24" width="24" height="58" rx="5" fill="#e7f5ff" opacity="0.35" stroke="#e7f5ff" stroke-width="2.5"/>
+      ${[0, 1, 2, 3, 4].map(i => `<path d="M12,${32 + i * 11} h-5" stroke="#e7f5ff" stroke-width="1.5"/>`).join('')}
+      <rect x="-2" y="${66 + estiro}" width="4" height="16" fill="#adb5bd"/>
+      <path d="M0,${82 + estiro} q8,2 6,9 q-3,6 -9,2" stroke="#adb5bd" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <g transform="translate(0 ${92 + estiro})">${carga}</g></g>`;
+  const mochila = (k = 1) => `<g transform="scale(${k})"><path d="M-10,0 q10,-10 20,0" stroke="#c92a2a" stroke-width="4" fill="none"/>
+      ${dt('<rect x="-22" y="0" width="44" height="46" rx="12" fill="FILL"/>', '#ff6b6b', '#e03131', { x: 8 })}<rect x="-14" y="22" width="28" height="18" rx="5" fill="#c92a2a"/>${cara(0, 12, 2.6, 'feliz')}</g>`;
+  const caja = (x, y, w, h, d, c, etq = {}) => `${sombra(x + w / 2 + d / 2, y + h + 2, (w + d) * 0.55)}
+      <path d="M${x},${y} l${d},${-d} h${w} l${-d},${d} Z" fill="${tono(c, 0.28)}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>
+      <path d="M${x + w},${y} l${d},${-d} v${h} l${-d},${d} Z" fill="${tono(c, -0.25)}"/>
+      <path d="M${x},${y} l${d},${-d} h${w} v${h} l${-d},${d} h${-w} Z M${x},${y} h${w} l${d},${-d} M${x + w},${y} v${h}" stroke="#e7f5ff" stroke-width="2" fill="none" stroke-linejoin="round" opacity="0.8"/>
+      ${etq.largo ? texto(x + w / 2, y + h + 17, etq.largo, 14, '#ffd166', 'font-weight="800"') : ''}
+      ${etq.alto ? texto(x - 22, y + h / 2 + 5, etq.alto, 14, '#ffd166', 'font-weight="800"') : ''}
+      ${etq.ancho ? texto(x + w + d / 2 + 30, y - d / 2 - 6, etq.ancho, 14, '#ffd166', 'font-weight="800"') : ''}`;
+  function velocimetro(x, y, r = 50) {
+    const p = (a, rr) => `${(rr * Math.cos(a * Math.PI / 180)).toFixed(1)},${(-rr * Math.sin(a * Math.PI / 180)).toFixed(1)}`;
+    const arco = (a1, a2, c) => `<path d="M${p(a1, r * 0.8)} A${r * 0.8},${r * 0.8} 0 0 1 ${p(a2, r * 0.8)}" stroke="${c}" stroke-width="7" fill="none"/>`;
+    return `<g transform="translate(${x} ${y})">${sombra(0, 8, r)}
+      ${dt(`<path d="M${-r},6 A${r},${r} 0 0 1 ${r},6 Z" fill="FILL"/>`, '#343a40', '#212529', { x: r * 0.3 })}
+      ${arco(180, 90, '#51cf66')}${arco(90, 36, '#ffd43b')}${arco(36, 0, '#ff6b6b')}
+      ${Array.from({ length: 9 }, (_, i) => `<path d="M${p(180 - i * 22.5, r * 0.62)} L${p(180 - i * 22.5, r * 0.7)}" stroke="#e7f5ff" stroke-width="2"/>`).join('')}
+      ${texto(0, -r * 0.28, 'km/h', 11, '#c9ccf5', 'font-weight="800"')}
+      <line x1="0" y1="0" x2="0" y2="${-r * 0.7}" stroke="#ff922b" stroke-width="4" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" values="-60;40;10;55;-60" dur="5s" repeatCount="indefinite"/></line>
+      <circle r="6" fill="#ff922b"/></g>`;
+  }
+  // Probeta graduada (0 a 200 mL) con el agua hasta «ml»; «piedra» la dibuja en el fondo.
+  function probetaP(x, ml, piedra = false, marcas = []) {
+    const base = PISO - 8, k = 0.5, top = base - 112, yN = base - ml * k;
+    return `${sombra(x + 3, PISO + 2, 32)}<rect x="${x - 26}" y="${PISO - 8}" width="52" height="8" rx="3" fill="#a5d8ff" opacity="0.7"/>
+      <rect x="${x - 16}" y="${top}" width="32" height="${base - top}" rx="4" fill="#dbe4ff" opacity="0.12"/>
+      ${dt(`<rect x="${x - 14}" y="${yN}" width="28" height="${base - yN}" fill="FILL"/>`, '#74c0fc', '#4dabf7', { x: x + 5 })}<rect x="${x - 14}" y="${yN}" width="28" height="3" fill="#d0ebff"/>
+      ${piedra ? `<g>${dt(`<path d="M${x - 11},${base} C${x - 14},${base - 14} ${x - 4},${base - 22} ${x + 4},${base - 20} C${x + 14},${base - 18} ${x + 13},${base - 4} ${x + 10},${base} Z" fill="FILL"/>`, '#868e96', '#5c636a', { x: x + 3 })}${cara(x, base - 10, 2.2, 'oh')}</g>` : ''}
+      ${Array.from({ length: 10 }, (_, i) => `<path d="M${x + 16},${base - (i + 1) * 20 * k} h${i % 5 === 4 ? -10 : -6}" stroke="#e7f5ff" stroke-width="1.5"/>`).join('')}
+      <path d="M${x - 20},${top} H${x - 16} V${base} M${x + 16},${base} V${top}" stroke="#e7f5ff" stroke-width="3" fill="none"/>
+      ${brillo(`M${x - 10},${top + 8} V${base - 12}`, 2.5)}
+      ${marcas.map(([v, t]) => `<path d="M${x + 18},${base - v * k} H${x + 34}" stroke="#ffd166" stroke-width="1.5" stroke-dasharray="3 2"/>${texto(x + 60, base - v * k + 4, t, 13, '#ffd166', 'font-weight="800"')}`).join('')}`;
+  }
+  const arbolManzanas = (x, cae = true) => `<g transform="translate(${x} ${PISO})">${sombra(4, 2, 50)}
+      ${dt('<path d="M-10,0 L-7,-52 H7 L10,0 Z" fill="FILL"/>', '#a0703d', '#7a4a2a', { x: 2 })}
+      ${dt('<path d="M-56,-70 C-66,-96 -40,-122 -14,-116 C-4,-136 30,-136 40,-114 C64,-110 70,-80 54,-64 C50,-46 20,-44 6,-52 C-10,-42 -48,-46 -56,-70 Z" fill="FILL"/>', '#51cf66', '#2f9e44', { x: 14 })}
+      ${[[-34, -84], [10, -104], [34, -76], [-8, -70]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="7" fill="#ff6b6b"/><circle cx="${a - 2}" cy="${b - 2}" r="2" fill="#fff" opacity="0.6"/>`).join('')}
+      ${cae ? `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 42;0 42" keyTimes="0;0.55;1" dur="2.4s" repeatCount="indefinite"/><circle cx="46" cy="-48" r="8" fill="#ff6b6b"/><path d="M46,-56 v-5" stroke="#7a4a2a" stroke-width="2"/><circle cx="44" cy="-50" r="2" fill="#fff" opacity="0.6"/></g>` : ''}</g>`;
+  const rayo = (x, y) => `${nube(x, y, 1.3, '#868e96', '#5c636a')}<path d="M${x - 4},${y + 14} l-12,26 h12 l-8,24 l24,-32 h-12 l10,-18 Z" fill="#ffe066" class="qzd-pulsa"/>`;
+  const lupa = (x, y, r = 30) => `<g transform="translate(${x} ${y})"><path d="M${r * 0.7},${r * 0.7} L${r * 1.6},${r * 1.6}" stroke="#7a4a2a" stroke-width="11" stroke-linecap="round"/>
+      <circle r="${r}" fill="#a5d8ff" opacity="0.35"/><circle r="${r}" fill="none" stroke="#adb5bd" stroke-width="7"/>${brillo(`M${-r * 0.55},${-r * 0.2} a${r * 0.6},${r * 0.6} 0 0 1 ${r * 0.35},${-r * 0.35}`, 3)}${cara(0, 0, r * 0.13, 'feliz')}</g>`;
+  const mano = (x, y, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-10,0 V-14 M-4,0 V-20 M2,0 V-20 M8,0 V-15 M-13,4 L-20,-4" stroke="#f2c094" stroke-width="5" stroke-linecap="round"/><rect x="-14" y="-4" width="26" height="18" rx="7" fill="#f2c094"/><path d="M-12,10 h22" stroke="#d9a273" stroke-width="2"/></g>`;
+
+  Object.assign(TEMAS, {
+    'La física y el método científico': () => `${mesada()}${arbolManzanas(110)}${lupa(290, 70, 34)}${rayo(480, 46)}
+      ${[0, 1, 2].map(i => `<path d="M${430 + i * 30},${PISO + 2} q4,-4 8,0" stroke="#74c0fc" stroke-width="2" fill="none" class="qzd-burbuja" style="animation-delay:${i * 0.3}s"/>`).join('')}`,
+    'Magnitudes y unidades': () => `${mesada()}${regla(50, PISO - 26, 170)}${cronometro(290, 82, 36)}${termometro(392)}${balanza(500, `<rect x="${478}" y="${PISO - 56}" width="44" height="26" rx="5" fill="#ffa94d"/>${cara(500, PISO - 46, 2.6, 'feliz')}`)}`,
+    'Masa y peso': () => `${tierra(130, 92, 58)}${luna(480, 80, 32)}<g class="qzd-flota">${astronauta(305, 98, 0.95, -12)}</g>
+      <path d="M200,92 q100,-60 240,-22" stroke="#c9ccf5" stroke-width="2" stroke-dasharray="5 6" fill="none" opacity="0.6"/>`,
+    'Magnitudes derivadas, área y volumen': () => `${mesada()}${caja(70, 70, 70, 70, 30, '#b197fc')}${velocimetro(310, 112, 58)}${probetaP(480, 110, true)}`,
+  });
+  Object.assign(DIBUJOS, {
+    'tele': () => `${mesada()}<g transform="translate(250 ${PISO})">${sombra(4, 2, 80)}<rect x="-70" y="-8" width="140" height="8" rx="3" fill="#7a4a2a"/>
+        <rect x="-10" y="-22" width="20" height="14" fill="#495057"/>${dt('<rect x="-74" y="-118" width="148" height="98" rx="10" fill="FILL"/>', '#495057', '#343a40', { x: 40 })}
+        <rect x="-64" y="-108" width="128" height="78" rx="6" fill="#5f6b94"/>${cara(0, -74, 5, 'triste')}${brillo('M-56,-100 h26', 2.5)}
+        <path d="M60,-14 C90,-4 110,6 150,4" stroke="#212529" stroke-width="4" fill="none"/><rect x="150" y="-2" width="16" height="11" rx="2" fill="#343a40"/><path d="M166,0 h7 M166,6 h7" stroke="#adb5bd" stroke-width="2"/></g>
+        <rect x="455" y="${PISO - 60}" width="26" height="36" rx="4" fill="#f8f9fa"/><circle cx="462" cy="${PISO - 42}" r="2.5" fill="#495057"/><circle cx="474" cy="${PISO - 42}" r="2.5" fill="#495057"/>
+        ${chico(530, { color: '#4dabf7', animo: 'oh' })}<circle cx="560" cy="34" r="14" fill="#fff"/>${texto(560, 41, '?', 20, '#12143a', 'font-weight="900"')}`,
+    'manzana': () => `${mesada()}${arbolManzanas(250)}${chico(330, { color: '#845ef7', pelo: '#e9ecef', animo: 'oh' })}`,
+    'pila': () => `${mesada()}<g transform="translate(300 ${PISO})">${sombra(4, 2, 56)}
+        ${dt('<rect x="-50" y="-80" width="100" height="80" rx="6" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 16 })}<rect x="-8" y="-80" width="16" height="80" fill="#ffd43b"/>
+        ${dt('<rect x="-56" y="-98" width="112" height="22" rx="5" fill="FILL"/>', '#ff8fab', '#e0607f', { x: 18 })}<rect x="-8" y="-98" width="16" height="22" fill="#ffd43b"/>
+        <path d="M0,-98 C-20,-122 -40,-110 -24,-100 M0,-98 C20,-122 40,-110 24,-100" stroke="#ffd43b" stroke-width="6" fill="none" stroke-linecap="round"/>
+        ${texto(-28, -30, '?', 34, '#fff', 'font-weight="900"')}${texto(30, -30, '?', 34, '#fff', 'font-weight="900"')}</g>
+        ${[[180, 50], [420, 46], [200, 104], [410, 100]].map(([a, b], i) => `<path d="M${a},${b} l-8,14 h8 l-6,14 l16,-20 h-8 l6,-8 Z" fill="#ffe066" class="qzd-pulsa" style="animation-delay:${i * 0.4}s"/>`).join('')}`,
+    'mano-banco': () => `${mesada()}<g transform="translate(0 0)">${sombra(300, PISO + 2, 170)}
+        ${dt(`<rect x="130" y="${PISO - 62}" width="340" height="16" rx="4" fill="FILL"/>`, '#e8a65d', '#c97b33', { y: PISO - 52 })}
+        <rect x="150" y="${PISO - 46}" width="12" height="46" fill="#a0612a"/><rect x="438" y="${PISO - 46}" width="12" height="46" fill="#a0612a"/>
+        ${[0, 1, 2, 3].map(i => `${mano(164 + i * 44, PISO - 66, 1.2)}${texto(164 + i * 44, PISO - 98, i + 1, 13, '#ffd166', 'font-weight="800"')}`).join('')}
+        ${texto(380, PISO - 92, '…', 24, '#ffd166', 'font-weight="900"')}${texto(430, PISO - 92, '?', 22, '#ffd166', 'font-weight="900"')}</g>`,
+    'avion': () => `${nube(110, 120, 1.1, '#dbe4ff', '#a5b4fc')}${nube(500, 40, 0.9, '#dbe4ff', '#a5b4fc')}<g class="qzd-flota"><g transform="translate(300 86)">
+        <path d="M-20,-4 L-60,-54 H-40 L20,-4 Z" fill="#a5b4fc"/><path d="M-90,-8 L-104,-40 H-90 L-70,-8 Z" fill="#5c7cfa"/>
+        ${dt('<path d="M-104,-8 H90 C120,-8 124,20 96,20 H-96 C-110,20 -110,-8 -104,-8 Z" fill="FILL"/>', '#f8f9fa', '#ced4da', { y: 8 })}
+        ${[-60, -40, -20, 0, 20, 40].map(dx => `<circle cx="${dx}" cy="2" r="4" fill="#4dabf7"/>`).join('')}
+        <path d="M-20,10 L-50,46 H-30 L20,10 Z" fill="#5c7cfa"/>${cara(84, 2, 3.2, 'feliz')}${brillo('M-90,-3 H60', 2.5)}</g></g>`,
+    'altura': () => `${mesada()}<g transform="translate(330 ${PISO})"><rect x="0" y="-130" width="26" height="130" fill="#fff3bf"/>
+        ${Array.from({ length: 16 }, (_, i) => `<path d="M0,${-i * 8} h${i % 5 ? 7 : 13}" stroke="#7a5a12" stroke-width="1.5"/>`).join('')}</g>
+        ${chico(290, { color: '#f783ac', pelo: '#7a4a2a', k: 0.94 })}<path d="M262,${PISO - 112} H338" stroke="#ffd166" stroke-width="2.5"/>${texto(410, PISO - 107, '140 cm', 15, '#ffd166', 'font-weight="800"')}`,
+    'instrumentos': () => `${mesada()}${balanza(190, `<rect x="168" y="${PISO - 58}" width="44" height="28" rx="5" fill="#ffa94d"/>${cara(190, PISO - 47, 2.6, 'feliz')}`)}
+        ${dinamometro(410, 16, `${dt('<circle cy="16" r="16" fill="FILL"/>', '#ff6b6b', '#e03131', { x: 5 })}<path d="M0,0 v-2" stroke="#2f9e44" stroke-width="3"/>${cara(0, 16, 2.4, 'feliz')}`)}`,
+    'astronauta': () => `${tierra(110, 120, 70)}${luna(500, 60, 36)}<g class="qzd-flota">${astronauta(320, 86, 1.1, 10)}</g>`,
+    'mochila': () => `${planeta(150, 86, 56, '#ff922b', '#e8590c', `<path d="M-60,-10 h120 M-60,14 h120" stroke="#ffc078" stroke-width="7"/>`)}${texto(150, 164, 'g = 12 m/s²', 13, '#ffd166', 'font-weight="800"')}
+        ${dinamometro(390, 34, mochila(0.95))}`,
+    'velocimetro': () => `<rect y="${PISO - 6}" width="${W}" height="${H - PISO + 6}" fill="#343a40"/>${velocimetro(300, 120, 82)}`,
+    'bici': () => `<rect y="${PISO}" width="${W}" height="${H - PISO}" fill="#343a40"/><path d="M0,${PISO + 14} H${W}" stroke="#ffd43b" stroke-width="3" stroke-dasharray="24 18"/>
+        ${[[40, '0 km'], [560, '30 km']].map(([a, t]) => `<path d="M${a},${PISO} V${PISO - 70}" stroke="#adb5bd" stroke-width="3"/><path d="M${a},${PISO - 70} h30 l-6,9 6,9 h-30 Z" fill="#ff6b6b"/>${texto(a, PISO - 78, t, 13, '#ffd166', 'font-weight="800"')}`).join('')}
+        <g transform="translate(300 ${PISO - 22})">${[-40, 40].map(dx => `<g transform="translate(${dx} 0)"><circle r="21" fill="none" stroke="#e9ecef" stroke-width="4"/><g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="1.2s" repeatCount="indefinite"/>${[0, 60, 120].map(a => `<line x1="-20" y1="0" x2="20" y2="0" stroke="#adb5bd" stroke-width="1.5" transform="rotate(${a})"/>`).join('')}</g></g>`).join('')}
+          <path d="M-40,0 L-10,0 L20,-34 L-18,-34 Z M-10,0 L-22,-46 M40,0 L22,-46 M14,-46 H30" stroke="#ff6b6b" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M-30,-48 h16" stroke="#343a40" stroke-width="6" stroke-linecap="round"/>
+          <path d="M-20,-50 L0,-82 M-4,-74 L24,-48" stroke="#4dabf7" stroke-width="10" stroke-linecap="round"/><path d="M-20,-50 L-6,-18" stroke="#364fc7" stroke-width="8" stroke-linecap="round"/>
+          <g transform="translate(6 -96)">${dt('<circle r="15" fill="FILL"/>', '#f2c094', '#d9a273', { x: 5 })}<path d="M-17,-2 C-18,-22 18,-22 17,-2 Z" fill="#ffd43b"/>${cara(4, 3, 3, 'feliz')}</g></g>
+        ${cronometro(470, 50, 22)}${texto(470, 96, '2 h', 13, '#ffd166', 'font-weight="800"')}`,
+    'probeta-piedra': () => `${mesada()}${probetaP(200, 120, false, [[120, '120 mL']])}<path d="M290,80 h40" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/><path d="M330,72 l10,8 -10,8" fill="#ffd166"/>${probetaP(400, 180, true, [[180, '180 mL']])}`,
+    'piscina': () => `<rect y="${PISO - 10}" width="${W}" height="${H - PISO + 10}" fill="#2f9e44"/>${caja(200, 60, 200, 50, 46, '#4dabf7', { largo: '10 m', alto: '2 m', ancho: '5 m' })}
+        ${[0, 1, 2].map(i => `<path d="M${226 + i * 50 + 23},${36} q8,-5 16,0 t16,0" stroke="#e7f5ff" stroke-width="2" fill="none" class="qzd-fluye"/>`).join('')}`,
+    'terreno': () => `<g transform="translate(160 22)"><rect width="280" height="120" rx="4" fill="#51cf66"/><rect width="280" height="120" rx="4" fill="none" stroke="#a0703d" stroke-width="4" stroke-dasharray="10 6"/>
+        <g transform="translate(70 60)">${dt('<rect x="-26" y="-14" width="52" height="34" fill="FILL"/>', '#ffe8cc', '#ffd8a8', { x: 8 })}<path d="M-32,-14 L0,-38 L32,-14 Z" fill="#e8590c"/><rect x="-6" y="4" width="12" height="16" fill="#7a4a2a"/></g>
+        ${Arte.pino(220, 84, 56)}${Arte.pino(250, 108, 50)}</g>${texto(300, 162, '50 m', 15, '#ffd166', 'font-weight="800"')}${texto(124, 88, '30 m', 15, '#ffd166', 'font-weight="800"')}`,
+    'carton-leche': () => `${mesada()}<g transform="translate(300 ${PISO})">${sombra(4, 2, 40)}
+        ${dt('<path d="M-34,0 V-90 L-24,-112 H24 L34,-90 V0 Z" fill="FILL"/>', '#f8f9fa', '#dee2e6', { x: 12 })}<path d="M-34,-90 H34" stroke="#ced4da" stroke-width="2"/>
+        <rect x="-24" y="-122" width="48" height="10" fill="#e9ecef"/><rect x="-34" y="-60" width="68" height="34" fill="#4dabf7"/>
+        ${texto(0, -40, 'LECHE', 13, '#fff', 'font-weight="900"')}${texto(0, -12, '1 L', 13, '#1c7ed6', 'font-weight="900"')}${cara(0, -78, 3.6, 'feliz')}</g>`,
+    'tanque': () => `${mesada()}${caja(230, 40, 100, 100, 40, '#74c0fc', { largo: '3 m', alto: '3 m', ancho: '3 m' })}<rect x="325" y="${PISO - 26}" width="26" height="8" rx="2" fill="#adb5bd"/><circle cx="350" cy="${PISO - 12}" r="3" fill="#74c0fc" class="qzd-cae"/>${cara(280, 90, 4, 'feliz')}`,
+  });
+
   function svg(p) {
     const id = 'qzd' + (n++);
     const dibujo = (p.imagen && DIBUJOS[p.imagen]) || TEMAS[p.tema];
