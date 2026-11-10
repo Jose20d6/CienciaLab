@@ -26,6 +26,8 @@
       g.querySelector('.grupo-btn').classList.toggle('activo', !!actual);
       g.querySelector('.grupo-actual').textContent = actual ? '· ' + actual.textContent.replace(/^\S+\s/, '') : '';
     });
+    // El quiz tiene su propio botón en la barra (el panel docente también lo marca).
+    document.querySelectorAll('.nav-solo').forEach(b => b.classList.toggle('activo', b.dataset.go === id || (id === 'docente' && b.dataset.go === 'quiz')));
     cerrarMenus();
     if (modulos[id] && !iniciados[id]) {
       modulos[id].iniciar(document.getElementById(id));
@@ -42,7 +44,7 @@
       g.querySelector('.grupo-btn').setAttribute('aria-expanded', 'false');
     });
   }
-  document.querySelectorAll('.grupo-btn').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.grupo .grupo-btn').forEach(btn => btn.addEventListener('click', () => {
     const g = btn.parentElement, menu = g.querySelector('.grupo-menu');
     cerrarMenus(g);
     menu.hidden = !menu.hidden;

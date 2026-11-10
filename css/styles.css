@@ -1586,7 +1586,7 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
   .topbar { flex-wrap: wrap; }
   .tabs { order: 3; flex-basis: 100%; }
   #btn-tema { margin-left: auto; }
-  .tabs .grupo { flex: 1; }
+  .tabs .grupo, .tabs .nav-solo { flex: 1; }
   .grupo-btn { width: 100%; justify-content: center; padding: 0.45rem 0.4rem; font-size: 0.86rem; gap: 0.2rem; }
   .tabs { gap: 0.2rem; }
   .tabs .grupo { min-width: 0; }
@@ -1846,3 +1846,6 @@ html.proyector .tp-celda .nom { font-size: 0.42rem; }
 .qzd-fluye { animation: qzd-fluye 6s linear infinite alternate; }
 @keyframes qzd-fluye { from { transform: translateX(-12px); } to { transform: translateX(12px); } }
 @media (prefers-reduced-motion: reduce) { .qzd-fluye { animation: none; } }
+
+/* Quiz en la barra y en el inicio */
+.tarjeta-quiz { background: linear-gradient(135deg, var(--panel), var(--primario-suave)); border-color: var(--primario); }
